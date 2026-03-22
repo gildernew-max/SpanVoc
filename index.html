@@ -18,11 +18,7 @@ a{color:inherit;text-decoration:none}
 
 .page{max-width:820px;margin:0 auto;padding:1.5rem 1rem}
 
-.hero{max-width:820px;margin:0 auto;padding:2rem 1rem 1.5rem;border-bottom:1px solid var(--bdr)}
-.hero-label{font-family:monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--a0);margin-bottom:10px}
-.hero-title{font-family:monospace;font-size:clamp(26px,6vw,40px);font-weight:700;letter-spacing:2px;line-height:1}
-.hero-title span{color:var(--a0)}
-.hero-sub{margin-top:8px;font-size:13px;color:var(--mut)}
+
 
 .btn{background:transparent;border:1px solid var(--bdr);border-radius:4px;padding:8px 16px;font-size:13px;color:var(--txt)}
 .btn-pri{background:rgba(79,195,247,0.1);border:1px solid var(--a1);border-radius:4px;padding:10px 20px;font-size:14px;color:var(--a1);font-weight:500}
@@ -103,11 +99,18 @@ let picks = {};
 let checked = {};
 
 async function callClaude(messages, system){
+  if(!API_KEY){ showSetup('No API key found. Please enter your key.'); throw new Error('No API key'); }
   const res = await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'content-type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:MODEL,max_tokens:4000,system,messages})
   });
+  if(res.status===401){
+    localStorage.removeItem('ltt-apikey');
+    API_KEY='';
+    showSetup('❌ Invalid API key — please re-enter a valid key from console.anthropic.com');
+    throw new Error('Invalid API key');
+  }
   if(!res.ok) throw new Error(`API ${res.status}: ${(await res.text()).slice(0,200)}`);
   const j = await res.json();
   return j.content.filter(b=>b.type==='text').map(b=>b.text).join('');
@@ -513,7 +516,7 @@ function buildNotionText(s){
 // ── INIT ──────────────────────────────────────────────────────────────────────
 if(!API_KEY) showSetup(); else showHome();
 
-function showSetup(){
+function showSetup(errorMsg=''){
   render(`
     <div style="max-width:480px;margin:3rem auto">
       <div class="mono-label" style="color:var(--a0);margin-bottom:10px">One-time setup</div>
@@ -522,15 +525,20 @@ function showSetup(){
         This app needs an Anthropic API key to generate study materials.<br>
         Your key is saved <strong style="color:var(--txt)">only on this device</strong> — it never appears in the code or on GitHub.
       </p>
+      ${errorMsg?`<div style="background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.3);border-radius:4px;padding:10px 14px;font-size:13px;color:var(--a4);margin-bottom:14px">${errorMsg}</div>`:''}
       <div style="margin-bottom:8px">
         <div class="mono-label" style="margin-bottom:6px">Anthropic API Key</div>
-        <input id="key-input" type="password" placeholder="sk-ant-..." style="width:100%;padding:10px 14px;font-size:13px;border-radius:4px;border:1px solid var(--bdr);background:var(--surf);color:var(--txt);outline:none;font-family:monospace"/>
+        <input id="key-input" type="password" placeholder="sk-ant-api03-..." style="width:100%;padding:10px 14px;font-size:13px;border-radius:4px;border:1px solid var(--bdr);background:var(--surf);color:var(--txt);outline:none;font-family:monospace"/>
       </div>
-      <p style="font-size:11px;color:var(--mut);margin-bottom:16px">
-        Get your key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--a1)">console.anthropic.com</a> → API Keys → Create Key
-      </p>
-      <button class="btn btn-pri" onclick="saveKey()">Save & Continue</button>
-      <div id="key-err" class="status-err" style="margin-top:8px"></div>
+      <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.2);border-radius:4px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--soft);line-height:1.7">
+        <strong style="color:var(--a1)">How to get your key:</strong><br>
+        1. Go to <a href="https://console.anthropic.com" target="_blank" style="color:var(--a1)">console.anthropic.com</a><br>
+        2. Click <strong style="color:var(--txt)">API Keys</strong> in the left sidebar<br>
+        3. Click <strong style="color:var(--txt)">Create Key</strong> — copy it immediately<br>
+        4. Paste it above — it starts with <code style="color:var(--a0)">sk-ant-api03-</code>
+      </div>
+      <button class="btn btn-pri" onclick="saveKey()" style="width:100%;padding:12px">Save & Continue</button>
+      <div id="key-err" class="status-err" style="margin-top:8px;text-align:center"></div>
     </div>
   `);
 }
