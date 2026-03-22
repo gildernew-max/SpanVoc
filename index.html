@@ -72,7 +72,7 @@ ul.bullets li::before{content:'→';position:absolute;left:0;color:var(--mut);fo
 
 <script>
 const MODEL = 'claude-sonnet-4-20250514';
-const API_KEY = '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'; // ← PASTE YOUR ANTHROPIC API KEY HERE
+let API_KEY = localStorage.getItem('ltt-apikey') || '';
 
 const ACCENT = ['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc'];
 const ac = i => ACCENT[i % ACCENT.length];
@@ -469,7 +469,41 @@ function buildNotionText(s){
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-showHome();
+if(!API_KEY) showSetup(); else showHome();
+
+function showSetup(){
+  render(`
+    <div style="max-width:480px;margin:3rem auto">
+      <div class="mono-label" style="color:var(--a0);margin-bottom:10px">One-time setup</div>
+      <div style="font-family:monospace;font-size:22px;font-weight:700;letter-spacing:2px;margin-bottom:16px">ADD API KEY</div>
+      <p style="font-size:13px;color:var(--soft);line-height:1.7;margin-bottom:20px">
+        This app needs an Anthropic API key to generate study materials.<br>
+        Your key is saved <strong style="color:var(--txt)">only on this device</strong> — it never appears in the code or on GitHub.
+      </p>
+      <div style="margin-bottom:8px">
+        <div class="mono-label" style="margin-bottom:6px">Anthropic API Key</div>
+        <input id="key-input" type="password" placeholder="sk-ant-..." style="width:100%;padding:10px 14px;font-size:13px;border-radius:4px;border:1px solid var(--bdr);background:var(--surf);color:var(--txt);outline:none;font-family:monospace"/>
+      </div>
+      <p style="font-size:11px;color:var(--mut);margin-bottom:16px">
+        Get your key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--a1)">console.anthropic.com</a> → API Keys → Create Key
+      </p>
+      <button class="btn btn-pri" onclick="saveKey()">Save & Continue</button>
+      <div id="key-err" class="status-err" style="margin-top:8px"></div>
+    </div>
+  `);
+}
+
+function saveKey(){
+  const k = document.getElementById('key-input')?.value?.trim();
+  if(!k || !k.startsWith('sk-ant-')){
+    document.getElementById('key-err').textContent = 'Please enter a valid Anthropic API key (starts with sk-ant-)';
+    return;
+  }
+  API_KEY = k;
+  localStorage.setItem('ltt-apikey', k);
+  showHome();
+}
 </script>
 </body>
 </html>
+
