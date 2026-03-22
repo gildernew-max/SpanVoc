@@ -65,7 +65,6 @@ ul.bullets li::before{content:'→';position:absolute;left:0;color:var(--mut);fo
 <div class="hero">
   <div class="hero-label">AP Exam Prep · CoCo's Study Tool</div>
   <div class="hero-title">LECTURE <span>TRAINER</span></div>
-  <div class="hero-sub">Paste any lecture transcript — get a visual study guide, flashcards, quiz, and resources instantly.</div>
 </div>
 
 <div class="page" id="app"></div>
@@ -101,7 +100,7 @@ const ac = i => ACCENT[i % ACCENT.length];
 function loadSessions(){try{return JSON.parse(localStorage.getItem('ltt-gh')||'[]')}catch{return[]}}
 function saveSessions(s){try{localStorage.setItem('ltt-gh',JSON.stringify(s))}catch{}}
 
-let sessions = loadSessions();
+let sessions = loadSessions().map(s => s.unit ? s : {...s, unit: detectUnit(s)});
 let currentSession = null;
 let currentTab = 'visual';
 let flipped = {};
