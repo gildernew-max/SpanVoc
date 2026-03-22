@@ -150,7 +150,13 @@ ul.bullets li::before{content:'→';position:absolute;left:0;color:var(--mut);fo
 @keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
 @keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(20px)}}
 
-/* ── COLOR PICKER ── */
+/* ── QUOTE FOOTER ── */
+.quote-footer{border-top:1px solid var(--bdr);padding:20px 24px;margin-top:0;background:linear-gradient(180deg,transparent,rgba(240,192,64,0.03));max-width:820px;margin:0 auto}
+.quote-text{font-size:13px;color:var(--soft);line-height:1.75;font-style:italic;margin-bottom:8px}
+.quote-attr{font-family:monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
+.quote-attr span{color:var(--accent)}
+.quote-next{background:none;border:none;font-family:monospace;font-size:9px;letter-spacing:1px;color:var(--mut);cursor:pointer;padding:0;margin-top:6px;text-transform:uppercase}
+.quote-next:hover{color:var(--soft)}
 .color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;flex-shrink:0}
 .color-swatch.active{border-color:var(--txt);transform:scale(1.15)}
 
@@ -353,7 +359,78 @@ const UNIT_OVERVIEWS=[
   {id:6,tagline:'How countries trade, borrow, and set exchange rates.',intro:'Unit 6 zooms out to the global economy. When the Fed raises rates, what happens to the dollar? It shows up on every AP Macro exam.',sections:[{title:'The balance of payments',body:'**Current account**: trade in goods/services/income. **Capital & Financial account**: purchases of assets. Golden rule: **Current + Capital = 0**. Trade deficit → capital inflows.'},{title:'Exchange rates',body:'Dollar **appreciates** → imports cheaper, exports pricier abroad → net exports fall → AD shifts left. Dollar **depreciates** → exports boom → AD shifts right.'},{title:'The interest rate → exchange rate chain',body:'**Fed raises rates → US assets more attractive → demand for dollars ↑ → dollar appreciates → net exports fall → AD shifts left.** Draw this chain and you can answer any Unit 6 FRQ.'}],examTip:'Unit 6 is 10–13% of the exam but heavy in FRQs. The exchange rate/interest rate chain is almost guaranteed. Practice the forex market graph.'},
 ];
 
-function loadSessions(){try{return JSON.parse(localStorage.getItem('apex-sessions')||'[]')}catch{return[]}}
+// ── QUOTES ────────────────────────────────────────────────────────────────
+const QUOTES=[
+  // Thomas Sowell
+  {q:"The first lesson of economics is scarcity: there is never enough of anything to fully satisfy all those who want it.",a:"Thomas Sowell",t:"Basic Economics"},
+  {q:"It is hard to imagine a more stupid or more dangerous way of making decisions than by putting those decisions in the hands of people who pay no price for being wrong.",a:"Thomas Sowell",t:""},
+  {q:"Prices are not just numbers that can be changed by government decree without consequences.",a:"Thomas Sowell",t:"Basic Economics"},
+  {q:"The real minimum wage is always zero — that's what someone gets when they lose their job because an employer can't afford to pay them more.",a:"Thomas Sowell",t:""},
+  {q:"No one will really understand politics until they understand that politicians are not trying to solve our problems. They are trying to solve their own problems — of which getting elected and re-elected are No. 1 and No. 2.",a:"Thomas Sowell",t:""},
+  {q:"The fact that so many successful politicians are such shameless liars is not only a reflection on them; it is also a reflection on us.",a:"Thomas Sowell",t:""},
+  {q:"Since this is an era when many people are concerned about fairness and social justice, what is your fair share of what someone else has worked for?",a:"Thomas Sowell",t:""},
+  {q:"Trade-offs have been with us ever since the Garden of Eden. The only thing that has changed is our awareness of them.",a:"Thomas Sowell",t:""},
+  {q:"In short, 'doing nothing' is not automatically worse than doing something. It all depends on what the something is.",a:"Thomas Sowell",t:""},
+  {q:"There are no solutions. There are only trade-offs.",a:"Thomas Sowell",t:"A Conflict of Visions"},
+  {q:"The problem isn't that Johnny can't read. The problem isn't even that Johnny can't think. The problem is that Johnny doesn't know what thinking is.",a:"Thomas Sowell",t:""},
+  {q:"Helping people feel good about themselves is an entirely different enterprise from making them actually better off.",a:"Thomas Sowell",t:""},
+  // Murray Rothbard
+  {q:"The market is not a place, a thing, or a collective entity. The market is a process, actuated by the interplay of the actions of the various individuals cooperating under the division of labor.",a:"Murray Rothbard",t:"Man, Economy, and State"},
+  {q:"It is no crime to be ignorant of economics, which is, after all, a specialized discipline and one that most people consider to be a 'dismal science.' But it is totally irresponsible to have a loud and vociferous opinion on economic subjects while remaining in this state of ignorance.",a:"Murray Rothbard",t:""},
+  {q:"In the long run, the market is the only effective check on governmental power.",a:"Murray Rothbard",t:""},
+  {q:"Inflation is not a higher price level — it is a general increase in the supply of money. It only looks like rising prices.",a:"Murray Rothbard",t:"What Has Government Done to Our Money?"},
+  {q:"The government is not a productive enterprise; it is a predatory enterprise.",a:"Murray Rothbard",t:""},
+  {q:"There is nothing wrong with profits — they simply mean that the entrepreneur has correctly anticipated what customers want.",a:"Murray Rothbard",t:""},
+  {q:"The function of the entrepreneur is not just to produce — but to produce what consumers want, when and where they want it.",a:"Murray Rothbard",t:"Man, Economy, and State"},
+  {q:"Sound money and free markets go together. You cannot have one without the other for long.",a:"Murray Rothbard",t:""},
+  {q:"Every intervention by government distorts the market and generates problems that government then uses as an excuse for further intervention.",a:"Murray Rothbard",t:""},
+  {q:"Taxation is just a fancy word for what the rest of us would call theft — the difference being that governments do it legally.",a:"Murray Rothbard",t:""},
+  // Ludwig Von Mises
+  {q:"The market economy is the social system of the division of labor under private ownership of the means of production. Everybody acts on his own behalf; but everybody's actions aim at the satisfaction of other people's needs as well as at the satisfaction of his own.",a:"Ludwig von Mises",t:"Human Action"},
+  {q:"No one can find a safe way out for himself if society is sweeping towards destruction. Therefore everyone, in his own interests, must thrust himself vigorously into the intellectual battle.",a:"Ludwig von Mises",t:""},
+  {q:"The capitalist system of production is an economic democracy in which every penny gives a right to vote.",a:"Ludwig von Mises",t:"Human Action"},
+  {q:"The economic freedom which is the prerequisite of any other freedom cannot be the freedom to destroy freedom.",a:"Ludwig von Mises",t:""},
+  {q:"Government is the only institution that can take a valuable commodity like paper, and make it worthless by applying ink.",a:"Ludwig von Mises",t:""},
+  {q:"The first condition of freedom is its limitation; make it absolute and it dies in chaos.",a:"Ludwig von Mises",t:""},
+  {q:"Whoever wishes peace among peoples must fight statism.",a:"Ludwig von Mises",t:"Omnipotent Government"},
+  {q:"What is needed for a sound expansion of production is additional capital goods, not money or fiduciary media.",a:"Ludwig von Mises",t:"The Theory of Money and Credit"},
+  {q:"The champions of socialism call themselves progressives, but they recommend a system which is characterized by rigid observance of routine and by a resistance to every kind of improvement.",a:"Ludwig von Mises",t:"Bureaucracy"},
+  {q:"Every price that is fixed by the government upsets the balance of the market — it always produces effects that are contrary to its own goals.",a:"Ludwig von Mises",t:""},
+  {q:"The individual is the carrier of human reason. There is no such thing as a collective reason.",a:"Ludwig von Mises",t:"Human Action"},
+  {q:"The history of the gold standard is the history of monetary freedom.",a:"Ludwig von Mises",t:"The Theory of Money and Credit"},
+];
+
+let quoteIndex=Math.floor(Math.random()*QUOTES.length);
+function getQuote(){return QUOTES[quoteIndex%QUOTES.length];}
+function nextQuote(){quoteIndex++;renderQuoteFooter();}
+
+function renderQuoteFooter(){
+  const existing=document.getElementById('quote-footer');
+  const q=getQuote();
+  const html=`<div class="quote-footer" id="quote-footer">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="font-size:24px;opacity:.3;line-height:1;flex-shrink:0;margin-top:2px">"</div>
+      <div>
+        <div class="quote-text">${esc(q.q)}</div>
+        <div class="quote-attr">— <span>${esc(q.a)}</span>${q.t?` · <em style="font-style:italic;color:var(--mut)">${esc(q.t)}</em>`:''}</div>
+        <button class="quote-next" onclick="nextQuote()">Next quote →</button>
+      </div>
+    </div>
+  </div>`;
+  if(existing){existing.outerHTML=html;}
+  else{
+    const app=document.getElementById('app');
+    if(app){const div=document.createElement('div');div.innerHTML=html;app.after(div.firstChild);}
+  }
+}
+
+function injectQuote(){
+  setTimeout(()=>{
+    const existing=document.getElementById('quote-footer');
+    if(existing)existing.remove();
+    renderQuoteFooter();
+  },50);
+}
 function saveSessions(s){try{localStorage.setItem('apex-sessions',JSON.stringify(s))}catch{}}
 
 function detectUnit(s){
@@ -434,6 +511,7 @@ function showHome(){
     <div class="content" id="home-content"></div>
   `);
   setTimeout(()=>renderHomeTab(),0);
+  injectQuote();
 }
 
 function switchHomeTab(t){
