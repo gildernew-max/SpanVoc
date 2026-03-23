@@ -5,1201 +5,1067 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>APEX — Your AP Exam Edge</title>
 <style>
+/* ── RESET & ROOT ── */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#07070d;--surf:#0f0f1a;--card:#141420;--card2:#1a1a28;--bdr:#252535;--bdr2:#32324a;
-  --txt:#eeeef5;--mut:#5a5a7a;--soft:#9090b8;
+  --bg:#07070d;--surf:#0d0d18;--card:#131320;--card2:#191928;--bdr:#1e1e30;--bdr2:#2a2a3e;
+  --txt:#f0f0f8;--mut:#4a4a6a;--soft:#8888aa;--mid:#b0b0c8;
   --accent:#f0c040;
-  --a0:#f0c040;--a1:#4fc3f7;--a2:#a78bfa;--a3:#34d399;--a4:#fb7185;--a5:#c084fc;
+  --c1:#f0c040;--c2:#4fc3f7;--c3:#a78bfa;--c4:#34d399;--c5:#fb7185;--c6:#c084fc;--c7:#ff8c42;
+  --r4:4px;--r6:6px;--r8:8px;--r12:12px;
+  --shadow:0 2px 12px rgba(0,0,0,.4);
 }
-body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh;overflow-x:hidden}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 button,input,textarea,select{font-family:inherit}
 button{cursor:pointer}
 a{color:inherit;text-decoration:none}
+::selection{background:rgba(240,192,64,.25);color:var(--txt)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
 
 /* ── HERO ── */
-.hero{position:relative;padding:2rem 1.5rem 1.5rem;background:linear-gradient(160deg,#0a0a18 0%,#0f0f20 60%,#070712 100%);border-bottom:1px solid var(--bdr);overflow:hidden}
-.hero::before{content:'';position:absolute;top:-60px;left:-60px;width:400px;height:400px;background:radial-gradient(circle,rgba(240,192,64,0.07) 0%,transparent 70%);pointer-events:none}
-.hero::after{content:'';position:absolute;bottom:-40px;right:-40px;width:300px;height:300px;background:radial-gradient(circle,rgba(79,195,247,0.05) 0%,transparent 70%);pointer-events:none}
-.hero-inner{max-width:820px;margin:0 auto;position:relative;z-index:1}
-.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.hero-badge{display:inline-block;font-family:monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);background:rgba(240,192,64,0.1);border:1px solid rgba(240,192,64,0.25);border-radius:2px;padding:4px 10px;margin-bottom:12px}
-.hero-title{font-family:monospace;font-size:clamp(32px,7vw,56px);font-weight:900;letter-spacing:-1px;line-height:0.95;color:var(--txt)}
-.hero-title .apex{color:var(--accent)}
-.hero-sub{margin-top:10px;font-size:14px;color:var(--soft);max-width:400px;line-height:1.6}
+.hero{position:relative;padding:2rem 1.5rem 1.75rem;overflow:hidden;border-bottom:1px solid var(--bdr)}
+.hero-glow-1{position:absolute;top:-80px;left:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(240,192,64,.06) 0%,transparent 65%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-60px;right:-60px;width:400px;height:400px;background:radial-gradient(circle,rgba(79,195,247,.04) 0%,transparent 65%);pointer-events:none}
+.hero-inner{max-width:860px;margin:0 auto;position:relative;z-index:1}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.hero-left{flex:1;min-width:0}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-family:monospace;letter-spacing:3px;text-transform:uppercase;color:var(--accent);background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);border-radius:2px;padding:4px 10px;margin-bottom:14px}
+.hero-title{font-family:monospace;font-size:clamp(38px,8vw,62px);font-weight:900;letter-spacing:-1px;line-height:.95;color:var(--txt);margin-bottom:10px}
+.hero-title .a{color:var(--accent)}
+.hero-sub{font-size:14px;color:var(--soft);line-height:1.65;max-width:420px}
 
-/* ── AXIE MASCOT ── */
-.axie-wrap{position:relative;flex-shrink:0;cursor:pointer}
-.axie-wrap:hover .axie-svg{transform:rotate(-5deg) scale(1.05)}
-.axie-svg{transition:transform .3s;width:80px;height:80px}
-.axie-bubble{position:absolute;right:88px;top:0;background:var(--card2);border:1px solid var(--bdr2);border-radius:12px 12px 0 12px;padding:8px 12px;font-size:12px;color:var(--soft);white-space:nowrap;max-width:200px;white-space:normal;line-height:1.5;opacity:0;transform:scale(.8);transition:all .2s;pointer-events:none;z-index:10}
-.axie-bubble.show{opacity:1;transform:scale(1)}
-.axie-bubble::after{content:'';position:absolute;right:-8px;top:10px;border:4px solid transparent;border-left-color:var(--bdr2)}
+/* ── AXIE ── */
+.axie{flex-shrink:0;cursor:pointer;position:relative;user-select:none}
+.axie svg{transition:transform .35s cubic-bezier(.34,1.56,.64,1);display:block}
+.axie:hover svg{transform:rotate(-8deg) scale(1.08) translateY(-3px)}
+.axie:active svg{transform:scale(.95)}
+.axie-msg{position:absolute;right:90px;top:-4px;background:var(--card2);border:1px solid var(--bdr2);border-radius:10px 10px 0 10px;padding:9px 13px;font-size:12px;color:var(--mid);line-height:1.5;max-width:200px;white-space:normal;opacity:0;transform:scale(.85) translateY(4px);transition:all .22s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:20;box-shadow:var(--shadow)}
+.axie-msg.on{opacity:1;transform:scale(1) translateY(0)}
+.axie-msg::after{content:'';position:absolute;right:-7px;top:10px;border:4px solid transparent;border-left-color:var(--bdr2)}
 
-/* ── STATS BAR ── */
-.stats-bar{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
-.stat-pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:20px;padding:6px 12px;font-size:12px;color:var(--soft)}
-.stat-pill .val{font-family:monospace;font-weight:700;font-size:13px;color:var(--txt)}
-.stat-pill .icon{font-size:14px}
+/* ── STATS ── */
+.stats{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.035);border:1px solid var(--bdr);border-radius:20px;padding:5px 11px;font-size:12px;color:var(--soft);transition:border-color .2s}
+.stat:hover{border-color:var(--bdr2)}
+.stat b{color:var(--txt);font-weight:600}
 
 /* ── COUNTDOWN ── */
-.countdown{background:linear-gradient(135deg,rgba(240,192,64,0.08),rgba(240,192,64,0.04));border:1px solid rgba(240,192,64,0.25);border-radius:8px;padding:14px 18px;margin-top:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.cd-num{font-family:monospace;font-size:32px;font-weight:900;color:var(--accent);line-height:1}
-.cd-label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:2px;font-family:monospace}
-.cd-divider{width:1px;height:36px;background:var(--bdr2)}
-.cd-msg{font-size:13px;color:var(--soft);line-height:1.5}
+.cd{background:linear-gradient(135deg,rgba(240,192,64,.07),rgba(240,192,64,.03));border:1px solid rgba(240,192,64,.18);border-radius:var(--r8);padding:14px 18px;margin-top:14px;display:flex;align-items:center;gap:0;flex-wrap:wrap}
+.cd-block{display:flex;flex-direction:column;align-items:center;padding:0 16px}
+.cd-num{font-family:monospace;font-size:30px;font-weight:900;line-height:1;color:var(--accent)}
+.cd-lbl{font-size:9px;font-family:monospace;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-top:2px}
+.cd-div{width:1px;height:32px;background:var(--bdr2)}
+.cd-info{flex:1;min-width:160px;padding-left:18px;font-size:13px;color:var(--soft);line-height:1.55}
+.cd-swatches{display:flex;gap:6px;align-items:center;margin-left:auto;padding-left:16px;flex-wrap:wrap}
+.swatch{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;flex-shrink:0}
+.swatch.on{border-color:rgba(255,255,255,.7);transform:scale(1.15)}
 
-/* ── XP BAR ── */
-.xp-bar-wrap{margin-top:12px}
-.xp-bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.xp-bar{height:6px;background:var(--bdr);border-radius:3px;overflow:hidden}
-.xp-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),#ff9f40);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+/* ── XP ── */
+.xp-wrap{margin-top:12px}
+.xp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-family:monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--mut)}
+.xp-top span{color:var(--accent)}
+.xp-track{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.xp-fill{height:100%;border-radius:3px;transition:width .7s cubic-bezier(.34,1.56,.64,1)}
 
 /* ── LAYOUT ── */
-#app{max-width:820px;margin:0 auto}
-.tab-bar{display:flex;border-bottom:1px solid var(--bdr);padding:0 1rem;overflow-x:auto;background:var(--surf);position:sticky;top:0;z-index:50}
-.tab{background:none;border:none;border-bottom:2px solid transparent;padding:13px 14px;font-size:11px;font-family:monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);white-space:nowrap;transition:color .15s}
-.tab.active{border-bottom-color:var(--accent);color:var(--accent);font-weight:700}
-.tab:hover:not(.active){color:var(--soft)}
-.content{padding:1.5rem 1rem}
+#app{max-width:860px;margin:0 auto}
+.page{padding:1.25rem 1rem 5rem}
+
+/* ── TABS ── */
+.tabbar{display:flex;border-bottom:1px solid var(--bdr);overflow-x:auto;background:var(--surf);position:sticky;top:0;z-index:40;scrollbar-width:none}
+.tabbar::-webkit-scrollbar{display:none}
+.tab{background:none;border:none;border-bottom:2px solid transparent;padding:12px 14px;font-size:10px;font-family:monospace;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);white-space:nowrap;transition:color .15s;flex-shrink:0}
+.tab.on{border-bottom-color:var(--accent);color:var(--accent);font-weight:700}
+.tab:hover:not(.on){color:var(--soft)}
 
 /* ── BUTTONS ── */
-.btn{background:transparent;border:1px solid var(--bdr2);border-radius:4px;padding:9px 18px;font-size:13px;color:var(--txt);transition:all .15s}
-.btn:hover{border-color:var(--soft);background:rgba(255,255,255,.04)}
-.btn:disabled{opacity:.35;cursor:not-allowed}
-.btn-accent{background:linear-gradient(135deg,rgba(240,192,64,0.15),rgba(240,192,64,0.08));border:1px solid rgba(240,192,64,0.4);color:var(--accent);font-weight:600;font-size:14px;padding:12px 24px;border-radius:6px;transition:all .2s}
-.btn-accent:hover{background:linear-gradient(135deg,rgba(240,192,64,0.25),rgba(240,192,64,0.15));border-color:var(--accent)}
-.btn-accent:disabled{opacity:.35;cursor:not-allowed}
+.btn{background:transparent;border:1px solid var(--bdr2);border-radius:var(--r4);padding:8px 16px;font-size:13px;color:var(--mid);transition:all .15s}
+.btn:hover{border-color:var(--soft);color:var(--txt);background:rgba(255,255,255,.03)}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+.btn-hi{background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.35);border-radius:var(--r6);padding:11px 22px;font-size:14px;font-weight:600;color:var(--accent);transition:all .2s;letter-spacing:.3px}
+.btn-hi:hover{background:rgba(240,192,64,.18);border-color:rgba(240,192,64,.6);transform:translateY(-1px);box-shadow:0 4px 16px rgba(240,192,64,.15)}
+.btn-hi:active{transform:scale(.98) translateY(0)}
+.btn-hi:disabled{opacity:.35;cursor:not-allowed;pointer-events:none;transform:none}
 .btn-full{display:block;width:100%;text-align:center}
-.btn-danger{color:var(--a4);border-color:rgba(251,113,133,0.25);font-size:12px;padding:5px 12px}
-.btn-notion{color:var(--a2);border-color:rgba(167,139,250,0.35);font-size:12px;padding:8px 14px;display:flex;align-items:center;gap:6px}
+.btn-del{color:var(--c5);border-color:rgba(251,113,133,.2);font-size:11px;padding:4px 10px;border-radius:var(--r4)}
+.btn-del:hover{background:rgba(251,113,133,.08);border-color:rgba(251,113,133,.4)}
+.btn-notion{color:var(--c3);border-color:rgba(167,139,250,.3);font-size:12px;padding:7px 13px;display:flex;align-items:center;gap:5px}
 
 /* ── CARDS ── */
-.card{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:16px 20px}
-.session-card{border-left:3px solid;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:14px 18px;cursor:pointer;border-radius:6px;transition:background .15s}
-.session-card:hover{background:var(--card2)}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r8);padding:16px 18px;transition:border-color .2s}
+.card-hi{border-top:2px solid}
+.scard{border-left:3px solid;display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding:13px 16px;cursor:pointer;border-radius:var(--r6);transition:background .15s,transform .15s}
+.scard:hover{background:var(--card2);transform:translateX(2px)}
+.scard:active{transform:scale(.99)}
 
 /* ── UNIT TILES ── */
-.unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:8px}
-.unit-tile{border:1px solid var(--bdr);border-radius:8px;padding:18px;cursor:pointer;position:relative;overflow:hidden;transition:all .2s;background:var(--card)}
-.unit-tile:hover{border-color:var(--bdr2);background:var(--card2);transform:translateY(-2px)}
-.unit-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.unit-tile-num{font-family:monospace;font-size:48px;font-weight:900;line-height:1;opacity:.08;position:absolute;top:8px;right:12px;letter-spacing:-2px}
-.unit-tile-sessions{font-family:monospace;font-size:9px;letter-spacing:1px;margin-top:8px;display:inline-block;padding:2px 8px;border-radius:2px}
+.ugrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:8px}
+.utile{border:1px solid var(--bdr);border-radius:var(--r8);padding:18px 16px;cursor:pointer;position:relative;overflow:hidden;transition:all .2s;background:var(--card)}
+.utile:hover{border-color:var(--bdr2);background:var(--card2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.utile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.utile-ghost{font-family:monospace;font-size:44px;font-weight:900;line-height:1;opacity:.07;position:absolute;top:6px;right:10px;letter-spacing:-2px;user-select:none}
 
-/* ── PROGRESS RING ── */
-.ring-wrap{position:relative;width:40px;height:40px;flex-shrink:0}
-.ring-wrap svg{transform:rotate(-90deg)}
-.ring-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:monospace;font-size:9px;font-weight:700;line-height:1}
+/* ── RING ── */
+.ring{position:relative;flex-shrink:0}
+.ring svg{transform:rotate(-90deg);display:block}
+.ring-n{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:monospace;font-size:9px;font-weight:700;line-height:1;text-align:center}
 
-/* ── SECTION HEADERS ── */
-.section-header{display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--bdr);margin:24px 0 12px}
-.section-num{font-family:monospace;font-size:36px;font-weight:900;opacity:.1;line-height:1}
-.section-name{font-family:monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+/* ── SECTION HEAD ── */
+.sh{display:flex;align-items:baseline;gap:12px;padding-bottom:9px;border-bottom:1px solid var(--bdr);margin:26px 0 12px}
+.sh-n{font-family:monospace;font-size:34px;font-weight:900;opacity:.08;line-height:1;flex-shrink:0}
+.sh-t{font-family:monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
 
-/* ── FORMULA BOXES ── */
-.formula{background:#0a0a14;border:1px solid var(--bdr);border-radius:2px;padding:10px 16px;font-family:monospace;font-size:13px;letter-spacing:.5px;margin:6px 0}
-.formula span{color:var(--mut);font-size:11px}
+/* ── FORMULA ── */
+.formula{background:rgba(0,0,0,.35);border:1px solid var(--bdr);border-radius:3px;padding:9px 15px;font-family:monospace;font-size:13px;letter-spacing:.5px;margin:5px 0;border-left:3px solid}
+.formula s{font-size:10px;color:var(--mut);font-style:normal;text-decoration:none}
 
-/* ── LABELS ── */
-.mono-label{font-family:monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--mut)}
+/* ── LABEL ── */
+.lbl{font-family:monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mut)}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:11px}
+.g3{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:9px}
 
 /* ── FLASHCARD ── */
-.fc-big{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:40px 28px;min-height:220px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;transition:all .2s;position:relative;overflow:hidden}
-.fc-big:hover{background:var(--card2);transform:translateY(-1px)}
-.fc-big::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.fc{perspective:800px}
+.fc-inner{position:relative;min-height:220px;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.fc-inner.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;width:100%;min-height:220px;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--bdr);border-radius:var(--r8);padding:32px 24px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;background:var(--card);transition:border-color .2s}
+.fc-face:hover{border-color:var(--bdr2)}
+.fc-back{transform:rotateY(180deg);background:var(--card2)}
+.fc-hint{font-size:11px;color:var(--mut);margin-top:12px;font-family:monospace;letter-spacing:1px}
 
-/* ── QUIZ OPTS ── */
-.quiz-opt{padding:11px 16px;border-radius:4px;border:1px solid var(--bdr);cursor:pointer;font-size:13px;color:var(--soft);transition:all .15s;margin-bottom:8px}
-.quiz-opt:hover:not(.locked){background:rgba(255,255,255,.03);border-color:var(--bdr2)}
+/* ── QUIZ OPTION ── */
+.qopt{padding:10px 14px;border-radius:var(--r4);border:1px solid var(--bdr);cursor:pointer;font-size:13px;color:var(--soft);transition:all .15s;margin-bottom:7px;line-height:1.5}
+.qopt:hover:not(.locked){background:rgba(255,255,255,.03);border-color:var(--bdr2);color:var(--mid)}
+.qopt.locked{cursor:default}
 
 /* ── CHAT ── */
-.chat-bubble-user{background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.25);color:#4fc3f7;padding:11px 16px;border-radius:6px;font-size:13px;line-height:1.7;max-width:78%}
-.chat-bubble-ai{background:var(--card);border:1px solid var(--bdr);color:var(--soft);padding:12px 16px;border-radius:6px;font-size:13px;line-height:1.8;max-width:82%}
+.bubble-u{background:rgba(79,195,247,.09);border:1px solid rgba(79,195,247,.22);color:#6ed4f8;padding:10px 15px;border-radius:10px 10px 2px 10px;font-size:13px;line-height:1.65;max-width:78%}
+.bubble-a{background:var(--card);border:1px solid var(--bdr);color:var(--mid);padding:12px 15px;border-radius:10px 10px 10px 2px;font-size:13px;line-height:1.75;max-width:82%}
+.chat-bline{display:flex;gap:7px;padding:4px 0;align-items:flex-start}
+.chat-bline .arr{color:var(--accent);font-size:10px;padding-top:4px;flex-shrink:0}
 
 /* ── SETUP ── */
-.setup-box{max-width:460px;margin:3rem auto;padding:0 1rem}
-.setup-steps{background:rgba(79,195,247,0.05);border:1px solid rgba(79,195,247,0.2);border-radius:6px;padding:14px 18px;margin-bottom:18px;font-size:12px;color:var(--soft);line-height:1.9}
+.setup{max-width:440px;margin:3rem auto;padding:0 1rem}
+.setup-steps{background:rgba(79,195,247,.05);border:1px solid rgba(79,195,247,.18);border-radius:var(--r6);padding:14px 18px;font-size:12px;color:var(--soft);line-height:1.95;margin-bottom:18px}
 
 /* ── MISC ── */
-.status-err{color:var(--a4);font-size:13px;padding:6px 0}
-.spinner{width:16px;height:16px;border:2px solid var(--bdr2);border-top-color:var(--a1);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.err{color:var(--c5);font-size:12px;padding:6px 0;font-family:monospace}
+.spin{width:15px;height:15px;border:2px solid var(--bdr2);border-top-color:var(--c2);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-ul.bullets{padding:0;list-style:none;margin:0}
-ul.bullets li{padding:4px 0 4px 18px;position:relative;color:var(--soft);font-size:12px;line-height:1.65;border-bottom:1px solid rgba(255,255,255,.025)}
-ul.bullets li::before{content:'→';position:absolute;left:0;color:var(--mut);font-size:10px;top:5px}
-.notion-export{background:#08080f;border:1px solid rgba(167,139,250,0.25);border-radius:4px;padding:10px;font-family:monospace;font-size:11px;color:var(--soft);width:100%;height:140px;resize:none;outline:none;margin-top:8px}
-.exam-tip{background:rgba(240,192,64,0.05);border:1px solid rgba(240,192,64,0.2);border-left:3px solid var(--a0);border-radius:4px;padding:14px 18px}
-.grid-2{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.notion-ta{background:#060610;border:1px solid rgba(167,139,250,.22);border-radius:var(--r4);padding:10px;font-family:monospace;font-size:11px;color:var(--soft);width:100%;height:130px;resize:none;outline:none;margin-top:8px;line-height:1.6}
+.tip-box{background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.18);border-left:3px solid var(--accent);border-radius:var(--r4);padding:13px 17px}
+.grade-badge{background:var(--card);border-radius:var(--r8);padding:12px 16px;min-width:148px}
+.grade-n{font-family:monospace;font-size:30px;font-weight:900;line-height:1}
+.grade-bar{height:3px;border-radius:2px;background:var(--bdr);margin-top:8px;overflow:hidden}
+.grade-fill{height:100%;border-radius:2px;transition:width .9s cubic-bezier(.34,1.56,.64,1)}
+ul.blist{padding:0;list-style:none;margin:0}
+ul.blist li{padding:4px 0 4px 16px;position:relative;color:var(--soft);font-size:12px;line-height:1.65;border-bottom:1px solid rgba(255,255,255,.025)}
+ul.blist li::before{content:'›';position:absolute;left:0;color:var(--mut)}
 
-/* ── UNIT NAV BAR ── */
-.unit-nav-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(7,7,13,0.96);border-top:1px solid var(--bdr2);display:flex;justify-content:center;z-index:100;backdrop-filter:blur(12px)}
-.unit-nav-btn{background:none;border:none;border-top:2px solid transparent;padding:8px 0;flex:1;max-width:110px;font-family:monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px}
-.unit-nav-btn:hover{color:var(--soft);background:rgba(255,255,255,.02)}
-.unit-nav-btn.active{border-top-color:var(--accent);color:var(--accent)}
-.unit-nav-num{font-size:18px;font-weight:900;font-family:monospace;line-height:1}
-.has-unit-nav{padding-bottom:60px}
+/* ── UNIT NAV ── */
+.unav{position:fixed;bottom:0;left:0;right:0;background:rgba(6,6,12,.97);border-top:1px solid var(--bdr);display:flex;justify-content:center;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.unav-btn{background:none;border:none;border-top:2px solid transparent;padding:7px 0;flex:1;max-width:100px;font-family:monospace;font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.unav-btn:hover{color:var(--soft)}
+.unav-btn.on{border-top-color:var(--accent);color:var(--accent)}
+.unav-n{font-size:17px;font-weight:900;font-family:monospace;line-height:1}
+.has-unav{padding-bottom:58px}
 
 /* ── CONFETTI ── */
-.confetti-piece{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:9999;animation:confettiFall linear forwards}
-@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+.cf{position:fixed;width:7px;height:7px;border-radius:2px;pointer-events:none;z-index:9999;animation:cffall linear forwards}
+@keyframes cffall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(760deg);opacity:0}}
 
-/* ── XP TOAST ── */
-.xp-toast{position:fixed;top:20px;right:20px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.4);border-radius:6px;padding:10px 16px;font-family:monospace;font-size:13px;color:var(--accent);z-index:9998;animation:toastIn .3s ease,toastOut .3s ease 1.7s forwards;pointer-events:none}
-@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-@keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(20px)}}
+/* ── TOAST ── */
+.toast{position:fixed;top:18px;right:18px;background:rgba(240,192,64,.12);border:1px solid rgba(240,192,64,.35);border-radius:var(--r6);padding:9px 15px;font-family:monospace;font-size:12px;color:var(--accent);z-index:9998;animation:tin .25s ease,tout .25s ease 1.75s forwards;pointer-events:none;box-shadow:var(--shadow)}
+@keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes tout{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(16px)}}
 
-/* ── QUOTE FOOTER ── */
-.quote-footer{border-top:1px solid var(--bdr);padding:20px 24px;margin-top:0;background:linear-gradient(180deg,transparent,rgba(240,192,64,0.03));max-width:820px;margin:0 auto}
-.quote-text{font-size:13px;color:var(--soft);line-height:1.75;font-style:italic;margin-bottom:8px}
-.quote-attr{font-family:monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
-.quote-attr span{color:var(--accent)}
-.quote-next{background:none;border:none;font-family:monospace;font-size:9px;letter-spacing:1px;color:var(--mut);cursor:pointer;padding:0;margin-top:6px;text-transform:uppercase}
-.quote-next:hover{color:var(--soft)}
-.color-swatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;flex-shrink:0}
-.color-swatch.active{border-color:var(--txt);transform:scale(1.15)}
+/* ── QUOTE ── */
+.qfoot{border-top:1px solid var(--bdr);padding:22px 24px;background:linear-gradient(180deg,transparent,rgba(240,192,64,.025));max-width:860px;margin:0 auto}
+.qfoot-q{font-size:13px;color:var(--soft);line-height:1.8;font-style:italic;margin-bottom:8px}
+.qfoot-a{font-family:monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
+.qfoot-a span{color:var(--accent)}
+.qfoot-btn{background:none;border:none;font-family:monospace;font-size:9px;letter-spacing:1px;color:var(--mut);cursor:pointer;padding:0;margin-top:5px;text-transform:uppercase;transition:color .15s}
+.qfoot-btn:hover{color:var(--soft)}
 
-/* ── GRADE BADGE ── */
-.grade-badge{background:var(--card);border-radius:6px;padding:12px 16px;min-width:140px;text-align:center}
-.grade-score{font-family:monospace;font-size:32px;font-weight:900;line-height:1}
-.grade-bar{height:4px;border-radius:2px;margin-top:8px;overflow:hidden;background:var(--bdr)}
-.grade-bar-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+/* ── ANIMATION ── */
+.fadein{animation:fadein .3s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.scalein{animation:scalein .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes scalein{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:540px){
+  .hero{padding:1.5rem 1rem 1.25rem}
+  .hero-title{font-size:clamp(32px,9vw,48px)}
+  .ugrid{grid-template-columns:1fr 1fr}
+  .g2{grid-template-columns:1fr}
+  .g3{grid-template-columns:1fr 1fr}
+  .grade-badge{min-width:120px}
+}
 </style>
 </head>
 <body>
 
-<div class="hero" id="hero-section">
+<!-- HERO -->
+<div class="hero" id="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
   <div class="hero-inner">
     <div class="hero-top">
-      <div>
-        <div class="hero-badge">AP Exam Prep · CoCo's Study Tool</div>
-        <div class="hero-title"><span class="apex">APEX</span></div>
+      <div class="hero-left">
+        <div class="hero-eyebrow">🎓 AP Exam Prep · CoCo's Study Tool</div>
+        <div class="hero-title"><span class="a">APEX</span></div>
         <div class="hero-sub">Turn any lecture into a complete study system.</div>
       </div>
-      <!-- AXIE MASCOT -->
-      <div class="axie-wrap" onclick="axieSpeak()" id="axie">
-        <svg class="axie-svg" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-          <!-- Body -->
-          <ellipse cx="40" cy="50" rx="22" ry="20" fill="#1a1a30" stroke="#f0c040" stroke-width="1.5"/>
-          <!-- Head -->
-          <ellipse cx="40" cy="28" rx="18" ry="17" fill="#1a1a30" stroke="#f0c040" stroke-width="1.5"/>
-          <!-- Ear tufts -->
-          <polygon points="26,14 22,4 30,12" fill="#f0c040" opacity=".9"/>
-          <polygon points="54,14 58,4 50,12" fill="#f0c040" opacity=".9"/>
-          <!-- Eyes -->
-          <circle cx="33" cy="26" r="6" fill="#0a0a18" stroke="#4fc3f7" stroke-width="1.5"/>
-          <circle cx="47" cy="26" r="6" fill="#0a0a18" stroke="#4fc3f7" stroke-width="1.5"/>
-          <circle cx="34" cy="25" r="3" fill="#4fc3f7"/>
-          <circle cx="48" cy="25" r="3" fill="#4fc3f7"/>
-          <circle cx="35" cy="24" r="1" fill="white" opacity=".8"/>
-          <circle cx="49" cy="24" r="1" fill="white" opacity=".8"/>
-          <!-- Beak -->
-          <polygon points="40,32 37,36 43,36" fill="#f0c040"/>
-          <!-- Graduation cap -->
-          <rect x="24" y="12" width="32" height="5" rx="1" fill="#f0c040"/>
-          <rect x="37" y="8" width="6" height="5" rx="1" fill="#f0c040"/>
-          <line x1="56" y1="14" x2="60" y2="20" stroke="#f0c040" stroke-width="2"/>
-          <circle cx="60" cy="21" r="2" fill="#f0c040"/>
-          <!-- Wings -->
-          <ellipse cx="20" cy="52" rx="8" ry="12" fill="#f0c040" opacity=".2" transform="rotate(-15 20 52)"/>
-          <ellipse cx="60" cy="52" rx="8" ry="12" fill="#f0c040" opacity=".2" transform="rotate(15 60 52)"/>
-          <!-- Feet -->
-          <line x1="33" y1="68" x2="28" y2="74" stroke="#f0c040" stroke-width="2"/>
-          <line x1="33" y1="68" x2="33" y2="75" stroke="#f0c040" stroke-width="2"/>
-          <line x1="33" y1="68" x2="38" y2="74" stroke="#f0c040" stroke-width="2"/>
-          <line x1="47" y1="68" x2="42" y2="74" stroke="#f0c040" stroke-width="2"/>
-          <line x1="47" y1="68" x2="47" y2="75" stroke="#f0c040" stroke-width="2"/>
-          <line x1="47" y1="68" x2="52" y2="74" stroke="#f0c040" stroke-width="2"/>
+      <div class="axie" onclick="axieTap()" id="axie">
+        <svg width="82" height="82" viewBox="0 0 80 80">
+          <ellipse cx="40" cy="51" rx="21" ry="19" fill="#12122a" stroke="var(--accent)" stroke-width="1.4"/>
+          <ellipse cx="40" cy="28" rx="18" ry="17" fill="#12122a" stroke="var(--accent)" stroke-width="1.4"/>
+          <polygon points="25,15 20,4 29,13" fill="var(--accent)" opacity=".9"/>
+          <polygon points="55,15 60,4 51,13" fill="var(--accent)" opacity=".9"/>
+          <rect x="23" y="12" width="34" height="5" rx="1.5" fill="var(--accent)"/>
+          <rect x="36" y="7" width="8" height="6" rx="1" fill="var(--accent)"/>
+          <line x1="57" y1="14" x2="62" y2="21" stroke="var(--accent)" stroke-width="2"/>
+          <circle cx="62" cy="22" r="2.5" fill="var(--accent)"/>
+          <circle cx="32" cy="27" r="6.5" fill="#08081a" stroke="var(--c2)" stroke-width="1.5"/>
+          <circle cx="48" cy="27" r="6.5" fill="#08081a" stroke="var(--c2)" stroke-width="1.5"/>
+          <circle cx="33" cy="26" r="3.2" fill="var(--c2)"/>
+          <circle cx="49" cy="26" r="3.2" fill="var(--c2)"/>
+          <circle cx="34.2" cy="24.8" r="1.2" fill="white" opacity=".85"/>
+          <circle cx="50.2" cy="24.8" r="1.2" fill="white" opacity=".85"/>
+          <polygon points="40,33 37,37 43,37" fill="var(--accent)"/>
+          <ellipse cx="19" cy="53" rx="7" ry="11" fill="var(--accent)" opacity=".15" transform="rotate(-12 19 53)"/>
+          <ellipse cx="61" cy="53" rx="7" ry="11" fill="var(--accent)" opacity=".15" transform="rotate(12 61 53)"/>
+          <g stroke="var(--accent)" stroke-width="1.8">
+            <line x1="32" y1="68" x2="27" y2="75"/><line x1="32" y1="68" x2="32" y2="76"/>
+            <line x1="32" y1="68" x2="37" y2="75"/>
+            <line x1="48" y1="68" x2="43" y2="75"/><line x1="48" y1="68" x2="48" y2="76"/>
+            <line x1="48" y1="68" x2="53" y2="75"/>
+          </g>
         </svg>
-        <div class="axie-bubble" id="axie-bubble">Hoot! Let's ace this exam 🎓</div>
+        <div class="axie-msg" id="axie-msg">Hoot! Let's ace this 🎓</div>
       </div>
     </div>
-
-    <!-- Stats bar -->
-    <div class="stats-bar" id="stats-bar"></div>
-
-    <!-- Countdown -->
-    <div class="countdown" id="countdown"></div>
-
-    <!-- XP bar -->
-    <div class="xp-bar-wrap" id="xp-bar-wrap"></div>
+    <div class="stats" id="stats"></div>
+    <div class="cd" id="cd"></div>
+    <div class="xp-wrap" id="xp"></div>
   </div>
 </div>
 
 <div id="app"></div>
 
 <script>
-const MODEL='claude-sonnet-4-20250514';
-let API_KEY=localStorage.getItem('apex-key')||'';
-
-// ── THEME ──────────────────────────────────────────────────────────────────
-const THEMES=['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc','#ff7849'];
-let accentColor=localStorage.getItem('apex-accent')||'#f0c040';
-function setAccent(c){accentColor=c;localStorage.setItem('apex-accent',c);document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--a0',c);}
-setAccent(accentColor);
+// ── THEME ─────────────────────────────────────────────────────────────────
+const PALETTE=['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc','#ff8c42'];
+let accent=localStorage.getItem('apex-accent')||'#f0c040';
+const setAccent=c=>{accent=c;localStorage.setItem('apex-accent',c);document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--c1',c);updateHero()};
+setAccent(accent);
 
 // ── XP & STREAK ───────────────────────────────────────────────────────────
-let xpData=JSON.parse(localStorage.getItem('apex-xp')||'{"xp":0,"level":1,"streak":0,"lastDate":"","sessions":0,"cardsReviewed":0,"quizzesTaken":0}');
-function saveXP(){localStorage.setItem('apex-xp',JSON.stringify(xpData));}
-function xpForLevel(l){return l*100;}
-function addXP(pts,label){
-  xpData.xp+=pts;
-  while(xpData.xp>=xpForLevel(xpData.level)){xpData.xp-=xpForLevel(xpData.level);xpData.level++;}
-  saveXP();showXPToast(`+${pts} XP — ${label}`);updateHeroStats();
+let G=JSON.parse(localStorage.getItem('apex-g')||'{"xp":0,"lv":1,"streak":0,"last":"","sess":0,"cards":0,"quizzes":0}');
+const saveG=()=>localStorage.setItem('apex-g',JSON.stringify(G));
+const xpNeeded=l=>l*120;
+function addXP(pts,msg){
+  G.xp+=pts;
+  while(G.xp>=xpNeeded(G.lv)){G.xp-=xpNeeded(G.lv);G.lv++;}
+  saveG();toast(`+${pts} XP  ${msg}`);updateHero();
 }
 function checkStreak(){
-  const today=new Date().toDateString();
-  if(xpData.lastDate===today)return;
-  const yesterday=new Date(Date.now()-86400000).toDateString();
-  xpData.streak=xpData.lastDate===yesterday?xpData.streak+1:1;
-  xpData.lastDate=today;saveXP();
+  const td=new Date().toDateString(),yd=new Date(Date.now()-86400000).toDateString();
+  if(G.last===td)return;
+  G.streak=G.last===yd?G.streak+1:1;G.last=td;saveG();
 }
-function showXPToast(msg){
-  const t=document.createElement('div');t.className='xp-toast';t.textContent=msg;
-  document.body.appendChild(t);setTimeout(()=>t.remove(),2200);
+function toast(msg){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2100);
 }
 
 // ── COUNTDOWN ─────────────────────────────────────────────────────────────
-function getCountdown(){
+function countdown(){
   const exam=new Date('2026-05-07T08:00:00');
-  const now=new Date();
-  const diff=exam-now;
-  if(diff<=0)return{days:0,hours:0,done:true};
-  return{days:Math.floor(diff/86400000),hours:Math.floor((diff%86400000)/3600000),done:false};
+  const diff=exam-new Date();
+  if(diff<=0)return{d:0,h:0,done:true};
+  return{d:Math.floor(diff/86400000),h:Math.floor((diff%86400000)/3600000),done:false};
 }
-function updateHeroStats(){
-  const cd=getCountdown();
-  const pct=Math.min(100,Math.round((xpData.xp/xpForLevel(xpData.level))*100));
-  const cdEl=document.getElementById('countdown');
-  if(cdEl){
-    if(cd.done){cdEl.innerHTML=`<div class="cd-msg" style="color:var(--accent);font-weight:700">🎉 AP Exam day! You've got this, CoCo!</div>`;}
-    else{
-      const urgency=cd.days<7?'var(--a4)':cd.days<30?'var(--a0)':'var(--a3)';
-      cdEl.innerHTML=`
-        <div><div class="cd-num" style="color:${urgency}">${cd.days}</div><div class="cd-label">days</div></div>
-        <div class="cd-divider"></div>
-        <div><div class="cd-num" style="color:${urgency};font-size:20px">${cd.hours}h</div><div class="cd-label">hours</div></div>
-        <div class="cd-divider"></div>
-        <div class="cd-msg">until AP Macro Exam<br><span style="color:var(--mut);font-size:11px">May 7, 2026 · 8:00 AM</span></div>
-        <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
-          ${THEMES.map(c=>`<div class="color-swatch ${c===accentColor?'active':''}" style="background:${c}" onclick="setAccent('${c}');updateHeroStats()" title="Change color"></div>`).join('')}
-        </div>`;
-    }
+
+function updateHero(){
+  const cd=countdown(),pct=Math.min(100,Math.round(G.xp/xpNeeded(G.lv)*100));
+  const urg=cd.d<7?'var(--c5)':cd.d<21?'var(--c7)':cd.d<60?'var(--accent)':'var(--c4)';
+  const el=id=>document.getElementById(id);
+
+  if(el('stats'))el('stats').innerHTML=
+    `<div class="stat">🔥 <b>${G.streak}</b> day streak</div>
+     <div class="stat">⭐ Level <b>${G.lv}</b></div>
+     <div class="stat">📚 <b>${sessions.length}</b> sessions</div>
+     <div class="stat">🃏 <b>${G.cards}</b> cards reviewed</div>`;
+
+  if(el('cd')){
+    if(cd.done){el('cd').innerHTML=`<div style="color:var(--accent);font-weight:700;font-size:15px">🎉 Exam day! You've got this, CoCo!</div>`;}
+    else{el('cd').innerHTML=`
+      <div class="cd-block"><div class="cd-num" style="color:${urg}">${cd.d}</div><div class="cd-lbl">days</div></div>
+      <div class="cd-div"></div>
+      <div class="cd-block"><div class="cd-num" style="color:${urg};font-size:22px">${cd.h}h</div><div class="cd-lbl">hours</div></div>
+      <div class="cd-div"></div>
+      <div class="cd-info">until <strong style="color:var(--txt)">AP Macro Exam</strong><br><span style="font-size:11px;color:var(--mut)">May 7, 2026 · 8:00 AM</span></div>
+      <div class="cd-swatches">${PALETTE.map(c=>`<div class="swatch${c===accent?' on':''}" style="background:${c}" onclick="setAccent('${c}')"></div>`).join('')}</div>`;}
   }
-  const sbEl=document.getElementById('stats-bar');
-  if(sbEl){sbEl.innerHTML=`
-    <div class="stat-pill"><span class="icon">🔥</span><span>${xpData.streak} day streak</span></div>
-    <div class="stat-pill"><span class="icon">⭐</span><span>Level <span class="val">${xpData.level}</span></span></div>
-    <div class="stat-pill"><span class="icon">📚</span><span><span class="val">${sessions.length}</span> sessions</span></div>
-    <div class="stat-pill"><span class="icon">🃏</span><span><span class="val">${xpData.cardsReviewed}</span> cards</span></div>`;}
-  const xpEl=document.getElementById('xp-bar-wrap');
-  if(xpEl){xpEl.innerHTML=`
-    <div class="xp-bar-top">
-      <span class="mono-label">XP — Level ${xpData.level}</span>
-      <span class="mono-label" style="color:var(--accent)">${xpData.xp} / ${xpForLevel(xpData.level)}</span>
-    </div>
-    <div class="xp-bar"><div class="xp-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${accentColor},#ff9f40)"></div></div>`;}
+
+  if(el('xp'))el('xp').innerHTML=
+    `<div class="xp-top"><span>XP — Level ${G.lv}</span><span>${G.xp} / ${xpNeeded(G.lv)}</span></div>
+     <div class="xp-track"><div class="xp-fill" style="width:${pct}%;background:linear-gradient(90deg,${accent},#ff9f40)"></div></div>`;
 }
 
 // ── AXIE ──────────────────────────────────────────────────────────────────
-const AXIE_PHRASES=[
-  'Hoot! You\'re on a roll 🎓','Keep it up! The AP exam is waiting 📝','Owl always believe in you! 🦉','Every session = more XP. Let\'s go! ⚡','History is made by those who show up 💪','You\'re smarter than yesterday 🧠','AP 5 incoming! 🏆','Hoot hoot! Economics is actually fun 🤓'];
-let axiePhraseIdx=0;
-function axieSpeak(){
-  const bubble=document.getElementById('axie-bubble');
-  if(!bubble)return;
-  bubble.textContent=AXIE_PHRASES[axiePhraseIdx%AXIE_PHRASES.length];
-  axiePhraseIdx++;
-  bubble.classList.add('show');
-  clearTimeout(window._axieTmo);
-  window._axieTmo=setTimeout(()=>bubble.classList.remove('show'),3000);
+const AXIE_LINES=['Hoot! You\'re on a roll 🎓','Every card = more confidence! ⚡','AP 5 incoming! 🏆','Owl believe in you always 🦉','Economics is actually fun — I promise 🤓','The exam is ${d} days away. Keep going! 💪','You\'re smarter than yesterday 🧠','Great job showing up today! ✨'];
+let axIdx=0;
+function axieTap(){
+  const m=document.getElementById('axie-msg');if(!m)return;
+  const line=AXIE_LINES[axIdx%AXIE_LINES.length].replace('${d}',countdown().d);
+  axIdx++;m.textContent=line;m.classList.add('on');
+  clearTimeout(window._at);window._at=setTimeout(()=>m.classList.remove('on'),3200);
 }
 function axieSay(msg){
-  const bubble=document.getElementById('axie-bubble');
-  if(!bubble)return;
-  bubble.textContent=msg;
-  bubble.classList.add('show');
-  clearTimeout(window._axieTmo);
-  window._axieTmo=setTimeout(()=>bubble.classList.remove('show'),3500);
+  const m=document.getElementById('axie-msg');if(!m)return;
+  m.textContent=msg;m.classList.add('on');
+  clearTimeout(window._at);window._at=setTimeout(()=>m.classList.remove('on'),3500);
 }
 
 // ── CONFETTI ──────────────────────────────────────────────────────────────
-function launchConfetti(){
-  const colors=['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc','#ff7849'];
-  for(let i=0;i<60;i++){
-    const el=document.createElement('div');
-    el.className='confetti-piece';
-    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*.5}s`;
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(),3500);
+function confetti(){
+  const cols=['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc','#ff8c42','#fff'];
+  for(let i=0;i<70;i++){
+    const el=document.createElement('div');el.className='cf';
+    el.style.cssText=`left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*cols.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*.6}s`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),3800);
   }
-  axieSay('🎉 Amazing! You crushed it!');
+  axieSay('🎉 PERFECT! You absolutely crushed it!');
 }
-
-// ── DATA ──────────────────────────────────────────────────────────────────
-const ACCENT_COLORS=['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc'];
-const ac=i=>ACCENT_COLORS[i%ACCENT_COLORS.length];
-
-const UNITS=[
-  {id:1,label:'Basic Concepts',color:'#f0c040',exam:'5–10%',emoji:'🧩',topics:['scarcity','opportunity cost','ppc','production possibilities','comparative advantage','supply','demand','trade']},
-  {id:2,label:'Economic Indicators',color:'#4fc3f7',exam:'12–17%',emoji:'📊',topics:['gdp','gross domestic product','unemployment','inflation','cpi','business cycle','recession','nominal','real','deflator','labor force']},
-  {id:3,label:'AS/AD & Fiscal Policy',color:'#a78bfa',exam:'17–27%',emoji:'📉',topics:['aggregate demand','aggregate supply','fiscal','multiplier','mpc','mps','government spending','tax','recessionary gap','inflationary gap','sras','lras','ad']},
-  {id:4,label:'Financial Sector',color:'#34d399',exam:'18–23%',emoji:'🏦',topics:['money','banking','t-account','reserve','money multiplier','monetary policy','federal reserve','fed','interest rate','loanable funds','m1','m2','bond','open market','discount rate','fractional reserve','deposit']},
-  {id:5,label:'Long-Run Policy',color:'#fb7185',exam:'20–30%',emoji:'📈',topics:['phillips curve','long run','crowding out','quantity theory','mv=py','stagflation','lrpc','srpc','natural rate','economic growth','lras shift']},
-  {id:6,label:'Open Economy & Forex',color:'#c084fc',exam:'10–13%',emoji:'🌍',topics:['foreign exchange','forex','exchange rate','balance of payments','current account','capital account','imports','exports','net exports','currency','appreciation','depreciation']},
-];
-
-const UNIT_OVERVIEWS=[
-  {id:1,tagline:'The foundation everything else is built on.',intro:'Before you can understand why the stock market moves or what the Fed does, you need to get comfortable with a few big ideas. Unit 1 is all about those fundamentals — and once these click, the rest of AP Macro starts to make a lot more sense.',sections:[{title:'Scarcity — the reason economics exists',body:'Here\'s the core problem: people want more than they can have. Resources — time, money, land, labor — are limited. Wants are not. That gap is called **scarcity**, and it\'s why every decision has a cost. Even choosing to watch Netflix instead of studying has a cost.'},{title:'Opportunity cost — the real price of everything',body:'Every time you choose one thing, you give up another. That thing you give up is your **opportunity cost**. The true cost of any decision isn\'t just what you paid — it\'s what you didn\'t do instead.'},{title:'The PPC — a picture of what\'s possible',body:'The **Production Possibilities Curve** shows the maximum output a country can produce. On the curve = efficient. Inside = wasting resources. Outside = impossible. Outward shift = economic growth.'},{title:'Comparative advantage — why trade makes everyone richer',body:'Even if one country is better at everything, it still makes sense to trade. Focus on what you\'re **relatively** better at — your comparative advantage. Everyone ends up with more.'},{title:'Supply & demand — how markets find their price',body:'When price goes up, buyers want less and sellers want more. When they meet, you get **equilibrium**. Master the shifters and you can predict what happens in almost any market.'}],examTip:'Unit 1 is 5–10% of the exam but runs through everything. Opportunity cost, PPC shifts, and comparative advantage appear in FRQs constantly.'},
-  {id:2,tagline:'How do we know if the economy is healthy?',intro:'You can\'t fix what you can\'t measure. Unit 2 is about the scoreboard — the tools economists use to take the economy\'s temperature. These are the numbers policymakers obsess over every day.',sections:[{title:'GDP — the economy\'s report card',body:'**Gross Domestic Product** = total value of everything a country produces. GDP = C + Ig + G + Xn. NOT included: used goods, stocks, underground activity. Real GDP adjusts for inflation — always use it to compare across years.'},{title:'Unemployment — not everyone counts',body:'You\'re only "unemployed" if actively looking. Stop looking = fall out of labor force = rate goes DOWN. Three types: **frictional** (between jobs), **structural** (skills mismatch), **cyclical** (recession). Natural rate = frictional + structural.'},{title:'Inflation — when your dollar buys less',body:'Inflation = general rise in price level. Main measure = **CPI**. Winners: **borrowers** (repay with cheaper dollars). Losers: lenders and savers (money loses purchasing power).'},{title:'The business cycle — boom and bust',body:'Economies expand, peak, contract, trough. **Recessionary gap** = output below potential. **Inflationary gap** = economy running hot. Where you are determines which policy tools make sense.'}],examTip:'Unit 2 is 12–17% of the exam. FRQs love unemployment rate, inflation rate, and GDP deflator calculations. Know your formulas cold.'},
-  {id:3,tagline:'What causes booms and busts — and what can the government do?',intro:'Unit 3 is the biggest, most tested unit. The AS/AD model shows how the whole economy works in one graph. Master this and you\'re in great shape.',sections:[{title:'The AS/AD model — the economy in one graph',body:'**AD** slopes down. **SRAS** slopes up. **LRAS** is vertical. Where AD meets SRAS = short-run equilibrium. Positive demand shock → higher output AND prices. Negative supply shock = **stagflation** — the worst combination.'},{title:'The multiplier — small changes, big effects',body:'Government spends $1 → that becomes income → someone spends 80¢ → and so on. **Spending multiplier** = 1 ÷ MPS. **Tax multiplier** = −MPC ÷ MPS. Always one less than spending multiplier.'},{title:'Fiscal policy — the government\'s toolkit',body:'**Expansionary** (recession): ↑ spending, ↓ taxes → AD right. **Contractionary** (inflation): ↓ spending, ↑ taxes → AD left. **Automatic stabilizers** kick in without legislation.'},{title:'Long-run self-correction',body:'Recessionary gap → wages fall → SRAS right → full employment. Inflationary gap → wages rise → SRAS left → full employment. Takes time — that\'s why policymakers don\'t always wait.'}],examTip:'Unit 3 is 17–27% of the exam and the heart of every FRQ. Draw the AS/AD model, show shifts, identify gaps, explain policy — all connected.'},
-  {id:4,tagline:'Where money comes from and how the Fed controls it.',intro:'Most of the money in the economy was created by banks — through lending. Unit 4 explains how that works and why interest rates are the most-watched number in finance.',sections:[{title:'What is money, really?',body:'M1 = cash + checking. M2 adds savings + money market funds. The monetary base is reserves + currency — the raw material banks use to create money.'},{title:'T-accounts — how banks see the world',body:'Assets on the left (cash, loans, reserves). Liabilities on the right (deposits). When you deposit $100: bank\'s assets ↑ $100, liabilities ↑ $100. **Assets = Liabilities + Equity. Always.**'},{title:'The money multiplier — how banks create money',body:'With 10% reserve requirement, $1,000 deposit keeps $100 and lends $900. Then $81, then $729... **Money Multiplier = 1 ÷ Reserve Requirement.** That $1,000 can become $10,000.'},{title:'The Fed\'s toolkit',body:'Open market operations: buy bonds → ↑ money supply. Discount rate: lower it → banks borrow more. Reserve requirements: lower them → more lending. Today the Fed mainly uses **interest on reserves (IOR)**.'}],examTip:'Unit 4 is 18–23% of the exam. Know T-accounts cold — trace a deposit through the banking system. Practice the money market and loanable funds graphs.'},
-  {id:5,tagline:'What happens in the long run when policy goes wrong — or right?',intro:'Unit 5 is where short-run thinking meets long-run reality. Policies that feel good today can have painful side effects later.',sections:[{title:'The Phillips Curve — inflation vs unemployment',body:'Short run: lower unemployment → higher inflation. **SRPC** is downward sloping. Long run: no tradeoff — **LRPC is vertical** at the natural rate. The SRPC mirrors the SRAS — they shift together.'},{title:'Crowding out — the dark side of deficit spending',body:'Government borrows → ↑ demand for loanable funds → real rates rise → private investment falls = **crowded out**. Budget surplus does the reverse: **crowding in**.'},{title:'The Quantity Theory of Money',body:'**M × V = P × Y**. If M doubles and V, Y stay constant → P doubles → inflation. This is why excessive money printing causes inflation.'},{title:'Long-run economic growth',body:'Real growth = LRAS shifting right. Drivers: more resources, better tech, improved productivity. Government can help with R&D, tax credits, education, deregulation.'}],examTip:'Unit 5 is 20–30% — the highest weight. Know Phillips Curve shifts, crowding out in the loanable funds graph, and long-run policy consequences.'},
-  {id:6,tagline:'How countries trade, borrow, and set exchange rates.',intro:'Unit 6 zooms out to the global economy. When the Fed raises rates, what happens to the dollar? It shows up on every AP Macro exam.',sections:[{title:'The balance of payments',body:'**Current account**: trade in goods/services/income. **Capital & Financial account**: purchases of assets. Golden rule: **Current + Capital = 0**. Trade deficit → capital inflows.'},{title:'Exchange rates',body:'Dollar **appreciates** → imports cheaper, exports pricier abroad → net exports fall → AD shifts left. Dollar **depreciates** → exports boom → AD shifts right.'},{title:'The interest rate → exchange rate chain',body:'**Fed raises rates → US assets more attractive → demand for dollars ↑ → dollar appreciates → net exports fall → AD shifts left.** Draw this chain and you can answer any Unit 6 FRQ.'}],examTip:'Unit 6 is 10–13% of the exam but heavy in FRQs. The exchange rate/interest rate chain is almost guaranteed. Practice the forex market graph.'},
-];
 
 // ── QUOTES ────────────────────────────────────────────────────────────────
 const QUOTES=[
-  // Thomas Sowell
-  {q:"The first lesson of economics is scarcity: there is never enough of anything to fully satisfy all those who want it.",a:"Thomas Sowell",t:"Basic Economics"},
-  {q:"It is hard to imagine a more stupid or more dangerous way of making decisions than by putting those decisions in the hands of people who pay no price for being wrong.",a:"Thomas Sowell",t:""},
-  {q:"Prices are not just numbers that can be changed by government decree without consequences.",a:"Thomas Sowell",t:"Basic Economics"},
-  {q:"The real minimum wage is always zero — that's what someone gets when they lose their job because an employer can't afford to pay them more.",a:"Thomas Sowell",t:""},
-  {q:"No one will really understand politics until they understand that politicians are not trying to solve our problems. They are trying to solve their own problems — of which getting elected and re-elected are No. 1 and No. 2.",a:"Thomas Sowell",t:""},
-  {q:"The fact that so many successful politicians are such shameless liars is not only a reflection on them; it is also a reflection on us.",a:"Thomas Sowell",t:""},
-  {q:"Since this is an era when many people are concerned about fairness and social justice, what is your fair share of what someone else has worked for?",a:"Thomas Sowell",t:""},
-  {q:"Trade-offs have been with us ever since the Garden of Eden. The only thing that has changed is our awareness of them.",a:"Thomas Sowell",t:""},
-  {q:"In short, 'doing nothing' is not automatically worse than doing something. It all depends on what the something is.",a:"Thomas Sowell",t:""},
-  {q:"There are no solutions. There are only trade-offs.",a:"Thomas Sowell",t:"A Conflict of Visions"},
-  {q:"The problem isn't that Johnny can't read. The problem isn't even that Johnny can't think. The problem is that Johnny doesn't know what thinking is.",a:"Thomas Sowell",t:""},
-  {q:"Helping people feel good about themselves is an entirely different enterprise from making them actually better off.",a:"Thomas Sowell",t:""},
-  // Murray Rothbard
-  {q:"The market is not a place, a thing, or a collective entity. The market is a process, actuated by the interplay of the actions of the various individuals cooperating under the division of labor.",a:"Murray Rothbard",t:"Man, Economy, and State"},
-  {q:"It is no crime to be ignorant of economics, which is, after all, a specialized discipline and one that most people consider to be a 'dismal science.' But it is totally irresponsible to have a loud and vociferous opinion on economic subjects while remaining in this state of ignorance.",a:"Murray Rothbard",t:""},
-  {q:"In the long run, the market is the only effective check on governmental power.",a:"Murray Rothbard",t:""},
-  {q:"Inflation is not a higher price level — it is a general increase in the supply of money. It only looks like rising prices.",a:"Murray Rothbard",t:"What Has Government Done to Our Money?"},
-  {q:"The government is not a productive enterprise; it is a predatory enterprise.",a:"Murray Rothbard",t:""},
-  {q:"There is nothing wrong with profits — they simply mean that the entrepreneur has correctly anticipated what customers want.",a:"Murray Rothbard",t:""},
-  {q:"The function of the entrepreneur is not just to produce — but to produce what consumers want, when and where they want it.",a:"Murray Rothbard",t:"Man, Economy, and State"},
-  {q:"Sound money and free markets go together. You cannot have one without the other for long.",a:"Murray Rothbard",t:""},
-  {q:"Every intervention by government distorts the market and generates problems that government then uses as an excuse for further intervention.",a:"Murray Rothbard",t:""},
-  {q:"Taxation is just a fancy word for what the rest of us would call theft — the difference being that governments do it legally.",a:"Murray Rothbard",t:""},
-  // Ludwig Von Mises
-  {q:"The market economy is the social system of the division of labor under private ownership of the means of production. Everybody acts on his own behalf; but everybody's actions aim at the satisfaction of other people's needs as well as at the satisfaction of his own.",a:"Ludwig von Mises",t:"Human Action"},
-  {q:"No one can find a safe way out for himself if society is sweeping towards destruction. Therefore everyone, in his own interests, must thrust himself vigorously into the intellectual battle.",a:"Ludwig von Mises",t:""},
-  {q:"The capitalist system of production is an economic democracy in which every penny gives a right to vote.",a:"Ludwig von Mises",t:"Human Action"},
-  {q:"The economic freedom which is the prerequisite of any other freedom cannot be the freedom to destroy freedom.",a:"Ludwig von Mises",t:""},
-  {q:"Government is the only institution that can take a valuable commodity like paper, and make it worthless by applying ink.",a:"Ludwig von Mises",t:""},
-  {q:"The first condition of freedom is its limitation; make it absolute and it dies in chaos.",a:"Ludwig von Mises",t:""},
-  {q:"Whoever wishes peace among peoples must fight statism.",a:"Ludwig von Mises",t:"Omnipotent Government"},
-  {q:"What is needed for a sound expansion of production is additional capital goods, not money or fiduciary media.",a:"Ludwig von Mises",t:"The Theory of Money and Credit"},
-  {q:"The champions of socialism call themselves progressives, but they recommend a system which is characterized by rigid observance of routine and by a resistance to every kind of improvement.",a:"Ludwig von Mises",t:"Bureaucracy"},
-  {q:"Every price that is fixed by the government upsets the balance of the market — it always produces effects that are contrary to its own goals.",a:"Ludwig von Mises",t:""},
-  {q:"The individual is the carrier of human reason. There is no such thing as a collective reason.",a:"Ludwig von Mises",t:"Human Action"},
-  {q:"The history of the gold standard is the history of monetary freedom.",a:"Ludwig von Mises",t:"The Theory of Money and Credit"},
+  {q:"There are no solutions. There are only trade-offs.",a:"Thomas Sowell",b:"A Conflict of Visions"},
+  {q:"The first lesson of economics is scarcity: there is never enough of anything to fully satisfy all those who want it.",a:"Thomas Sowell",b:"Basic Economics"},
+  {q:"It is hard to imagine a more stupid or more dangerous way of making decisions than by putting those decisions in the hands of people who pay no price for being wrong.",a:"Thomas Sowell",b:""},
+  {q:"Prices are not just numbers that can be changed by government decree without consequences.",a:"Thomas Sowell",b:"Basic Economics"},
+  {q:"The real minimum wage is always zero — that's what someone gets when they lose their job because an employer can't afford to pay them more.",a:"Thomas Sowell",b:""},
+  {q:"Since this is an era when many people are concerned about fairness and social justice, what is your fair share of what someone else has worked for?",a:"Thomas Sowell",b:""},
+  {q:"Trade-offs have been with us ever since the Garden of Eden. The only thing that has changed is our awareness of them.",a:"Thomas Sowell",b:""},
+  {q:"Helping people feel good about themselves is an entirely different enterprise from making them actually better off.",a:"Thomas Sowell",b:""},
+  {q:"It is no crime to be ignorant of economics — but it is totally irresponsible to have a loud and vociferous opinion on economic subjects while remaining in this state of ignorance.",a:"Murray Rothbard",b:""},
+  {q:"The market is not a place, a thing, or a collective entity. The market is a process, actuated by the interplay of the actions of the various individuals cooperating under the division of labor.",a:"Murray Rothbard",b:"Man, Economy, and State"},
+  {q:"Inflation is not a higher price level — it is a general increase in the supply of money. It only looks like rising prices.",a:"Murray Rothbard",b:"What Has Government Done to Our Money?"},
+  {q:"There is nothing wrong with profits — they simply mean that the entrepreneur has correctly anticipated what consumers want.",a:"Murray Rothbard",b:""},
+  {q:"Every intervention by government distorts the market and generates problems that government then uses as an excuse for further intervention.",a:"Murray Rothbard",b:""},
+  {q:"Sound money and free markets go together. You cannot have one without the other for long.",a:"Murray Rothbard",b:""},
+  {q:"The function of the entrepreneur is not just to produce — but to produce what consumers want, when and where they want it.",a:"Murray Rothbard",b:"Man, Economy, and State"},
+  {q:"The market economy is the social system of the division of labor under private ownership of the means of production.",a:"Ludwig von Mises",b:"Human Action"},
+  {q:"The capitalist system of production is an economic democracy in which every penny gives a right to vote.",a:"Ludwig von Mises",b:"Human Action"},
+  {q:"Government is the only institution that can take a valuable commodity like paper, and make it worthless by applying ink.",a:"Ludwig von Mises",b:""},
+  {q:"No one can find a safe way out for himself if society is sweeping towards destruction. Therefore everyone, in his own interests, must thrust himself vigorously into the intellectual battle.",a:"Ludwig von Mises",b:""},
+  {q:"What is needed for a sound expansion of production is additional capital goods, not money or fiduciary media.",a:"Ludwig von Mises",b:"The Theory of Money and Credit"},
+  {q:"Every price that is fixed by the government upsets the balance of the market — it always produces effects that are contrary to its own goals.",a:"Ludwig von Mises",b:""},
+  {q:"The individual is the carrier of human reason. There is no such thing as a collective reason.",a:"Ludwig von Mises",b:"Human Action"},
+  {q:"Whoever wishes peace among peoples must fight statism.",a:"Ludwig von Mises",b:"Omnipotent Government"},
+  {q:"The history of the gold standard is the history of monetary freedom.",a:"Ludwig von Mises",b:"The Theory of Money and Credit"},
+];
+let qIdx=Math.floor(Math.random()*QUOTES.length);
+const nextQ=()=>{qIdx=(qIdx+1)%QUOTES.length;renderQuote()};
+
+function renderQuote(){
+  const q=QUOTES[qIdx],old=document.getElementById('qfooter');
+  const html=`<div class="qfoot" id="qfooter"><div style="display:flex;gap:12px;align-items:flex-start">
+    <div style="font-size:28px;color:var(--accent);opacity:.25;line-height:1;flex-shrink:0;margin-top:-2px">"</div>
+    <div>
+      <div class="qfoot-q">${e(q.q)}</div>
+      <div class="qfoot-a">— <span>${e(q.a)}</span>${q.b?` · <em style="font-style:italic;color:var(--mut)">${e(q.b)}</em>`:''}</div>
+      <button class="qfoot-btn" onclick="nextQ()">next quote →</button>
+    </div>
+  </div></div>`;
+  if(old){old.outerHTML=html;}
+  else{const d=document.createElement('div');d.innerHTML=html;document.getElementById('app').after(d.firstChild);}
+}
+function injectQuote(){setTimeout(()=>{const old=document.getElementById('qfooter');if(old)old.remove();renderQuote();},60);}
+
+// ── CONSTANTS ─────────────────────────────────────────────────────────────
+const MODEL='claude-sonnet-4-20250514';
+let API_KEY=localStorage.getItem('apex-key')||'';
+const AC=['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc'];
+const ac=i=>AC[i%AC.length];
+const e=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const bold=s=>e(s).replace(/\*\*(.*?)\*\*/g,'<strong style="color:var(--txt)">$1</strong>');
+
+const UNITS=[
+  {id:1,lbl:'Basic Concepts',col:'#f0c040',ex:'5–10%',em:'🧩',kw:['scarcity','opportunity cost','ppc','production possibilities','comparative advantage','supply','demand','trade']},
+  {id:2,lbl:'Economic Indicators',col:'#4fc3f7',ex:'12–17%',em:'📊',kw:['gdp','gross domestic product','unemployment','inflation','cpi','business cycle','recession','nominal','real','deflator','labor force']},
+  {id:3,lbl:'AS/AD & Fiscal Policy',col:'#a78bfa',ex:'17–27%',em:'📉',kw:['aggregate demand','aggregate supply','fiscal','multiplier','mpc','mps','government spending','tax','recessionary gap','inflationary gap','sras','lras','ad']},
+  {id:4,lbl:'Financial Sector',col:'#34d399',ex:'18–23%',em:'🏦',kw:['money','banking','t-account','reserve','money multiplier','monetary policy','federal reserve','fed','interest rate','loanable funds','m1','m2','bond','open market','discount rate','fractional reserve','deposit']},
+  {id:5,lbl:'Long-Run Policy',col:'#fb7185',ex:'20–30%',em:'📈',kw:['phillips curve','long run','crowding out','quantity theory','mv=py','stagflation','lrpc','srpc','natural rate','economic growth','lras shift']},
+  {id:6,lbl:'Open Economy & Forex',col:'#c084fc',ex:'10–13%',em:'🌍',kw:['foreign exchange','forex','exchange rate','balance of payments','current account','capital account','imports','exports','net exports','currency','appreciation','depreciation']},
 ];
 
-let quoteIndex=Math.floor(Math.random()*QUOTES.length);
-function getQuote(){return QUOTES[quoteIndex%QUOTES.length];}
-function nextQuote(){quoteIndex++;renderQuoteFooter();}
+const UNIT_OVERVIEWS=[
+  {id:1,tag:'The foundation everything else is built on.',intro:'Before you can understand why the stock market moves or what the Fed does, you need to get comfortable with a few big ideas. Unit 1 is all about those fundamentals — and once these click, the rest of AP Macro starts to make sense.',secs:[{t:'Scarcity — the reason economics exists',b:'Here\'s the core problem: people want more than they can have. Resources — time, money, land, labor — are limited. Wants are not. That gap is called **scarcity**, and it\'s why every decision has a cost. Even choosing Netflix over studying has an opportunity cost.'},{t:'Opportunity cost — the real price of everything',b:'Every time you choose one thing, you give up another. That thing you give up is your **opportunity cost**. The true cost of any decision isn\'t just what you paid — it\'s what you didn\'t do instead.'},{t:'The PPC — a picture of what\'s possible',b:'The **Production Possibilities Curve** shows the maximum output a country can produce. On the curve = efficient. Inside = wasting resources. Outside = impossible. Outward shift = **economic growth**.'},{t:'Comparative advantage — why trade makes everyone richer',b:'Even if one country is better at producing everything, it still makes sense to trade. Focus on what you\'re **relatively** better at. Everyone ends up with more.'},{t:'Supply & demand — how markets find their price',b:'When price rises, buyers want less and sellers want more. When they meet, you get **equilibrium**. Master the shifters and you can predict almost any market outcome.'}],tip:'Unit 1 is 5–10% of the exam but runs through everything. Opportunity cost, PPC shifts, and comparative advantage appear in FRQs constantly.'},
+  {id:2,tag:'How do we know if the economy is healthy?',intro:'You can\'t fix what you can\'t measure. Unit 2 is about the scoreboard — the tools economists use to take the economy\'s temperature. These are the numbers policymakers obsess over every day.',secs:[{t:'GDP — the economy\'s report card',b:'**Gross Domestic Product** = total value of everything a country produces. GDP = C + Ig + G + Xn. NOT included: used goods, stocks, underground activity. **Real GDP** adjusts for inflation — always use it to compare across years.'},{t:'Unemployment — not everyone counts',b:'You\'re only "unemployed" if actively looking. Stop looking → fall out of labor force → rate goes DOWN. Three types: **frictional** (between jobs), **structural** (skills mismatch), **cyclical** (recession). Natural rate = frictional + structural.'},{t:'Inflation — when your dollar buys less',b:'Inflation = general rise in price level. Main measure = **CPI**. **Borrowers win** — they repay loans with cheaper dollars. **Lenders and savers lose** — their money loses purchasing power.'},{t:'The business cycle — boom and bust',b:'Economies expand, peak, contract, trough. **Recessionary gap** = output below potential. **Inflationary gap** = economy running hot. Where you are determines which policy tools make sense.'}],tip:'Unit 2 is 12–17% of the exam. FRQs love to ask you to calculate unemployment rate, inflation rate, or GDP deflator. Know your formulas cold.'},
+  {id:3,tag:'What causes booms and busts — and what can the government do?',intro:'Unit 3 is the biggest, most tested unit. The AS/AD model shows how the whole economy works in one graph, and fiscal policy is what the government does when things go wrong.',secs:[{t:'The AS/AD model — the economy in one graph',b:'**AD** slopes down. **SRAS** slopes up. **LRAS** is vertical at potential output. Where AD meets SRAS = short-run equilibrium. Positive demand shock → ↑ output AND ↑ prices. Negative supply shock = **stagflation** — the worst combo.'},{t:'The multiplier — small changes, big effects',b:'Government spends $1 → becomes income → someone spends 80¢ → becomes income → and so on. **Spending multiplier** = 1 ÷ MPS. **Tax multiplier** = −MPC ÷ MPS. Always 1 less (in absolute value) than spending.'},{t:'Fiscal policy — the government\'s toolkit',b:'**Expansionary** (recession): ↑ spending, ↓ taxes → AD shifts right. **Contractionary** (inflation): ↓ spending, ↑ taxes → AD shifts left. **Automatic stabilizers** kick in without any legislation.'},{t:'Long-run self-correction',b:'Recessionary gap → wages eventually fall → SRAS right → full employment. Inflationary gap → wages rise → SRAS left → full employment. Takes time — that\'s why policymakers don\'t always wait.'}],tip:'Unit 3 is 17–27% of the exam and the heart of every FRQ. Draw the AS/AD model, show shifts, identify gaps, explain policy — all connected.'},
+  {id:4,tag:'Where money comes from and how the Fed controls it.',intro:'Most of the money in the economy was created by banks — through lending. Unit 4 explains how that works and why interest rates are the most-watched number in finance.',secs:[{t:'What is money, really?',b:'M1 = cash + checking accounts. M2 adds savings + money market funds. The monetary base is reserves + currency — the raw material banks use to create money.'},{t:'T-accounts — how banks see the world',b:'Assets on the left (cash, loans, reserves). Liabilities on the right (deposits). When you deposit $100: bank\'s assets ↑ $100, liabilities ↑ $100. **Assets = Liabilities + Equity. Always.**'},{t:'The money multiplier — how banks create money',b:'With 10% reserve requirement, $1,000 deposit keeps $100 and lends $900. Then $810, then $729... **Money Multiplier = 1 ÷ Reserve Requirement.** That $1,000 can support up to $10,000 in deposits.'},{t:'The Fed\'s toolkit',b:'Open market operations: buy bonds → ↑ money supply (most common). Discount rate: lower it → banks borrow more. Reserve requirements: lower → more lending. Today the Fed mainly uses **interest on reserves (IOR)** to set policy.'}],tip:'Unit 4 is 18–23% of the exam. Know T-accounts cold — the FRQ often gives you a deposit and asks you to trace through the banking system. Practice the loanable funds graph.'},
+  {id:5,tag:'What happens in the long run when policy goes wrong — or right?',intro:'Unit 5 is where short-run thinking meets long-run reality. Policies that feel good today can have painful side effects later.',secs:[{t:'The Phillips Curve — inflation vs unemployment',b:'Short run: lower unemployment → higher inflation. The **SRPC** is downward sloping. Long run: no trade-off — **LRPC is vertical** at the natural rate. The SRPC mirrors the SRAS — they shift together. Stagflation shifts both SRAS left and SRPC right.'},{t:'Crowding out — the dark side of deficit spending',b:'Government borrows → ↑ demand for loanable funds → real rates rise → private investment falls = **crowded out**. Budget surplus does the reverse: **crowding in** → lower rates → more investment.'},{t:'The Quantity Theory of Money',b:'**M × V = P × Y**. If M doubles and V, Y stay constant → P doubles → inflation. This is why excessive money printing causes inflation in the long run.'},{t:'Long-run economic growth',b:'Real growth = LRAS shifting right. Drivers: ↑ resources, ↑ technology, ↑ productivity. Government accelerates this with R&D, tax credits, education, deregulation. PPC shifts outward.'}],tip:'Unit 5 is 20–30% — highest weight of any unit. Know Phillips Curve shifts, crowding out in the loanable funds graph, and long-run policy consequences cold.'},
+  {id:6,tag:'How countries trade, borrow, and set exchange rates.',intro:'Unit 6 zooms out to the global economy. When the Fed raises rates, what happens to the dollar? It shows up on every AP Macro exam.',secs:[{t:'The balance of payments',b:'**Current account**: trade in goods, services, income. **Capital & Financial account**: purchases of assets. Golden rule: **Current + Capital = 0**. A trade deficit → capital inflows. The accounts always balance.'},{t:'Exchange rates',b:'Dollar **appreciates** → imports cheaper, exports pricier abroad → net exports fall → AD shifts left. Dollar **depreciates** → exports boom → net exports rise → AD shifts right.'},{t:'The interest rate → exchange rate chain',b:'**Fed raises rates → US assets more attractive → demand for dollars ↑ → dollar appreciates → imports ↑, exports ↓ → net exports fall → AD shifts left.** Draw this chain for any Unit 6 FRQ.'}],tip:'Unit 6 is 10–13% but heavy in FRQs. The exchange rate / interest rate chain is almost guaranteed. Practice the forex market graph.'},
+];
 
-function renderQuoteFooter(){
-  const existing=document.getElementById('quote-footer');
-  const q=getQuote();
-  const html=`<div class="quote-footer" id="quote-footer">
-    <div style="display:flex;align-items:flex-start;gap:12px">
-      <div style="font-size:24px;opacity:.3;line-height:1;flex-shrink:0;margin-top:2px">"</div>
-      <div>
-        <div class="quote-text">${esc(q.q)}</div>
-        <div class="quote-attr">— <span>${esc(q.a)}</span>${q.t?` · <em style="font-style:italic;color:var(--mut)">${esc(q.t)}</em>`:''}</div>
-        <button class="quote-next" onclick="nextQuote()">Next quote →</button>
-      </div>
-    </div>
-  </div>`;
-  if(existing){existing.outerHTML=html;}
-  else{
-    const app=document.getElementById('app');
-    if(app){const div=document.createElement('div');div.innerHTML=html;app.after(div.firstChild);}
-  }
-}
-
-function injectQuote(){
-  setTimeout(()=>{
-    const existing=document.getElementById('quote-footer');
-    if(existing)existing.remove();
-    renderQuoteFooter();
-  },50);
-}
-function saveSessions(s){try{localStorage.setItem('apex-sessions',JSON.stringify(s))}catch{}}
-
+// ── DATA ──────────────────────────────────────────────────────────────────
+function loadS(){try{return JSON.parse(localStorage.getItem('apex-sessions')||'[]')}catch{return[]}}
+function saveS(s){try{localStorage.setItem('apex-sessions',JSON.stringify(s))}catch{}}
 function detectUnit(s){
-  const text=[s.title,s.summary,...(s.studyGuide?.keyTakeaways||[]),...(s.studyGuide?.sections||[]).map(x=>x.title+' '+(x.cards||[]).map(c=>c.title).join(' '))].join(' ').toLowerCase();
-  let best=null,bestScore=0;
-  for(const u of UNITS){const score=u.topics.filter(t=>text.includes(t)).length;if(score>bestScore){bestScore=score;best=u;}}
+  const tx=[s.title,s.summary,...(s.studyGuide?.keyTakeaways||[]),...(s.studyGuide?.sections||[]).map(x=>x.title+' '+(x.cards||[]).map(c=>c.title).join(' '))].join(' ').toLowerCase();
+  let best=null,top=0;
+  for(const u of UNITS){const sc=u.kw.filter(k=>tx.includes(k)).length;if(sc>top){top=sc;best=u;}}
   return best||UNITS[3];
 }
 
-let sessions=loadSessions().map(s=>s.unit?s:{...s,unit:detectUnit(s)});
-let currentSession=null,currentTab='visual',homeTab='sessions';
-let flipped={},picks={},checked={},chatHistory=[],fcIndex=0,mcqPicks={};
+let sessions=loadS().map(s=>s.unit?s:{...s,unit:detectUnit(s)});
+let cur=null,tab='visual',htab='sessions';
+let fcIdx=0,picks={},checked={},chatH=[],mcqP={};
 
-async function callClaude(messages,system){
-  if(!API_KEY){showSetup('Please enter your API key to continue.');throw new Error('No key');}
-  const res=await fetch('https://api.anthropic.com/v1/messages',{
+// ── API ───────────────────────────────────────────────────────────────────
+async function callClaude(msgs,sys){
+  if(!API_KEY){showSetup('Enter your API key to continue.');throw new Error('no-key');}
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'content-type':'application/json','x-api-key':API_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:MODEL,max_tokens:4000,system,messages})
+    body:JSON.stringify({model:MODEL,max_tokens:4000,system:sys,messages:msgs})
   });
-  if(res.status===401){localStorage.removeItem('apex-key');API_KEY='';showSetup('❌ Invalid API key — please enter a valid key from console.anthropic.com');throw new Error('401');}
-  if(!res.ok)throw new Error(`API ${res.status}: ${(await res.text()).slice(0,200)}`);
-  return(await res.json()).content.filter(b=>b.type==='text').map(b=>b.text).join('');
+  if(r.status===401){localStorage.removeItem('apex-key');API_KEY='';showSetup('❌ Invalid API key — please re-enter a valid key from console.anthropic.com');throw new Error('401');}
+  if(!r.ok)throw new Error(`API ${r.status}: ${(await r.text()).slice(0,200)}`);
+  return(await r.json()).content.filter(b=>b.type==='text').map(b=>b.text).join('');
 }
 
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function bold(s){return esc(s).replace(/\*\*(.*?)\*\*/g,'<strong style="color:#eeeef5">$1</strong>')}
-function render(html){document.getElementById('app').innerHTML=html}
+// ── RENDER ────────────────────────────────────────────────────────────────
+const $=id=>document.getElementById(id);
+const R=html=>{$('app').innerHTML=html;injectQuote();}
 
-// ── SETUP ──────────────────────────────────────────────────────────────────
+// ── RING ──────────────────────────────────────────────────────────────────
+function ring(pct,col,sz=38){
+  const r=14,c=2*Math.PI*r,d=c*(pct/100),g=c-d;
+  return`<div class="ring" style="width:${sz}px;height:${sz}px">
+    <svg width="${sz}" height="${sz}" viewBox="0 0 34 34">
+      <circle cx="17" cy="17" r="${r}" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="3"/>
+      <circle cx="17" cy="17" r="${r}" fill="none" stroke="${col}" stroke-width="3" stroke-dasharray="${d} ${g}" stroke-linecap="round"/>
+    </svg>
+    <div class="ring-n" style="color:${col}">${pct}%</div>
+  </div>`;
+}
+
+// ── UNIT NAV ──────────────────────────────────────────────────────────────
+const uNavBar=(aid)=>`<div class="unav">${UNITS.map(u=>{
+  const on=aid===u.id,cnt=sessions.filter(s=>s.unit?.id===u.id).length;
+  return`<button class="unav-btn${on?' on':''}" onclick="jumpUnit(${u.id})" style="${on?`border-top-color:${u.col};color:${u.col}`:''}">
+    <span class="unav-n" style="${on?`color:${u.col}`:''}">${u.em}</span>
+    <span>${cnt?cnt+'s':''}</span>
+  </button>`;
+}).join('')}</div>`;
+
+function jumpUnit(id){
+  const s=sessions.find(x=>x.unit?.id===id);
+  if(s)openSess(sessions.indexOf(s));else showUnit(id);
+}
+
+// ── SETUP ─────────────────────────────────────────────────────────────────
 function showSetup(err=''){
-  render(`<div class="setup-box">
+  R(`<div class="setup fadein">
     <div style="text-align:center;margin-bottom:24px">
-      <svg width="60" height="60" viewBox="0 0 80 80">
-        <ellipse cx="40" cy="50" rx="22" ry="20" fill="#1a1a30" stroke="#f0c040" stroke-width="1.5"/>
-        <ellipse cx="40" cy="28" rx="18" ry="17" fill="#1a1a30" stroke="#f0c040" stroke-width="1.5"/>
-        <polygon points="26,14 22,4 30,12" fill="#f0c040"/><polygon points="54,14 58,4 50,12" fill="#f0c040"/>
-        <circle cx="33" cy="26" r="6" fill="#0a0a18" stroke="#4fc3f7" stroke-width="1.5"/>
-        <circle cx="47" cy="26" r="6" fill="#0a0a18" stroke="#4fc3f7" stroke-width="1.5"/>
-        <circle cx="34" cy="25" r="3" fill="#4fc3f7"/><circle cx="48" cy="25" r="3" fill="#4fc3f7"/>
-        <polygon points="40,32 37,36 43,36" fill="#f0c040"/>
-        <rect x="24" y="12" width="32" height="5" rx="1" fill="#f0c040"/><rect x="37" y="8" width="6" height="5" rx="1" fill="#f0c040"/>
+      <svg width="64" height="64" viewBox="0 0 80 80">
+        <ellipse cx="40" cy="51" rx="21" ry="19" fill="#12122a" stroke="#f0c040" stroke-width="1.4"/>
+        <ellipse cx="40" cy="28" rx="18" ry="17" fill="#12122a" stroke="#f0c040" stroke-width="1.4"/>
+        <polygon points="25,15 20,4 29,13" fill="#f0c040"/><polygon points="55,15 60,4 51,13" fill="#f0c040"/>
+        <rect x="23" y="12" width="34" height="5" rx="1.5" fill="#f0c040"/>
+        <circle cx="32" cy="27" r="6" fill="#08081a" stroke="#4fc3f7" stroke-width="1.5"/>
+        <circle cx="48" cy="27" r="6" fill="#08081a" stroke="#4fc3f7" stroke-width="1.5"/>
+        <circle cx="33" cy="26" r="3" fill="#4fc3f7"/><circle cx="49" cy="26" r="3" fill="#4fc3f7"/>
+        <polygon points="40,33 37,37 43,37" fill="#f0c040"/>
       </svg>
-      <div style="font-family:monospace;font-size:22px;font-weight:900;color:var(--accent);letter-spacing:2px;margin-top:8px">APEX</div>
-      <div style="font-size:12px;color:var(--mut);margin-top:4px">Your AP Exam Edge · by Axie 🦉</div>
+      <div style="font-family:monospace;font-size:26px;font-weight:900;color:var(--accent);letter-spacing:2px;margin-top:8px">APEX</div>
+      <div style="font-size:12px;color:var(--mut);margin-top:3px">Your AP Exam Edge · powered by Axie 🦉</div>
     </div>
-    ${err?`<div style="background:rgba(251,113,133,0.08);border:1px solid rgba(251,113,133,0.3);border-radius:4px;padding:10px 14px;color:var(--a4);font-size:13px;margin-bottom:14px">${esc(err)}</div>`:''}
+    ${err?`<div style="background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:var(--r6);padding:10px 14px;color:var(--c5);font-size:12px;margin-bottom:14px">${e(err)}</div>`:''}
     <div class="setup-steps">
-      <strong style="color:var(--a1)">How to get your Anthropic API key:</strong><br>
-      1. Go to <a href="https://console.anthropic.com" target="_blank" style="color:var(--a1)">console.anthropic.com</a><br>
-      2. Click <strong style="color:var(--txt)">API Keys</strong> → <strong style="color:var(--txt)">Create Key</strong><br>
-      3. Copy it immediately — starts with <code style="color:var(--accent)">sk-ant-api03-</code><br>
-      4. Paste below and hit Save
+      <strong style="color:var(--c2)">How to get your Anthropic API key:</strong><br>
+      1. Go to <a href="https://console.anthropic.com" target="_blank" style="color:var(--c2)">console.anthropic.com</a><br>
+      2. Click <strong style="color:var(--txt)">API Keys → Create Key</strong><br>
+      3. Copy immediately — starts with <code style="color:var(--accent);font-size:11px">sk-ant-api03-</code><br>
+      4. Paste below and tap Save
     </div>
-    <div class="mono-label" style="margin-bottom:8px">Your API Key</div>
-    <input id="key-input" type="password" placeholder="sk-ant-api03-..." style="width:100%;padding:11px 14px;font-size:13px;border-radius:4px;border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);outline:none;font-family:monospace;margin-bottom:12px"/>
-    <button class="btn-accent btn-full" onclick="saveKey()" style="margin-bottom:8px">Save & Launch APEX 🚀</button>
-    <div id="key-err" class="status-err"></div>
-    <p style="font-size:11px;color:var(--mut);margin-top:12px;text-align:center">Saved only on this device. Never on GitHub.</p>
+    <div class="lbl" style="margin-bottom:8px">Your Anthropic API Key</div>
+    <input id="ki" type="password" placeholder="sk-ant-api03-..." style="width:100%;padding:11px 14px;font-size:13px;border-radius:var(--r6);border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);outline:none;font-family:monospace;margin-bottom:12px"/>
+    <button class="btn-hi btn-full" onclick="saveKey()">Save &amp; Launch APEX 🚀</button>
+    <div id="ke" class="err"></div>
+    <p style="font-size:11px;color:var(--mut);text-align:center;margin-top:12px">Saved only on this device. Never on GitHub.</p>
   </div>`);
 }
-
 function saveKey(){
-  const k=document.getElementById('key-input')?.value?.trim();
-  if(!k||!k.startsWith('sk-')){document.getElementById('key-err').textContent='Please enter a valid key (starts with sk-ant-)';return;}
-  API_KEY=k;localStorage.setItem('apex-key',k);checkStreak();updateHeroStats();showHome();
-  axieSay('Welcome back! Let\'s get studying 🦉');
+  const k=$('ki')?.value?.trim();
+  if(!k||!k.startsWith('sk-')){$('ke').textContent='Please enter a valid key (starts with sk-ant-)';return;}
+  API_KEY=k;localStorage.setItem('apex-key',k);checkStreak();updateHero();showHome();
+  axieSay('Welcome back! Let\'s get to work 🦉');
 }
 
 // ── HOME ──────────────────────────────────────────────────────────────────
 function showHome(){
-  currentSession=null;
-  render(`
-    <div class="tab-bar">
-      <button class="tab ${homeTab==='sessions'?'active':''}" onclick="switchHomeTab('sessions')">Sessions</button>
-      <button class="tab ${homeTab==='units'?'active':''}" onclick="switchHomeTab('units')">Unit Overviews</button>
-    </div>
-    <div class="content" id="home-content"></div>
-  `);
-  setTimeout(()=>renderHomeTab(),0);
-  injectQuote();
+  cur=null;
+  R(`<div class="tabbar">
+    <button class="tab${htab==='sessions'?' on':''}" onclick="switchH('sessions')">Sessions</button>
+    <button class="tab${htab==='units'?' on':''}" onclick="switchH('units')">Unit Overviews</button>
+  </div>
+  <div class="page fadein" id="hcontent"></div>`);
+  setTimeout(()=>renderH(),0);
+}
+function switchH(t){
+  htab=t;
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',(i===0&&t==='sessions')||(i===1&&t==='units')));
+  renderH();
+}
+function renderH(){const el=$('hcontent');if(!el)return;el.innerHTML=htab==='sessions'?renderSess():renderUnits();}
+
+function upct(uid){
+  const n=sessions.filter(s=>s.unit?.id===uid).length;
+  return Math.min(100,Math.round((n/3)*100));
 }
 
-function switchHomeTab(t){
-  homeTab=t;
-  document.querySelectorAll('.tab').forEach((b,i)=>{b.classList.toggle('active',(i===0&&t==='sessions')||(i===1&&t==='units'));});
-  renderHomeTab();
-}
-
-function renderHomeTab(){
-  const el=document.getElementById('home-content');if(!el)return;
-  if(homeTab==='sessions')el.innerHTML=renderSessions();
-  else el.innerHTML=renderUnits();
-}
-
-function unitProgress(uid){
-  const us=sessions.filter(s=>s.unit?.id===uid);
-  if(!us.length)return 0;
-  return Math.min(100,Math.round((us.length/3)*100));
-}
-
-function renderProgressRing(pct,color,size=40){
-  const r=15,circ=2*Math.PI*r,dash=circ*(pct/100),gap=circ-dash;
-  return`<div class="ring-wrap" style="width:${size}px;height:${size}px">
-    <svg width="${size}" height="${size}" viewBox="0 0 36 36">
-      <circle cx="18" cy="18" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="3"/>
-      <circle cx="18" cy="18" r="${r}" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="${dash} ${gap}" stroke-linecap="round"/>
-    </svg>
-    <div class="ring-pct" style="color:${color}">${pct}%</div>
+function renderSess(){
+  let out=`<button class="btn-hi btn-full" onclick="showNew()" style="margin-bottom:22px">+ New Session ✨</button>`;
+  if(!sessions.length)return out+`<div class="card fadein" style="text-align:center;padding:3rem 2rem">
+    <div style="font-size:52px;margin-bottom:14px">🦉</div>
+    <div style="font-size:16px;color:var(--mid);margin-bottom:8px;font-weight:600">Axie's waiting for your first session!</div>
+    <div style="font-size:13px;color:var(--mut)">AP Macro exam is in <strong style="color:var(--accent)">${countdown().d} days</strong>. Let's start.</div>
   </div>`;
-}
-
-function renderSessions(){
-  let out=`<button class="btn-accent btn-full" onclick="showNew()" style="margin-bottom:24px">+ New Session ✨</button>`;
-  if(!sessions.length)return out+`<div class="card" style="text-align:center;padding:3rem">
-    <div style="font-size:40px;margin-bottom:12px">🦉</div>
-    <div style="font-size:16px;color:var(--soft);margin-bottom:8px">Axie's waiting for your first session!</div>
-    <div style="font-size:13px;color:var(--mut)">AP Macro exam is in ${getCountdown().days} days. Let's get started.</div>
-  </div>`;
-  let hasAny=false;
-  for(const unit of UNITS){
-    const us=sessions.map((s,i)=>({s,i})).filter(({s})=>s.unit?.id===unit.id);
-    if(!us.length)continue;hasAny=true;
-    out+=`<div class="section-header">
-      <span class="section-num" style="color:${unit.color}">0${unit.id}</span>
-      <span class="section-name" style="color:${unit.color}">${unit.emoji} ${unit.label}</span>
-    </div>`;
+  for(const u of UNITS){
+    const us=sessions.map((s,i)=>({s,i})).filter(({s})=>s.unit?.id===u.id);
+    if(!us.length)continue;
+    out+=`<div class="sh"><span class="sh-n" style="color:${u.col}">0${u.id}</span><span class="sh-t" style="color:${u.col}">${u.em} ${u.lbl}</span></div>`;
     out+=us.map(({s,i})=>{
-      const grade=s.instructorGrade;
-      const gc=grade?grade.score>=90?'#34d399':grade.score>=75?'#f0c040':'#fb7185':'var(--mut)';
-      return`<div class="session-card" style="border-color:${unit.color}" onclick="openSession(${i})">
-        <div style="flex:1">
-          <div style="font-weight:600;font-size:14px;color:var(--txt);margin-bottom:3px">${esc(s.title)}</div>
-          <div class="mono-label">${esc(s.date)} · ${s.flashcards?.length||0} cards · ${s.quiz?.length||0} questions${grade?` · <span style="color:${gc}">Grade: ${grade.score}/100</span>`:''}</div>
+      const gr=s.instructorGrade,gc=gr?gr.score>=90?'#34d399':gr.score>=75?'#f0c040':'#fb7185':'var(--mut)';
+      return`<div class="scard fadein" style="border-color:${u.col}" onclick="openSess(${i})">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:14px;color:var(--txt);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e(s.title)}</div>
+          <div class="lbl">${e(s.date)} · ${s.flashcards?.length||0} cards · ${s.quiz?.length||0} q${gr?` · <span style="color:${gc}">${gr.score}/100</span>`:''}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          ${renderProgressRing(unitProgress(unit.id),unit.color,36)}
-          <button class="btn btn-danger" onclick="event.stopPropagation();deleteSession(${i})">✕</button>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          ${ring(upct(u.id),u.col,34)}
+          <button class="btn btn-del" onclick="event.stopPropagation();delSess(${i})">✕</button>
         </div>
       </div>`;
     }).join('');
   }
   const untagged=sessions.map((s,i)=>({s,i})).filter(({s})=>!s.unit);
   if(untagged.length){
-    out+=`<div class="section-header"><span class="section-name">Untagged</span></div>`;
-    out+=untagged.map(({s,i})=>`<div class="session-card" style="border-color:var(--bdr2)" onclick="openSession(${i})"><div><div style="font-weight:600;font-size:14px;color:var(--txt)">${esc(s.title)}</div><div class="mono-label">${esc(s.date)}</div></div><button class="btn btn-danger" onclick="event.stopPropagation();deleteSession(${i})">✕</button></div>`).join('');
+    out+=`<div class="sh"><span class="sh-t">Untagged</span></div>`;
+    out+=untagged.map(({s,i})=>`<div class="scard" style="border-color:var(--bdr2)" onclick="openSess(${i})"><div><div style="font-weight:600;font-size:14px;color:var(--txt)">${e(s.title)}</div><div class="lbl">${e(s.date)}</div></div><button class="btn btn-del" onclick="event.stopPropagation();delSess(${i})">✕</button></div>`).join('');
   }
   out+=`<div style="margin-top:36px;text-align:center;padding-top:16px;border-top:1px solid var(--bdr)"><button class="btn" style="font-size:11px;color:var(--mut);border-color:transparent" onclick="if(confirm('Reset API key?')){localStorage.removeItem('apex-key');API_KEY='';showSetup();}">Change API key</button></div>`;
   return out;
 }
 
 function renderUnits(){
-  return`<div style="margin-bottom:16px"><div class="mono-label" style="margin-bottom:4px">6 Units · AP Macroeconomics</div><div style="font-size:13px;color:var(--soft)">Click any unit for the full overview and your sessions.</div></div>
-  <div class="unit-grid">
-    ${UNITS.map(u=>{
-      const count=sessions.filter(s=>s.unit?.id===u.id).length;
-      const pct=unitProgress(u.id);
-      return`<div class="unit-tile" onclick="showUnitOverview(${u.id})">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${u.color};border-radius:8px 8px 0 0"></div>
-        <div class="unit-tile-num" style="color:${u.color}">0${u.id}</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div class="mono-label" style="color:${u.color}">Unit ${u.id}</div>
-          ${renderProgressRing(pct,u.color,32)}
-        </div>
-        <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:4px;line-height:1.3">${u.emoji} ${u.label}</div>
-        <div style="font-size:11px;color:var(--mut)">Exam weight: <strong style="color:${u.color}">${u.exam}</strong></div>
-        ${count?`<div class="unit-tile-sessions" style="background:${u.color}18;color:${u.color};border:1px solid ${u.color}30">${count} session${count>1?'s':''}</div>`:`<div style="font-size:11px;color:var(--mut);margin-top:6px">No sessions yet</div>`}
-      </div>`;
-    }).join('')}
-  </div>`;
+  return`<div style="margin-bottom:16px"><div class="lbl" style="margin-bottom:5px">6 Units · AP Macroeconomics</div><div style="font-size:13px;color:var(--soft)">Tap any unit for the full overview and your sessions.</div></div>
+  <div class="ugrid">${UNITS.map(u=>{
+    const cnt=sessions.filter(s=>s.unit?.id===u.id).length,pct=upct(u.id);
+    return`<div class="utile scalein" onclick="showUnit(${u.id})">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${u.col};border-radius:8px 8px 0 0"></div>
+      <div class="utile-ghost" style="color:${u.col}">0${u.id}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+        <div class="lbl" style="color:${u.col}">Unit ${u.id}</div>
+        ${ring(pct,u.col,30)}
+      </div>
+      <div style="font-size:14px;font-weight:600;color:var(--txt);line-height:1.3;margin-bottom:4px">${u.em} ${u.lbl}</div>
+      <div style="font-size:11px;color:var(--mut)">Exam: <strong style="color:${u.col}">${u.ex}</strong></div>
+      <div style="margin-top:8px;font-size:10px;${cnt?`color:${u.col};background:${u.col}15;border:1px solid ${u.col}25;border-radius:3px;padding:2px 8px;display:inline-block`:'color:var(--mut)'}">${cnt?cnt+' session'+(cnt>1?'s':''):'No sessions yet'}</div>
+    </div>`;
+  }).join('')}`;
 }
 
-function deleteSession(i){sessions.splice(i,1);saveSessions(sessions);showHome();}
+function delSess(i){sessions.splice(i,1);saveS(sessions);showHome();}
 
-// ── UNIT OVERVIEW ──────────────────────────────────────────────────────────
-function showUnitOverview(id){
-  const u=UNIT_OVERVIEWS.find(x=>x.id===id),unit=UNITS[id-1];
-  if(!u)return;
-  const unitSessions=sessions.map((s,i)=>({s,i})).filter(({s})=>s.unit?.id===id);
-  render(`
-    <div class="tab-bar">
-      <button class="tab active" style="color:${unit.color};border-bottom-color:${unit.color}">${unit.emoji} Unit ${unit.id} — ${unit.label}</button>
+// ── UNIT OVERVIEW ─────────────────────────────────────────────────────────
+function showUnit(id){
+  const ov=UNIT_OVERVIEWS.find(x=>x.id===id),u=UNITS[id-1];
+  if(!ov)return;
+  const us=sessions.map((s,i)=>({s,i})).filter(({s})=>s.unit?.id===id);
+  R(`<div class="tabbar">
+    <button class="tab on" style="color:${u.col};border-bottom-color:${u.col}">${u.em} Unit ${id} — ${u.lbl}</button>
+  </div>
+  <div class="page has-unav fadein">
+    <button class="btn" onclick="showHome();switchH('units')" style="font-size:12px;margin-bottom:18px">← Unit Overviews</button>
+    <div style="display:flex;align-items:baseline;gap:14px;padding-bottom:12px;border-bottom:1px solid var(--bdr);margin-bottom:18px">
+      <span style="font-family:monospace;font-size:48px;font-weight:900;color:${u.col};opacity:.1;line-height:1">0${id}</span>
+      <div>
+        <div class="lbl" style="color:${u.col};margin-bottom:3px">Unit ${id} of 6 · ${u.ex} of exam</div>
+        <div style="font-family:monospace;font-size:17px;font-weight:800;color:var(--txt)">${u.em} ${u.lbl.toUpperCase()}</div>
+      </div>
     </div>
-    <div class="content has-unit-nav">
-      <button class="btn" onclick="showHome();switchHomeTab('units')" style="font-size:12px;margin-bottom:20px">← Unit Overviews</button>
-      <div style="display:flex;align-items:baseline;gap:16px;padding-bottom:14px;border-bottom:1px solid var(--bdr);margin-bottom:20px">
-        <span style="font-family:monospace;font-size:52px;font-weight:900;color:${unit.color};opacity:.1;line-height:1">0${id}</span>
-        <div>
-          <div class="mono-label" style="color:${unit.color};margin-bottom:4px">Unit ${id} of 6 · ${unit.exam} of exam</div>
-          <div style="font-family:monospace;font-size:18px;font-weight:800;letter-spacing:1px;color:var(--txt)">${unit.emoji} ${unit.label.toUpperCase()}</div>
-        </div>
-      </div>
-      <div style="border-left:3px solid ${unit.color};padding-left:16px;margin-bottom:24px">
-        <p style="font-size:15px;color:${unit.color};font-style:italic;font-weight:500;margin-bottom:6px">${esc(u.tagline)}</p>
-        <p style="font-size:14px;color:var(--soft);line-height:1.8">${esc(u.intro)}</p>
-      </div>
-      ${u.sections.map(sec=>`<div style="margin-bottom:24px">
-        <div class="mono-label" style="color:${unit.color};margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--bdr)">${esc(sec.title)}</div>
-        <p style="font-size:13px;color:var(--soft);line-height:1.85">${bold(sec.body)}</p>
-      </div>`).join('')}
-      <div class="exam-tip" style="margin-bottom:32px">
-        <div class="mono-label" style="color:var(--accent);margin-bottom:6px">AP Exam Tip 📝</div>
-        <p style="font-size:13px;color:var(--soft);line-height:1.7;margin:0">${esc(u.examTip)}</p>
-      </div>
-      <div class="mono-label" style="margin-bottom:12px">Your Sessions for This Unit</div>
-      ${unitSessions.length?unitSessions.map(({s,i})=>`<div class="session-card" style="border-color:${unit.color}" onclick="openSession(${i})">
-        <div><div style="font-weight:600;font-size:14px;color:var(--txt);margin-bottom:3px">${esc(s.title)}</div>
-        <div class="mono-label">${esc(s.date)} · ${s.flashcards?.length||0} cards</div></div>
-      </div>`).join(''):`<div class="card" style="text-align:center;padding:1.5rem;color:var(--mut);font-size:13px">No sessions yet. <a onclick="showNew()" style="color:${unit.color};cursor:pointer">Add one →</a></div>`}
+    <div style="border-left:3px solid ${u.col};padding-left:15px;margin-bottom:22px">
+      <p style="font-size:15px;color:${u.col};font-style:italic;font-weight:500;margin-bottom:6px">${e(ov.tag)}</p>
+      <p style="font-size:13px;color:var(--soft);line-height:1.8">${e(ov.intro)}</p>
     </div>
-    ${unitNavBar(id)}`);
+    ${ov.secs.map(s=>`<div style="margin-bottom:22px">
+      <div class="lbl" style="color:${u.col};padding-bottom:8px;border-bottom:1px solid var(--bdr);margin-bottom:10px">${e(s.t)}</div>
+      <p style="font-size:13px;color:var(--soft);line-height:1.85">${bold(s.b)}</p>
+    </div>`).join('')}
+    <div class="tip-box" style="margin-bottom:28px">
+      <div class="lbl" style="color:var(--accent);margin-bottom:6px">📝 AP Exam Tip</div>
+      <p style="font-size:13px;color:var(--soft);line-height:1.7;margin:0">${e(ov.tip)}</p>
+    </div>
+    <div class="lbl" style="margin-bottom:12px">Your Sessions</div>
+    ${us.length?us.map(({s,i})=>`<div class="scard" style="border-color:${u.col}" onclick="openSess(${i})">
+      <div><div style="font-weight:600;font-size:14px;color:var(--txt);margin-bottom:3px">${e(s.title)}</div>
+      <div class="lbl">${e(s.date)} · ${s.flashcards?.length||0} cards</div></div>
+    </div>`).join(''):`<div class="card" style="text-align:center;padding:1.5rem;color:var(--mut);font-size:13px">No sessions yet for this unit. <a onclick="showNew()" style="color:${u.col};cursor:pointer">Add one →</a></div>`}
+  </div>
+  ${uNavBar(id)}`);
 }
 
-// ── NEW SESSION ────────────────────────────────────────────────────────────
+// ── NEW SESSION ───────────────────────────────────────────────────────────
 function showNew(){
-  render(`
-    <div class="tab-bar"><button class="tab active">✨ New Session</button></div>
-    <div class="content">
-      <button class="btn" onclick="showHome()" style="font-size:12px;margin-bottom:20px">← Back</button>
-      <div style="margin-bottom:18px">
-        <div class="mono-label" style="color:var(--a1);margin-bottom:8px">New Session</div>
-        <div style="font-family:monospace;font-size:20px;font-weight:800;letter-spacing:2px;color:var(--txt)">PASTE TRANSCRIPT</div>
-        <div style="font-size:13px;color:var(--soft);margin-top:6px">Works with tutor sessions, class notes, lecture recordings, or any written content.</div>
-      </div>
-      <textarea id="tx" placeholder="Paste your lecture or tutor session text here..." style="width:100%;min-height:260px;padding:14px;font-size:14px;border-radius:6px;border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);resize:vertical;outline:none;line-height:1.6"></textarea>
-      <div style="margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <button class="btn-accent" onclick="generate()" id="gen-btn">Generate Study Materials 🚀</button>
-        <div id="loading" style="display:none;align-items:center;gap:8px;font-size:13px;color:var(--soft)"><div class="spinner"></div><span>Axie is analyzing your transcript...</span></div>
-        <div id="gen-err" class="status-err"></div>
-      </div>
-    </div>`);
+  R(`<div class="tabbar"><button class="tab on">✨ New Session</button></div>
+  <div class="page fadein">
+    <button class="btn" onclick="showHome()" style="font-size:12px;margin-bottom:18px">← Back</button>
+    <div style="margin-bottom:16px">
+      <div class="lbl" style="color:var(--c2);margin-bottom:8px">New Session</div>
+      <div style="font-family:monospace;font-size:19px;font-weight:800;letter-spacing:2px;color:var(--txt)">PASTE TRANSCRIPT</div>
+      <div style="font-size:13px;color:var(--soft);margin-top:5px">Works with tutor notes, lecture recordings, class notes — any text.</div>
+    </div>
+    <textarea id="tx" placeholder="Paste your lecture or tutor session text here..." style="width:100%;min-height:240px;padding:14px;font-size:14px;border-radius:var(--r6);border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);resize:vertical;outline:none;line-height:1.65;transition:border-color .2s" onfocus="this.style.borderColor='var(--bdr2)'" onblur="this.style.borderColor='var(--bdr)'"></textarea>
+    <div style="margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <button class="btn-hi" onclick="doGen()" id="gb">Generate Study Materials 🚀</button>
+      <div id="gl" style="display:none;align-items:center;gap:8px;font-size:13px;color:var(--soft)"><div class="spin"></div><span>Axie is analyzing your transcript…</span></div>
+      <div id="ge" class="err"></div>
+    </div>
+  </div>`);
 }
 
-async function generate(){
-  const tx=document.getElementById('tx')?.value?.trim();
-  if(!tx)return;
-  document.getElementById('gen-btn').disabled=true;
-  document.getElementById('loading').style.display='flex';
-  document.getElementById('gen-err').textContent='';
+async function doGen(){
+  const tx=$('tx')?.value?.trim();if(!tx)return;
+  $('gb').disabled=true;$('gl').style.display='flex';$('ge').textContent='';
   try{
-    const sys=`You are an expert AP Macroeconomics tutor. Given a lecture transcript, respond ONLY with valid JSON — no markdown, no fences:
-{"title":"short title","summary":"2-3 sentence summary","instructorGrade":{"score":85,"rationale":"2-3 sentence honest assessment. Score 1-100 based on: clarity of explanations (40pts), use of examples (20pts), coverage of key concepts (20pts), student engagement (20pts)."},"studyGuide":{"keyTakeaways":["...","...","...","..."],"sections":[{"title":"Section Title","cards":[{"label":"label","title":"Card Title","bullets":["bullet with **bold** terms"]},{"label":"label","title":"Card Title","text":"prose with **bold** terms"}],"formulas":[{"eq":"formula","label":"description"}]}],"formulas":[{"eq":"formula","label":"description"}]},"flashcards":[{"term":"...","definition":"...","example":"..."}],"quiz":[{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"answer":"A","explanation":"..."}],"resources":[{"name":"...","url":"...","why":"..."}]}
-Rules: 2-3 sections, 2-3 cards each, 4 keyTakeaways, 3-5 global formulas, 6 flashcards, 5 quiz questions (answer=single letter), 3 resources. Be honest in instructor grade.`;
+    const sys=`You are an expert AP Macroeconomics tutor. Given a lecture transcript, respond ONLY with valid JSON — no markdown fences:
+{"title":"concise title","summary":"2-3 sentence plain-English summary","instructorGrade":{"score":85,"rationale":"2-3 honest sentences. Score 1-100: clarity of explanations (40pts), use of examples (20pts), AP concept coverage (20pts), student engagement (20pts)."},"studyGuide":{"keyTakeaways":["...","...","...","..."],"sections":[{"title":"Section Title","cards":[{"label":"label","title":"Card Title","bullets":["point with **bold** key terms","another point"]},{"label":"label","title":"Card Title","text":"prose with **bold** key terms"}],"formulas":[{"eq":"formula","label":"what it means"}]}],"formulas":[{"eq":"formula","label":"description"}]},"flashcards":[{"term":"...","definition":"...","example":"..."}],"quiz":[{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"answer":"A","explanation":"..."}],"resources":[{"name":"...","url":"...","why":"..."}]}
+Rules: 2-3 sections, 2-3 cards each. 4 takeaways. 3-5 global formulas. 6 flashcards. 5 quiz questions (answer = single letter). 3 resources. Be honest and specific in instructor grade.`;
     const raw=await callClaude([{role:'user',content:`Transcript:\n${tx.slice(0,6000)}`}],sys);
     const parsed=JSON.parse(raw.replace(/^```json|^```|```$/gm,'').trim());
     const s={id:Date.now(),date:new Date().toLocaleDateString(),transcript:tx,...parsed};
-    s.unit=detectUnit(s);
-    sessions.unshift(s);saveSessions(sessions);
-    checkStreak();xpData.sessions++;addXP(50,'New session created!');
-    axieSay('Hoot! New session ready — let\'s study! 🦉');
-    openSession(0);
-  }catch(e){
-    if(e.message!=='401'&&e.message!=='No key'){document.getElementById('gen-err').textContent='Error: '+e.message;}
-    document.getElementById('gen-btn').disabled=false;
-    document.getElementById('loading').style.display='none';
+    s.unit=detectUnit(s);sessions.unshift(s);saveS(sessions);
+    checkStreak();G.sess++;addXP(50,'New session!');
+    axieSay('New session ready! Time to study 🦉');
+    openSess(0);
+  }catch(err){
+    if(err.message!=='401'&&err.message!=='no-key'){$('ge').textContent='Error: '+err.message;}
+    $('gb').disabled=false;$('gl').style.display='none';
   }
 }
 
-// ── STUDY SESSION ──────────────────────────────────────────────────────────
-function openSession(i){
-  currentSession=sessions[i];currentTab='visual';
-  flipped={};picks={};checked={};chatHistory=[];fcIndex=0;mcqPicks={};
-  showStudy();
-}
+// ── STUDY ─────────────────────────────────────────────────────────────────
+function openSess(i){cur=sessions[i];tab='visual';fcIdx=0;picks={};checked={};chatH=[];mcqP={};showStudy();}
 
 const TABS=[['visual','Visual'],['flashcards','Flashcards'],['quiz','Quiz'],['apexam','AP Exam'],['gaps','Gaps'],['chat','Q&A'],['resources','Resources']];
 
-function unitNavBar(activeId){
-  return`<div class="unit-nav-bar">
-    ${UNITS.map(u=>{
-      const active=activeId===u.id;
-      const count=sessions.filter(s=>s.unit?.id===u.id).length;
-      return`<button class="unit-nav-btn ${active?'active':''}" onclick="jumpToUnit(${u.id})" style="${active?`border-top-color:${u.color};color:${u.color}`:''}">
-        <span class="unit-nav-num" style="${active?`color:${u.color}`:''}">${u.emoji||u.id}</span>
-        <span>${count?`${count}s`:''}</span>
-      </button>`;
-    }).join('')}
-  </div>`;
-}
-
 function showStudy(){
-  const s=currentSession,unit=s.unit||UNITS[0];
-  const grade=s.instructorGrade;
-  const gradeColor=!grade?'var(--mut)':grade.score>=90?'#34d399':grade.score>=75?'#f0c040':grade.score>=60?'#4fc3f7':'#fb7185';
-
-  render(`
-    <div class="tab-bar">
-      ${TABS.map(([id,label])=>`<button class="tab ${currentTab===id?'active':''}" onclick="switchStudyTab('${id}')">${label}</button>`).join('')}
-    </div>
-    <div class="content has-unit-nav">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--bdr);margin-bottom:20px">
-        <div style="flex:1;min-width:0">
-          <button class="btn" onclick="showHome()" style="font-size:11px;margin-bottom:10px">← Sessions</button>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-            <span style="font-family:monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${unit.color};background:${unit.color}18;border:1px solid ${unit.color}30;padding:3px 8px;border-radius:2px">${unit.emoji} Unit ${unit.id} — ${unit.label}</span>
-            ${s.transcript?`<button class="btn" onclick="showTranscript()" style="font-size:10px;padding:3px 10px;color:var(--mut)">📄 Transcript</button>`:''}
-          </div>
-          <div style="font-family:monospace;font-size:17px;font-weight:800;letter-spacing:1px;color:var(--txt);line-height:1.2">${esc(s.title?.toUpperCase())}</div>
-          <p style="margin-top:8px;font-size:13px;color:var(--soft);line-height:1.6">${esc(s.summary)}</p>
+  const s=cur,u=s.unit||UNITS[0],gr=s.instructorGrade;
+  const gc=!gr?'var(--mut)':gr.score>=90?'#34d399':gr.score>=75?'#f0c040':gr.score>=60?'#4fc3f7':'#fb7185';
+  R(`<div class="tabbar">${TABS.map(([id,lbl])=>`<button class="tab${tab===id?' on':''}" onclick="switchTab('${id}')">${lbl}</button>`).join('')}</div>
+  <div class="page has-unav fadein">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--bdr);margin-bottom:20px">
+      <div style="flex:1;min-width:0">
+        <button class="btn" onclick="showHome()" style="font-size:11px;margin-bottom:10px">← Sessions</button>
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap">
+          <span style="font-family:monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:${u.col};background:${u.col}15;border:1px solid ${u.col}25;padding:3px 8px;border-radius:2px">${u.em} Unit ${u.id} — ${u.lbl}</span>
+          ${s.transcript?`<button class="btn" onclick="showTx()" style="font-size:10px;padding:3px 9px;color:var(--mut)">📄 Transcript</button>`:''}
         </div>
-        <div style="flex-shrink:0;display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-          ${grade?`<div class="grade-badge" style="border:1px solid ${gradeColor}35;border-left:3px solid ${gradeColor}">
-            <div class="mono-label" style="color:${gradeColor};margin-bottom:4px">Instructor Grade</div>
-            <div class="grade-score" style="color:${gradeColor}">${grade.score}<span style="font-size:13px;opacity:.5">/100</span></div>
-            <div class="grade-bar"><div class="grade-bar-fill" style="width:${grade.score}%;background:${gradeColor}"></div></div>
-            <div style="font-size:10px;color:var(--soft);margin-top:6px;line-height:1.5;text-align:left;max-width:180px">${esc(grade.rationale)}</div>
-          </div>`:''}
-          <button class="btn btn-notion" onclick="toggleNotion()">N Export for Notion</button>
-          <div id="notion-panel" style="display:none">
-            <div class="mono-label" style="margin-bottom:4px;margin-top:6px">Click inside → Ctrl+A → Copy → paste in Claude chat</div>
-            <textarea class="notion-export" onclick="this.select()" readonly>${esc(buildNotionText(s))}</textarea>
-          </div>
+        <div style="font-family:monospace;font-size:16px;font-weight:800;letter-spacing:.5px;color:var(--txt);line-height:1.25;margin-bottom:8px">${e(s.title?.toUpperCase())}</div>
+        <p style="font-size:13px;color:var(--soft);line-height:1.65;max-width:500px">${e(s.summary)}</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0">
+        ${gr?`<div class="grade-badge" style="border:1px solid ${gc}30;border-left:3px solid ${gc}">
+          <div class="lbl" style="color:${gc};margin-bottom:4px">Instructor Grade</div>
+          <div class="grade-n" style="color:${gc}">${gr.score}<span style="font-size:13px;opacity:.45">/100</span></div>
+          <div class="grade-bar"><div class="grade-fill" style="width:${gr.score}%;background:${gc}"></div></div>
+          <div style="font-size:10px;color:var(--soft);margin-top:7px;line-height:1.55;max-width:175px">${e(gr.rationale)}</div>
+        </div>`:''}
+        <button class="btn btn-notion" onclick="toggleNotion()">N Export for Notion</button>
+        <div id="np" style="display:none;max-width:260px">
+          <div class="lbl" style="margin-bottom:4px;margin-top:6px">Click → Ctrl+A → Copy → paste in Claude chat</div>
+          <textarea class="notion-ta" onclick="this.select()" readonly>${e(buildNotion(s))}</textarea>
         </div>
       </div>
-      <div id="study-content"></div>
     </div>
-    ${unitNavBar(unit.id)}`);
-  setTimeout(()=>renderStudyTab(),0);
+    <div id="tc" class="fadein"></div>
+  </div>
+  ${uNavBar(u.id)}`);
+  setTimeout(()=>renderTab(),0);
 }
 
-function switchStudyTab(t){
-  currentTab=t;
-  document.querySelectorAll('.tab').forEach((b,i)=>{b.classList.toggle('active',TABS[i]?.[0]===t);});
-  renderStudyTab();
+function switchTab(t){tab=t;document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',TABS[i]?.[0]===t));const tc=$('tc');if(tc){tc.className='fadein';renderTab();}}
+const toggleNotion=()=>{const p=$('np');if(p)p.style.display=p.style.display==='none'?'block':'none';};
+
+function renderTab(){
+  const el=$('tc');if(!el)return;
+  const s=cur;
+  if(tab==='visual')el.innerHTML=renderVisual(s.studyGuide);
+  else if(tab==='flashcards')el.innerHTML=renderFC(s.flashcards);
+  else if(tab==='quiz')el.innerHTML=renderQuiz(s.quiz);
+  else if(tab==='apexam')el.innerHTML=renderAPX(s);
+  else if(tab==='gaps')el.innerHTML=renderGaps(s);
+  else if(tab==='chat')el.innerHTML=renderChat();
+  else if(tab==='resources')el.innerHTML=renderRes(s.resources);
 }
 
-function toggleNotion(){
-  const p=document.getElementById('notion-panel');
-  if(p)p.style.display=p.style.display==='none'?'block':'none';
-}
-
-function renderStudyTab(){
-  const el=document.getElementById('study-content');if(!el)return;
-  const s=currentSession;
-  if(currentTab==='visual')el.innerHTML=renderVisual(s.studyGuide);
-  else if(currentTab==='flashcards')el.innerHTML=renderFlashcards(s.flashcards);
-  else if(currentTab==='quiz')el.innerHTML=renderQuiz(s.quiz);
-  else if(currentTab==='apexam')el.innerHTML=renderAPExam(s);
-  else if(currentTab==='gaps')el.innerHTML=renderGaps(s);
-  else if(currentTab==='chat')el.innerHTML=renderChat();
-  else if(currentTab==='resources')el.innerHTML=renderResources(s.resources);
-}
-
-// ── VISUAL ─────────────────────────────────────────────────────────────────
+// ── VISUAL ────────────────────────────────────────────────────────────────
 function renderVisual(sg){
   if(!sg)return'<p style="color:var(--mut)">No study guide data.</p>';
   const{keyTakeaways=[],sections=[],formulas=[]}=sg;
-  const takeaways=keyTakeaways.length?`<div style="margin-bottom:28px">
-    <div class="mono-label" style="margin-bottom:12px">Key Takeaways 🎯</div>
-    <div class="grid-3">${keyTakeaways.map((t,i)=>`
-      <div class="card" style="border-top:2px solid ${ac(i)};padding:14px 16px">
-        <div class="mono-label" style="color:${ac(i)};display:block;margin-bottom:6px">0${i+1}</div>
-        <p style="font-size:13px;color:var(--soft);line-height:1.65;margin:0">${esc(t)}</p>
+  const tk=keyTakeaways.length?`<div style="margin-bottom:26px">
+    <div class="lbl" style="margin-bottom:12px">Key Takeaways 🎯</div>
+    <div class="g3">${keyTakeaways.map((t,i)=>`
+      <div class="card card-hi fadein" style="border-top-color:${ac(i)};padding:14px 15px">
+        <div class="lbl" style="color:${ac(i)};margin-bottom:6px">0${i+1}</div>
+        <p style="font-size:12px;color:var(--soft);line-height:1.65;margin:0">${e(t)}</p>
       </div>`).join('')}
     </div></div>`:'';
-  const secs=sections.map((sec,si)=>{
-    const a=ac(si);
-    return`<div style="margin-bottom:32px">
-      <div class="section-header">
-        <span class="section-num" style="color:${a}">${String(si+1).padStart(2,'0')}</span>
-        <span class="section-name" style="color:${a}">${esc(sec.title?.toUpperCase())}</span>
-      </div>
-      <div class="grid-2" style="margin-bottom:${sec.formulas?.length?'12px':'0'}">
-        ${(sec.cards||[]).map(card=>`
-          <div class="card" style="border-top:2px solid ${a}">
-            <div class="mono-label" style="color:${a};margin-bottom:8px">${esc(card.label)}</div>
-            <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:10px">${esc(card.title)}</div>
-            ${card.bullets?`<ul class="bullets">${card.bullets.map(b=>`<li><span>${bold(b)}</span></li>`).join('')}</ul>`:`<p style="font-size:12px;color:var(--soft);line-height:1.7;margin:0">${bold(card.text)}</p>`}
-          </div>`).join('')}
-      </div>
-      ${(sec.formulas||[]).map(f=>`<div class="formula" style="border-left:3px solid ${a};color:${a}">${esc(f.eq)}${f.label?`<span> — ${esc(f.label)}</span>`:''}</div>`).join('')}
-    </div>`;
-  }).join('');
-  const cheat=formulas.length?`<div style="padding-top:28px;border-top:2px solid var(--bdr)">
-    <div style="font-family:monospace;font-size:15px;font-weight:800;letter-spacing:3px;color:var(--accent);margin-bottom:14px">⚡ FORMULA CHEAT SHEET</div>
-    <div class="grid-2">${formulas.map((f,i)=>`<div class="formula" style="border-left:3px solid ${ac(i)};color:${ac(i)}">${esc(f.eq)}${f.label?`<span> — ${esc(f.label)}</span>`:''}</div>`).join('')}</div>
+
+  const secs=sections.map((sec,si)=>{const a=ac(si);return`<div style="margin-bottom:28px">
+    <div class="sh"><span class="sh-n" style="color:${a}">${String(si+1).padStart(2,'0')}</span><span class="sh-t" style="color:${a}">${e(sec.title?.toUpperCase())}</span></div>
+    <div class="g2" style="margin-bottom:${sec.formulas?.length?'11px':'0'}">
+      ${(sec.cards||[]).map(c=>`
+        <div class="card card-hi fadein" style="border-top-color:${a}">
+          <div class="lbl" style="color:${a};margin-bottom:7px">${e(c.label)}</div>
+          <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:9px;line-height:1.3">${e(c.title)}</div>
+          ${c.bullets?`<ul class="blist">${c.bullets.map(b=>`<li><span>${bold(b)}</span></li>`).join('')}</ul>`:`<p style="font-size:12px;color:var(--soft);line-height:1.7;margin:0">${bold(c.text)}</p>`}
+        </div>`).join('')}
+    </div>
+    ${(sec.formulas||[]).map(f=>`<div class="formula" style="border-left-color:${a};color:${a}">${e(f.eq)}${f.label?`<s> — ${e(f.label)}</s>`:''}</div>`).join('')}
+  </div>`;}).join('');
+
+  const cs=formulas.length?`<div style="padding-top:26px;border-top:2px solid var(--bdr)">
+    <div style="font-family:monospace;font-size:13px;font-weight:800;letter-spacing:3px;color:var(--accent);margin-bottom:14px">⚡ FORMULA CHEAT SHEET</div>
+    <div class="g2">${formulas.map((f,i)=>`<div class="formula" style="border-left-color:${ac(i)};color:${ac(i)}">${e(f.eq)}${f.label?`<s> — ${e(f.label)}</s>`:''}</div>`).join('')}</div>
   </div>`:'';
-  return takeaways+secs+cheat;
+  return tk+secs+cs;
 }
 
-// ── FLASHCARDS ─────────────────────────────────────────────────────────────
-function renderFlashcards(cards){
+// ── FLASHCARDS ────────────────────────────────────────────────────────────
+function renderFC(cards){
   if(!cards?.length)return'<p style="color:var(--mut)">No flashcards.</p>';
-  fcIndex=Math.min(fcIndex,cards.length-1);
-  const fc=cards[fcIndex],a=ac(fcIndex);
-  const pct=Math.round(((fcIndex+1)/cards.length)*100);
-  return`
-    <div style="margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="mono-label">Card ${fcIndex+1} of ${cards.length}</div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="mono-label" style="color:${a}">${pct}%</div>
-          <button class="btn" onclick="shuffleCards()" style="font-size:11px;padding:4px 10px;font-family:monospace;color:var(--mut)">🔀 Shuffle</button>
-        </div>
-      </div>
-      <div style="height:4px;background:var(--bdr);border-radius:2px;overflow:hidden;margin-bottom:16px">
-        <div style="height:100%;width:${pct}%;background:${a};border-radius:2px;transition:width .4s"></div>
+  fcIdx=Math.min(fcIdx,cards.length-1);
+  const fc=cards[fcIdx],a=ac(fcIdx),pct=Math.round(((fcIdx+1)/cards.length)*100);
+  return`<div style="margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+      <div class="lbl">Card ${fcIdx+1} of ${cards.length}</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="lbl" style="color:${a}">${pct}%</span>
+        <button class="btn" onclick="shuffleFC()" style="font-size:11px;padding:4px 10px;color:var(--mut)">🔀 Shuffle</button>
       </div>
     </div>
-    <div class="fc-big" id="fc-main" onclick="flipMainCard()" style="border-top-color:${a}">
-      <div id="fc-front">
-        <div class="mono-label" style="color:${a};margin-bottom:14px">Term — tap to flip</div>
-        <p style="font-size:24px;font-weight:700;color:var(--txt);margin:0;line-height:1.3">${esc(fc.term)}</p>
-        <div style="margin-top:16px;font-size:28px">🤔</div>
-      </div>
-      <div id="fc-back" style="display:none">
-        <div class="mono-label" style="color:${a};margin-bottom:10px">${esc(fc.term)}</div>
-        <p style="font-size:16px;color:var(--soft);line-height:1.7;margin:0">${esc(fc.definition)}</p>
-        ${fc.example?`<p style="font-size:12px;color:var(--mut);font-style:italic;margin-top:14px;border-top:1px solid var(--bdr);padding-top:12px">💡 ${esc(fc.example)}</p>`:''}
-      </div>
+    <div style="height:4px;background:var(--bdr);border-radius:2px;overflow:hidden;margin-bottom:18px">
+      <div style="height:100%;width:${pct}%;background:${a};border-radius:2px;transition:width .4s"></div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn" onclick="prevCard()" ${fcIndex===0?'disabled':''} style="flex:1;padding:13px;font-size:16px">←</button>
-      <button class="btn-accent" onclick="nextCard()" ${fcIndex===cards.length-1?'disabled':''} style="flex:1;padding:13px;font-size:16px">→</button>
-    </div>
-    <div style="display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;justify-content:center">
-      ${cards.map((_,i)=>`<div onclick="goToCard(${i})" style="width:${i===fcIndex?'20px':'8px'};height:8px;border-radius:4px;background:${i===fcIndex?a:'var(--bdr2)'};cursor:pointer;transition:all .2s"></div>`).join('')}
-    </div>`;
-}
-
-function flipMainCard(){
-  const f=document.getElementById('fc-front'),b=document.getElementById('fc-back'),c=document.getElementById('fc-main');
-  if(!f||!b)return;
-  const on=b.style.display!=='none';
-  f.style.display=on?'flex':'none';b.style.display=on?'none':'flex';
-  if(!on){xpData.cardsReviewed++;addXP(5,'Card reviewed!');}
-  c.style.background=on?'var(--card)':'rgba(79,195,247,0.05)';
-}
-function nextCard(){fcIndex=Math.min(fcIndex+1,currentSession.flashcards.length-1);renderStudyTab();}
-function prevCard(){fcIndex=Math.max(fcIndex-1,0);renderStudyTab();}
-function goToCard(i){fcIndex=i;renderStudyTab();}
-function shuffleCards(){currentSession.flashcards.sort(()=>Math.random()-.5);fcIndex=0;renderStudyTab();axieSay('Shuffled! Mix it up 🦉');}
-
-// ── QUIZ ───────────────────────────────────────────────────────────────────
-let quizScore=0,quizTotal=0;
-function renderQuiz(quiz){
-  quizScore=0;quizTotal=quiz?.length||0;
-  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <div class="mono-label">${quiz?.length} Questions 📝</div>
-    <div id="quiz-score-display" class="mono-label" style="color:var(--accent)"></div>
   </div>
-  ${(quiz||[]).map((q,i)=>`
-    <div class="card" style="border-left:3px solid ${ac(i)};margin-bottom:14px;padding:18px 20px">
-      <p style="font-weight:600;font-size:14px;color:var(--txt);line-height:1.55;margin-bottom:14px">${i+1}. ${esc(q.question)}</p>
-      <div>${(q.options||[]).map((opt,oi)=>`<div id="opt-${i}-${oi}" class="quiz-opt" onclick="pickOpt(${i},'${opt[0]}')">${esc(opt)}</div>`).join('')}</div>
-      <button class="btn-accent" id="cbtn-${i}" style="display:none;margin-top:10px;font-size:12px;padding:7px 18px" onclick="checkAnswer(${i},'${q.answer}','${encodeURIComponent(q.explanation)}')">Check Answer ✓</button>
-      <div id="exp-${i}" style="display:none;font-size:12px;color:var(--soft);border-top:1px solid var(--bdr);padding-top:12px;margin-top:12px;line-height:1.7"></div>
-    </div>`).join('')}`;
-}
-
-function pickOpt(qi,letter){
-  if(checked[qi])return;
-  picks[qi]=letter;
-  document.querySelectorAll(`[id^="opt-${qi}-"]`).forEach((el,oi)=>{
-    const l='ABCD'[oi];
-    el.style.background=l===letter?'rgba(79,195,247,0.1)':'transparent';
-    el.style.borderColor=l===letter?'#4fc3f7':'var(--bdr)';
-    el.style.color=l===letter?'#4fc3f7':'var(--soft)';
-  });
-  const btn=document.getElementById(`cbtn-${qi}`);if(btn)btn.style.display='inline-block';
-}
-
-function checkAnswer(qi,correct,expEnc){
-  checked[qi]=true;const chosen=picks[qi];
-  const isCorrect=chosen===correct;
-  document.querySelectorAll(`[id^="opt-${qi}-"]`).forEach((el,oi)=>{
-    const l='ABCD'[oi];
-    if(l===correct){el.style.background='rgba(52,211,153,0.1)';el.style.borderColor='#34d399';el.style.color='#34d399';}
-    else if(l===chosen&&!isCorrect){el.style.background='rgba(251,113,133,0.1)';el.style.borderColor='#fb7185';el.style.color='#fb7185';}
-    el.classList.add('locked');el.style.cursor='default';
-  });
-  const btn=document.getElementById(`cbtn-${qi}`);if(btn)btn.style.display='none';
-  const exp=document.getElementById(`exp-${qi}`);
-  if(exp){exp.style.display='block';exp.innerHTML=(isCorrect?'✅ ':'❌ ')+esc(decodeURIComponent(expEnc));}
-  if(isCorrect){quizScore++;addXP(15,'Correct answer!');}
-  else{addXP(5,'Nice try — keep going!');}
-  const sd=document.getElementById('quiz-score-display');
-  if(sd)sd.textContent=`${quizScore}/${Object.keys(checked).length} correct`;
-  // Check if all answered
-  if(Object.keys(checked).length===quizTotal){
-    setTimeout(()=>{
-      if(quizScore===quizTotal){launchConfetti();axieSay('PERFECT SCORE! You\'re incredible! 🏆');}
-      else if(quizScore>=quizTotal*0.8){axieSay(`${quizScore}/${quizTotal} — Great job! Almost perfect! 🌟`);}
-      else{axieSay(`${quizScore}/${quizTotal} — Review the ones you missed! You\'ve got this 💪`);}
-    },500);
-    xpData.quizzesTaken++;saveXP();
-  }
-}
-
-// ── AP EXAM PRACTICE ──────────────────────────────────────────────────────
-function renderAPExam(session){
-  if(session.apExam)return renderAPExamContent(session.apExam);
-  return`<div style="text-align:center;padding:2.5rem 1rem">
-    <div style="font-size:48px;margin-bottom:12px">🎓</div>
-    <div class="mono-label" style="color:var(--accent);margin-bottom:8px;font-size:12px">AP Exam Practice</div>
-    <p style="font-size:14px;color:var(--soft);max-width:400px;margin:0 auto 8px;line-height:1.7">Real AP-style FRQs and MCQs based on this lecture — with rubrics and model answers.</p>
-    <p class="mono-label" style="margin-bottom:20px">Free Response + Multiple Choice · College Board Format</p>
-    <button class="btn-accent" onclick="generateAPExam()">Generate AP Exam Questions 📝</button>
-    <div id="ap-loading" style="display:none;margin-top:16px;font-size:13px;color:var(--mut)">Axie is writing your exam...</div>
-    <div id="ap-err" class="status-err" style="margin-top:8px"></div>
+  <div class="fc" onclick="flipFC()" style="margin-bottom:16px">
+    <div class="fc-inner${window._fcFlipped?' flipped':''}" id="fci" style="border-top:3px solid ${a}">
+      <div class="fc-face">
+        <div class="lbl" style="color:${a};margin-bottom:14px">Tap to flip →</div>
+        <p style="font-size:22px;font-weight:700;color:var(--txt);line-height:1.3;margin:0">${e(fc.term)}</p>
+        <div style="margin-top:18px;font-size:32px">🤔</div>
+      </div>
+      <div class="fc-face fc-back">
+        <div class="lbl" style="color:${a};margin-bottom:10px">${e(fc.term)}</div>
+        <p style="font-size:15px;color:var(--mid);line-height:1.75;margin:0">${e(fc.definition)}</p>
+        ${fc.example?`<p style="font-size:12px;color:var(--mut);font-style:italic;margin-top:14px;border-top:1px solid var(--bdr);padding-top:12px;line-height:1.6">💡 ${e(fc.example)}</p>`:''}
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:14px">
+    <button class="btn" onclick="prevFC()" ${fcIdx===0?'disabled':''} style="flex:1;padding:12px;font-size:17px">←</button>
+    <button class="btn-hi" onclick="nextFC()" ${fcIdx===cards.length-1?'disabled':''} style="flex:1;padding:12px;font-size:17px">→</button>
+  </div>
+  <div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap">
+    ${cards.map((_,i)=>`<div onclick="goFC(${i})" style="width:${i===fcIdx?'18px':'7px'};height:7px;border-radius:4px;background:${i===fcIdx?a:'var(--bdr2)'};cursor:pointer;transition:all .25s"></div>`).join('')}
   </div>`;
 }
+function flipFC(){
+  window._fcFlipped=!window._fcFlipped;
+  const el=$('fci');if(el)el.classList.toggle('flipped');
+  if(window._fcFlipped){G.cards++;addXP(5,'Card reviewed!');}
+}
+function nextFC(){window._fcFlipped=false;fcIdx=Math.min(fcIdx+1,cur.flashcards.length-1);renderTab();}
+function prevFC(){window._fcFlipped=false;fcIdx=Math.max(fcIdx-1,0);renderTab();}
+function goFC(i){window._fcFlipped=false;fcIdx=i;renderTab();}
+function shuffleFC(){cur.flashcards.sort(()=>Math.random()-.5);window._fcFlipped=false;fcIdx=0;renderTab();axieSay('Shuffled! Keep going 🦉');}
 
-async function generateAPExam(){
-  document.getElementById('ap-loading').style.display='block';
-  document.getElementById('ap-err').textContent='';
-  const s=currentSession;
-  try{
-    const sys=`You are an AP Macroeconomics exam writer trained on College Board standards. Respond ONLY with valid JSON — no markdown:
-{"frqs":[{"title":"FRQ title","points":5,"context":"1-2 sentence scenario","parts":[{"letter":"a","question":"Question text","points":2,"skill":"Knowledge|Application|Analysis","modelAnswer":"Complete model answer","rubric":"What earns full credit"}]}],"mcqs":[{"question":"Question stem","options":["A) ...","B) ...","C) ...","D) ..."],"answer":"A","skill":"Knowledge|Application|Analysis","explanation":"Why correct and why others wrong"}]}
-Rules: 2 FRQs with 2-3 parts each, 4 MCQs. Scenario-based. Use real AP Macro graphs where relevant. Be specific to the lecture topics.`;
-    const raw=await callClaude([{role:'user',content:`Session: ${s.title}\nSummary: ${s.summary}\nTopics: ${(s.studyGuide?.sections||[]).map(x=>x.title).join(', ')}`}],sys);
-    const parsed=JSON.parse(raw.replace(/^```json|^```|```$/gm,'').trim());
-    currentSession.apExam=parsed;
-    sessions=sessions.map(x=>x.id===s.id?currentSession:x);
-    saveSessions(sessions);addXP(20,'AP Exam practice unlocked!');
-    document.getElementById('study-content').innerHTML=renderAPExamContent(parsed);
-  }catch(e){
-    if(e.message!=='401'&&e.message!=='No key'){document.getElementById('ap-err').textContent='Error: '+e.message;}
-    document.getElementById('ap-loading').style.display='none';
+// ── QUIZ ──────────────────────────────────────────────────────────────────
+let qScore=0,qTotal=0;
+function renderQuiz(quiz){
+  qScore=0;qTotal=quiz?.length||0;
+  return`<div style="display:flex;justify-content:space-between;margin-bottom:16px;align-items:center">
+    <div class="lbl">${quiz?.length} Questions 📝</div>
+    <div id="qs" class="lbl" style="color:var(--accent)"></div>
+  </div>
+  ${(quiz||[]).map((q,i)=>`
+    <div class="card fadein" style="border-left:3px solid ${ac(i)};margin-bottom:13px;padding:16px 18px">
+      <p style="font-weight:600;font-size:14px;color:var(--txt);line-height:1.55;margin-bottom:12px">${i+1}. ${e(q.question)}</p>
+      <div>${(q.options||[]).map((opt,oi)=>`<div id="op-${i}-${oi}" class="qopt" onclick="pickQ(${i},'${opt[0]}')">${e(opt)}</div>`).join('')}</div>
+      <button class="btn-hi" id="cb-${i}" style="display:none;margin-top:10px;font-size:12px;padding:7px 18px" onclick="checkQ(${i},'${q.answer}','${encodeURIComponent(q.explanation)}')">Check Answer ✓</button>
+      <div id="ex-${i}" style="display:none;font-size:12px;color:var(--soft);border-top:1px solid var(--bdr);padding-top:10px;margin-top:10px;line-height:1.75"></div>
+    </div>`).join('')}`;
+}
+function pickQ(qi,l){
+  if(checked[qi])return;picks[qi]=l;
+  document.querySelectorAll(`[id^="op-${qi}-"]`).forEach((el,oi)=>{
+    const x='ABCD'[oi];
+    el.style.background=x===l?'rgba(79,195,247,.09)':'transparent';
+    el.style.borderColor=x===l?'#4fc3f7':'var(--bdr)';
+    el.style.color=x===l?'#4fc3f7':'var(--soft)';
+  });
+  const b=$(`cb-${qi}`);if(b)b.style.display='inline-block';
+}
+function checkQ(qi,correct,enc){
+  checked[qi]=true;const ch=picks[qi],ok=ch===correct;
+  document.querySelectorAll(`[id^="op-${qi}-"]`).forEach((el,oi)=>{
+    const x='ABCD'[oi];
+    if(x===correct){el.style.background='rgba(52,211,153,.09)';el.style.borderColor='#34d399';el.style.color='#34d399';}
+    else if(x===ch&&!ok){el.style.background='rgba(251,113,133,.09)';el.style.borderColor='#fb7185';el.style.color='#fb7185';}
+    el.classList.add('locked');
+  });
+  const b=$(`cb-${qi}`);if(b)b.style.display='none';
+  const ex=$(`ex-${qi}`);if(ex){ex.style.display='block';ex.innerHTML=(ok?'✅ ':'❌ ')+e(decodeURIComponent(enc));}
+  if(ok){qScore++;addXP(15,'Correct! 🎯');}else addXP(5,'Good try!');
+  const qs=$('qs');if(qs)qs.textContent=`${qScore}/${Object.keys(checked).length} correct`;
+  if(Object.keys(checked).length===qTotal){
+    G.quizzes++;saveG();
+    setTimeout(()=>{
+      if(qScore===qTotal){confetti();}
+      else if(qScore>=qTotal*.8)axieSay(`${qScore}/${qTotal} — Nearly perfect! 🌟`);
+      else axieSay(`${qScore}/${qTotal} — Review the missed ones! 💪`);
+    },400);
   }
 }
 
-function renderAPExamContent(data){
-  const skillColor={Knowledge:'#4fc3f7',Application:'#f0c040',Analysis:'#a78bfa'};
-  const frqs=(data.frqs||[]).map((frq,fi)=>`
-    <div class="card" style="border-left:3px solid var(--accent);margin-bottom:20px;padding:18px 20px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+// ── AP EXAM ───────────────────────────────────────────────────────────────
+function renderAPX(session){
+  if(session.apExam)return renderAPXContent(session.apExam);
+  return`<div style="text-align:center;padding:2.5rem 1rem fadein">
+    <div style="font-size:52px;margin-bottom:14px">🎓</div>
+    <div class="lbl" style="color:var(--accent);margin-bottom:8px;font-size:11px">AP Exam Practice</div>
+    <p style="font-size:14px;color:var(--soft);max-width:380px;margin:0 auto 8px;line-height:1.75">Real AP-style FRQs and MCQs based on this lecture — with rubrics and model answers, College Board format.</p>
+    <p class="lbl" style="margin-bottom:20px">Free Response + Multiple Choice</p>
+    <button class="btn-hi" onclick="genAPX()">Generate AP Exam Questions 📝</button>
+    <div id="apl" style="display:none;margin-top:16px;font-size:13px;color:var(--mut);font-style:italic">Axie is writing your exam…</div>
+    <div id="ape" class="err" style="margin-top:8px"></div>
+  </div>`;
+}
+async function genAPX(){
+  $('apl').style.display='block';$('ape').textContent='';
+  try{
+    const sys=`You are an AP Macroeconomics exam writer trained on College Board standards. Respond ONLY with valid JSON:
+{"frqs":[{"title":"FRQ title","points":5,"context":"1-2 sentence scenario","parts":[{"letter":"a","question":"Question text","points":2,"skill":"Knowledge|Application|Analysis","modelAnswer":"Complete model answer","rubric":"What earns full credit"}]}],"mcqs":[{"question":"stem","options":["A) ...","B) ...","C) ...","D) ..."],"answer":"A","skill":"Knowledge|Application|Analysis","explanation":"Why correct and others wrong"}]}
+Rules: 2 FRQs with 2-3 parts each. 4 MCQs. Scenario-based. Use real AP Macro graphs. Be specific to lecture topics.`;
+    const raw=await callClaude([{role:'user',content:`Session: ${cur.title}\nSummary: ${cur.summary}\nTopics: ${(cur.studyGuide?.sections||[]).map(x=>x.title).join(', ')}`}],sys);
+    const parsed=JSON.parse(raw.replace(/^```json|^```|```$/gm,'').trim());
+    cur.apExam=parsed;sessions=sessions.map(x=>x.id===cur.id?cur:x);saveS(sessions);
+    addXP(20,'AP Exam unlocked! 🎓');$('tc').innerHTML=renderAPXContent(parsed);
+  }catch(err){
+    if(err.message!=='401'&&err.message!=='no-key'){$('ape').textContent='Error: '+err.message;}
+    $('apl').style.display='none';
+  }
+}
+function renderAPXContent(d){
+  const SC={Knowledge:'#4fc3f7',Application:'#f0c040',Analysis:'#a78bfa'};
+  const frqs=(d.frqs||[]).map((frq,fi)=>`
+    <div class="card fadein" style="border-left:3px solid var(--accent);margin-bottom:18px;padding:17px 19px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:10px;flex-wrap:wrap">
         <div>
-          <div class="mono-label" style="color:var(--accent);margin-bottom:4px">Free Response Question ${fi+1}</div>
-          <div style="font-size:15px;font-weight:700;color:var(--txt)">${esc(frq.title)}</div>
+          <div class="lbl" style="color:var(--accent);margin-bottom:4px">Free Response Question ${fi+1}</div>
+          <div style="font-size:15px;font-weight:700;color:var(--txt)">${e(frq.title)}</div>
         </div>
-        <div style="font-family:monospace;font-weight:700;color:var(--accent);background:rgba(240,192,64,0.1);border:1px solid rgba(240,192,64,0.3);padding:4px 12px;border-radius:2px">${frq.points} pts</div>
+        <div style="font-family:monospace;font-weight:700;color:var(--accent);background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.3);padding:4px 12px;border-radius:3px;white-space:nowrap;font-size:13px">${frq.points} pts</div>
       </div>
-      ${frq.context?`<div style="background:rgba(255,255,255,.03);border-left:2px solid var(--bdr2);padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--soft);line-height:1.6;font-style:italic">${esc(frq.context)}</div>`:''}
-      ${(frq.parts||[]).map((p,pi)=>{
-        const sc=skillColor[p.skill]||'#888';
-        return`<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bdr)">
-          <div style="display:flex;gap:12px;margin-bottom:8px">
-            <span style="font-family:monospace;font-size:14px;font-weight:700;color:var(--accent);min-width:20px">(${p.letter})</span>
+      ${frq.context?`<div style="background:rgba(255,255,255,.025);border-left:2px solid var(--bdr2);padding:9px 13px;margin-bottom:13px;font-size:12px;color:var(--soft);line-height:1.65;font-style:italic;border-radius:0 4px 4px 0">${e(frq.context)}</div>`:''}
+      ${(frq.parts||[]).map((p,pi)=>{const sc=SC[p.skill]||'#888';return`
+        <div style="margin-bottom:15px;padding-bottom:15px;border-bottom:1px solid var(--bdr)">
+          <div style="display:flex;gap:11px;margin-bottom:8px">
+            <span style="font-family:monospace;font-size:14px;font-weight:700;color:var(--accent);flex-shrink:0;padding-top:1px">(${p.letter})</span>
             <div style="flex:1">
-              <p style="font-size:13px;font-weight:600;color:var(--txt);margin:0 0 6px;line-height:1.5">${esc(p.question)}</p>
+              <p style="font-size:13px;font-weight:600;color:var(--txt);margin:0 0 6px;line-height:1.5">${e(p.question)}</p>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
                 <span style="font-family:monospace;font-size:9px;color:${sc};background:${sc}18;border:1px solid ${sc}30;padding:2px 8px;border-radius:2px">${p.skill}</span>
-                <span class="mono-label">${p.points} pt${p.points>1?'s':''}</span>
+                <span class="lbl">${p.points} pt${p.points>1?'s':''}</span>
               </div>
             </div>
           </div>
-          <div id="frq-ans-${fi}-${pi}" style="display:none;margin-left:32px">
-            <div style="background:rgba(52,211,153,0.05);border:1px solid rgba(52,211,153,0.2);border-radius:4px;padding:12px 14px;margin-bottom:8px">
-              <div class="mono-label" style="color:#34d399;margin-bottom:6px">✅ Model Answer</div>
-              <p style="font-size:13px;color:var(--soft);line-height:1.7;margin:0">${esc(p.modelAnswer)}</p>
+          <div id="fa-${fi}-${pi}" style="display:none;margin-left:25px">
+            <div style="background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.18);border-radius:var(--r6);padding:11px 14px;margin-bottom:7px">
+              <div class="lbl" style="color:#34d399;margin-bottom:5px">✅ Model Answer</div>
+              <p style="font-size:12px;color:var(--soft);line-height:1.75;margin:0">${e(p.modelAnswer)}</p>
             </div>
-            <div style="background:rgba(240,192,64,0.05);border:1px solid rgba(240,192,64,0.2);border-radius:4px;padding:10px 14px">
-              <div class="mono-label" style="color:var(--accent);margin-bottom:4px">📋 AP Rubric Hint</div>
-              <p style="font-size:12px;color:var(--soft);line-height:1.6;margin:0">${esc(p.rubric)}</p>
+            <div style="background:rgba(240,192,64,.04);border:1px solid rgba(240,192,64,.18);border-radius:var(--r6);padding:10px 14px">
+              <div class="lbl" style="color:var(--accent);margin-bottom:4px">📋 AP Rubric Hint</div>
+              <p style="font-size:12px;color:var(--soft);line-height:1.65;margin:0">${e(p.rubric)}</p>
             </div>
           </div>
-          <button class="btn" onclick="toggleFRQAnswer('frq-ans-${fi}-${pi}',this)" style="margin-top:8px;margin-left:32px;font-size:11px;color:var(--mut)">Show Model Answer</button>
-        </div>`;
-      }).join('')}
+          <button class="btn" onclick="togFRQ('fa-${fi}-${pi}',this)" style="margin-top:8px;margin-left:25px;font-size:11px;color:var(--mut)">Show Model Answer</button>
+        </div>`;}).join('')}
     </div>`).join('');
-
-  const mcqs=(data.mcqs||[]).map((q,i)=>{
-    const sc=skillColor[q.skill]||'#888';
-    return`<div class="card" style="border-left:3px solid var(--a2);margin-bottom:12px;padding:16px 20px">
-      <div style="display:flex;gap:10px;margin-bottom:12px">
-        <span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--a2);min-width:24px">${i+1}.</span>
-        <div style="flex:1">
-          <p style="font-size:14px;font-weight:600;color:var(--txt);margin:0 0 8px;line-height:1.5">${esc(q.question)}</p>
+  const mcqs=(d.mcqs||[]).map((q,i)=>{const sc=SC[q.skill]||'#888';return`
+    <div class="card fadein" style="border-left:3px solid var(--c3);margin-bottom:11px;padding:15px 18px">
+      <div style="display:flex;gap:10px;margin-bottom:11px">
+        <span style="font-family:monospace;font-size:13px;font-weight:700;color:var(--c3);flex-shrink:0">${i+1}.</span>
+        <div>
+          <p style="font-size:13px;font-weight:600;color:var(--txt);margin:0 0 7px;line-height:1.5">${e(q.question)}</p>
           <span style="font-family:monospace;font-size:9px;color:${sc};background:${sc}18;border:1px solid ${sc}30;padding:2px 8px;border-radius:2px">${q.skill}</span>
         </div>
       </div>
-      <div>${(q.options||[]).map((opt,oi)=>`<div id="mcq-opt-${i}-${oi}" class="quiz-opt" onclick="pickMCQ(${i},'${opt[0]}')" style="margin-left:24px">${esc(opt)}</div>`).join('')}</div>
-      <div style="margin-left:24px;margin-top:8px"><button id="mcq-cbtn-${i}" class="btn-accent" style="display:none;font-size:11px;padding:6px 14px" onclick="checkMCQ(${i},'${q.answer}','${encodeURIComponent(q.explanation)}')">Check ✓</button></div>
-      <div id="mcq-exp-${i}" style="display:none;margin-top:10px;margin-left:24px;font-size:12px;color:var(--soft);border-top:1px solid var(--bdr);padding-top:10px;line-height:1.7"></div>
-    </div>`;
-  }).join('');
-
-  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:8px">
-    <div>
-      <div class="mono-label" style="color:var(--accent);margin-bottom:4px">Free Response Questions 📝</div>
-      <p style="font-size:12px;color:var(--mut)">Write your answer first, then reveal the model answer</p>
-    </div>
-    <button class="btn" onclick="currentSession.apExam=null;renderStudyTab()" style="font-size:11px;color:var(--mut)">🔄 Regenerate</button>
-  </div>
-  ${frqs}
-  <div class="mono-label" style="color:var(--a2);margin:20px 0 12px">Multiple Choice Questions</div>
-  ${mcqs}`;
+      <div>${(q.options||[]).map((opt,oi)=>`<div id="mop-${i}-${oi}" class="qopt" onclick="pickM(${i},'${opt[0]}')" style="margin-left:22px">${e(opt)}</div>`).join('')}</div>
+      <div style="margin-left:22px;margin-top:8px"><button id="mcb-${i}" class="btn-hi" style="display:none;font-size:11px;padding:6px 14px" onclick="checkM(${i},'${q.answer}','${encodeURIComponent(q.explanation)}')">Check ✓</button></div>
+      <div id="mex-${i}" style="display:none;margin-top:10px;margin-left:22px;font-size:12px;color:var(--soft);border-top:1px solid var(--bdr);padding-top:10px;line-height:1.7"></div>
+    </div>`;}).join('');
+  return`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:8px">
+    <div><div class="lbl" style="color:var(--accent);margin-bottom:3px">Free Response Questions 📝</div><p style="font-size:12px;color:var(--mut)">Write your answer first, then reveal the model</p></div>
+    <button class="btn" onclick="cur.apExam=null;renderTab()" style="font-size:11px;color:var(--mut)">🔄 Regenerate</button>
+  </div>${frqs}
+  <div class="lbl" style="color:var(--c3);margin:18px 0 11px">Multiple Choice Questions</div>${mcqs}`;
+}
+function togFRQ(id,btn){const el=$(id);if(!el)return;const sh=el.style.display!=='none';el.style.display=sh?'none':'block';btn.textContent=sh?'Show Model Answer':'Hide Model Answer';if(!sh)addXP(10,'Model answer reviewed!');}
+function pickM(qi,l){
+  if(mcqP[qi+'_c'])return;mcqP[qi]=l;
+  document.querySelectorAll(`[id^="mop-${qi}-"]`).forEach((el,oi)=>{const x='ABCD'[oi];el.style.background=x===l?'rgba(167,139,250,.09)':'transparent';el.style.borderColor=x===l?'#a78bfa':'var(--bdr)';el.style.color=x===l?'#a78bfa':'var(--soft)';});
+  const b=$(`mcb-${qi}`);if(b)b.style.display='inline-block';
+}
+function checkM(qi,correct,enc){
+  mcqP[qi+'_c']=true;const ch=mcqP[qi],ok=ch===correct;
+  document.querySelectorAll(`[id^="mop-${qi}-"]`).forEach((el,oi)=>{const x='ABCD'[oi];if(x===correct){el.style.background='rgba(52,211,153,.09)';el.style.borderColor='#34d399';el.style.color='#34d399';}else if(x===ch&&!ok){el.style.background='rgba(251,113,133,.09)';el.style.borderColor='#fb7185';el.style.color='#fb7185';}el.style.cursor='default';});
+  const b=$(`mcb-${qi}`);if(b)b.style.display='none';
+  const ex=$(`mex-${qi}`);if(ex){ex.style.display='block';ex.innerHTML=(ok?'✅ ':'❌ ')+e(decodeURIComponent(enc));}
+  addXP(ok?15:5,ok?'AP MCQ correct! 🎯':'Keep going!');
 }
 
-function toggleFRQAnswer(id,btn){
-  const el=document.getElementById(id);if(!el)return;
-  const showing=el.style.display!=='none';
-  el.style.display=showing?'none':'block';
-  btn.textContent=showing?'Show Model Answer':'Hide Model Answer';
-  if(!showing)addXP(10,'Reviewed model answer!');
-}
-
-function pickMCQ(qi,letter){
-  if(mcqPicks[qi+'_c'])return;
-  mcqPicks[qi]=letter;
-  document.querySelectorAll(`[id^="mcq-opt-${qi}-"]`).forEach((el,oi)=>{
-    const l='ABCD'[oi];
-    el.style.background=l===letter?'rgba(167,139,250,0.1)':'transparent';
-    el.style.borderColor=l===letter?'#a78bfa':'var(--bdr)';
-    el.style.color=l===letter?'#a78bfa':'var(--soft)';
-  });
-  const btn=document.getElementById(`mcq-cbtn-${qi}`);if(btn)btn.style.display='inline-block';
-}
-
-function checkMCQ(qi,correct,expEnc){
-  mcqPicks[qi+'_c']=true;const chosen=mcqPicks[qi];const ok=chosen===correct;
-  document.querySelectorAll(`[id^="mcq-opt-${qi}-"]`).forEach((el,oi)=>{
-    const l='ABCD'[oi];
-    if(l===correct){el.style.background='rgba(52,211,153,0.1)';el.style.borderColor='#34d399';el.style.color='#34d399';}
-    else if(l===chosen&&!ok){el.style.background='rgba(251,113,133,0.1)';el.style.borderColor='#fb7185';el.style.color='#fb7185';}
-    el.style.cursor='default';
-  });
-  const btn=document.getElementById(`mcq-cbtn-${qi}`);if(btn)btn.style.display='none';
-  const exp=document.getElementById(`mcq-exp-${qi}`);
-  if(exp){exp.style.display='block';exp.innerHTML=(ok?'✅ ':'❌ ')+esc(decodeURIComponent(expEnc));}
-  addXP(ok?15:5,ok?'AP MCQ correct! 🎯':'Keep practicing!');
-}
-
-// ── GAPS & WATCH-OUTS ──────────────────────────────────────────────────────
-function renderGaps(session){
-  if(session.gaps)return renderGapsContent(session.gaps);
+// ── GAPS ──────────────────────────────────────────────────────────────────
+function renderGaps(s){
+  if(s.gaps)return renderGapsContent(s.gaps);
   return`<div style="text-align:center;padding:2.5rem 1rem">
-    <div style="font-size:48px;margin-bottom:12px">🔍</div>
-    <div class="mono-label" style="color:var(--a4);margin-bottom:8px;font-size:12px">Gap Analysis</div>
-    <p style="font-size:13px;color:var(--soft);max-width:380px;margin:0 auto 20px;line-height:1.7">Axie will analyze this session and flag what was missed, what's likely on the AP exam, and what to review next.</p>
-    <button class="btn-accent" onclick="generateGaps()">Analyze Gaps 🔍</button>
-    <div id="gap-loading" style="display:none;margin-top:16px;font-size:13px;color:var(--mut)">Axie is analyzing...</div>
-    <div id="gap-err" class="status-err" style="margin-top:8px"></div>
+    <div style="font-size:52px;margin-bottom:14px">🔍</div>
+    <div class="lbl" style="color:var(--c5);margin-bottom:8px">Gap Analysis</div>
+    <p style="font-size:13px;color:var(--soft);max-width:360px;margin:0 auto 20px;line-height:1.75">Axie will analyze this session and flag what was missed, what's likely on the AP exam, and what to study next.</p>
+    <button class="btn-hi" onclick="genGaps()">Analyze Gaps 🔍</button>
+    <div id="gapl" style="display:none;margin-top:14px;font-size:13px;color:var(--mut)">Axie is analyzing…</div>
+    <div id="gape" class="err" style="margin-top:8px"></div>
   </div>`;
 }
-
-async function generateGaps(){
-  document.getElementById('gap-loading').style.display='block';
-  document.getElementById('gap-err').textContent='';
-  const s=currentSession;
+async function genGaps(){
+  $('gapl').style.display='block';$('gape').textContent='';
   try{
-    const sys=`You are an AP Macroeconomics exam expert. Analyze this study session. Respond ONLY with valid JSON:
-{"gaps":[{"type":"missed","title":"Topic title","description":"What was missed and why it matters"},{"type":"exam","title":"AP exam topic","description":"Likely on exam but not covered"},{"type":"review","title":"Concept","description":"Mentioned but not fully explained"}],"watchouts":["Short specific exam watch-out"],"nextSession":"One sentence: what to cover next"}
-Provide 2-4 gaps, 3-5 watchouts. Be specific and honest.`;
-    const raw=await callClaude([{role:'user',content:`Session: ${s.title}\nSummary: ${s.summary}\nTopics: ${(s.studyGuide?.sections||[]).map(x=>x.title).join(', ')}\nTranscript: ${(s.transcript||'').slice(0,3000)}`}],sys);
+    const sys=`You are an AP Macroeconomics exam expert. Analyze this session and respond ONLY with valid JSON:
+{"gaps":[{"type":"missed|exam|review","title":"topic","description":"what and why"}],"watchouts":["short specific exam watch-out"],"nextSession":"one sentence recommendation"}
+2-4 gaps, 3-5 watchouts. Be honest and specific. Types: missed=not covered, exam=likely on AP exam, review=needs clarification.`;
+    const raw=await callClaude([{role:'user',content:`Session: ${cur.title}\nSummary: ${cur.summary}\nTopics: ${(cur.studyGuide?.sections||[]).map(x=>x.title).join(', ')}\nTranscript: ${(cur.transcript||'').slice(0,3000)}`}],sys);
     const parsed=JSON.parse(raw.replace(/^```json|^```|```$/gm,'').trim());
-    currentSession.gaps=parsed;sessions=sessions.map(x=>x.id===s.id?currentSession:x);saveSessions(sessions);
-    document.getElementById('study-content').innerHTML=renderGapsContent(parsed);
-    addXP(15,'Gap analysis complete!');
-  }catch(e){
-    if(e.message!=='401'&&e.message!=='No key'){document.getElementById('gap-err').textContent='Error: '+e.message;}
-    document.getElementById('gap-loading').style.display='none';
-  }
+    cur.gaps=parsed;sessions=sessions.map(x=>x.id===cur.id?cur:x);saveS(sessions);
+    addXP(15,'Gap analysis done!');$('tc').innerHTML=renderGapsContent(parsed);
+  }catch(err){if(err.message!=='401'&&err.message!=='no-key'){$('gape').textContent='Error: '+err.message;}$('gapl').style.display='none';}
 }
-
-function renderGapsContent(data){
-  const typeStyle={
-    missed:{color:'#fb7185',bg:'rgba(251,113,133,0.08)',label:'❌ Not Covered'},
-    exam:{color:'#f0c040',bg:'rgba(240,192,64,0.08)',label:'⚡ AP Exam Topic'},
-    review:{color:'#4fc3f7',bg:'rgba(79,195,247,0.08)',label:'📖 Needs Clarification'},
-  };
+function renderGapsContent(d){
+  const TS={missed:{col:'#fb7185',bg:'rgba(251,113,133,.08)',lbl:'❌ Not Covered'},exam:{col:'#f0c040',bg:'rgba(240,192,64,.08)',lbl:'⚡ AP Exam Topic'},review:{col:'#4fc3f7',bg:'rgba(79,195,247,.08)',lbl:'📖 Needs Clarification'}};
   return`<div style="margin-bottom:24px">
-    <div class="mono-label" style="margin-bottom:14px">Gaps & Missing Coverage</div>
-    ${(data.gaps||[]).map(g=>{const ts=typeStyle[g.type]||typeStyle.review;
-      return`<div class="card" style="border-left:3px solid ${ts.color};margin-bottom:10px;padding:14px 18px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-          <span style="font-family:monospace;font-size:9px;color:${ts.color};background:${ts.color}15;border:1px solid ${ts.color}30;padding:2px 8px;border-radius:2px">${ts.label}</span>
-          <span style="font-size:14px;font-weight:600;color:var(--txt)">${esc(g.title)}</span>
-        </div>
-        <p style="font-size:13px;color:var(--soft);margin:0;line-height:1.6">${esc(g.description)}</p>
-      </div>`;
-    }).join('')}
+    <div class="lbl" style="margin-bottom:13px">Gaps &amp; Missing Coverage</div>
+    ${(d.gaps||[]).map(g=>{const ts=TS[g.type]||TS.review;return`<div class="card fadein" style="border-left:3px solid ${ts.col};margin-bottom:9px;padding:13px 17px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+        <span style="font-family:monospace;font-size:9px;color:${ts.col};background:${ts.col}18;border:1px solid ${ts.col}30;padding:2px 8px;border-radius:2px">${ts.lbl}</span>
+        <span style="font-size:14px;font-weight:600;color:var(--txt)">${e(g.title)}</span>
+      </div>
+      <p style="font-size:12px;color:var(--soft);margin:0;line-height:1.65">${e(g.description)}</p>
+    </div>`;}).join('')}
   </div>
   <div style="margin-bottom:24px">
-    <div class="mono-label" style="margin-bottom:12px">⚠️ Watch-Outs Before the Exam</div>
-    ${(data.watchouts||[]).map((w,i)=>`<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr)">
-      <span style="font-family:monospace;font-size:11px;color:var(--accent);min-width:20px;padding-top:1px">${i+1}</span>
-      <p style="font-size:13px;color:var(--soft);margin:0;line-height:1.6">${esc(w)}</p>
+    <div class="lbl" style="margin-bottom:11px">⚠️ Watch-Outs Before the Exam</div>
+    ${(d.watchouts||[]).map((w,i)=>`<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--bdr)">
+      <span style="font-family:monospace;font-size:11px;color:var(--accent);min-width:18px;padding-top:1px">${i+1}</span>
+      <p style="font-size:12px;color:var(--soft);margin:0;line-height:1.65">${e(w)}</p>
     </div>`).join('')}
   </div>
-  ${data.nextSession?`<div class="exam-tip"><div class="mono-label" style="color:var(--a3);margin-bottom:6px">🦉 Axie's Next Session Recommendation</div><p style="font-size:13px;color:var(--soft);line-height:1.6;margin:0">${esc(data.nextSession)}</p></div>`:''}
-  <button class="btn" onclick="currentSession.gaps=null;renderStudyTab()" style="margin-top:14px;font-size:12px;color:var(--mut)">Re-analyze</button>`;
+  ${d.nextSession?`<div class="tip-box"><div class="lbl" style="color:var(--c4);margin-bottom:6px">🦉 Axie's Recommendation</div><p style="font-size:13px;color:var(--soft);line-height:1.65;margin:0">${e(d.nextSession)}</p></div>`:''}
+  <button class="btn" onclick="cur.gaps=null;renderTab()" style="margin-top:14px;font-size:11px;color:var(--mut)">Re-analyze</button>`;
 }
 
-// ── CHAT ───────────────────────────────────────────────────────────────────
+// ── CHAT ──────────────────────────────────────────────────────────────────
 function renderChat(){
-  chatHistory=[];
-  return`<div class="mono-label" style="margin-bottom:14px">🦉 Ask Axie Anything</div>
-  <div id="chat-msgs" style="display:flex;flex-direction:column;gap:12px;min-height:100px;margin-bottom:14px">
-    <div class="card" style="border-left:3px solid var(--a2)"><p style="margin:0;font-size:13px;color:var(--soft)">Ask me anything about this lecture or AP Macro! I'll give you short, clear answers you can actually use. 🦉</p></div>
+  chatH=[];
+  return`<div class="lbl" style="margin-bottom:13px">🦉 Ask Axie Anything</div>
+  <div id="cm" style="display:flex;flex-direction:column;gap:11px;min-height:80px;margin-bottom:14px">
+    <div class="card fadein" style="border-left:3px solid var(--c3);padding:13px 16px">
+      <p style="margin:0;font-size:13px;color:var(--soft);line-height:1.65">Ask me anything about this lecture or AP Macro! I'll keep answers short, clear, and useful. 🦉</p>
+    </div>
   </div>
   <div style="display:flex;gap:8px">
-    <input id="chat-in" placeholder="Ask Axie a question..." onkeydown="if(event.key==='Enter')sendChat()" style="flex:1;padding:11px 14px;font-size:13px;border-radius:4px;border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);outline:none"/>
-    <button class="btn-accent" onclick="sendChat()" style="padding:11px 20px">Ask 🦉</button>
+    <input id="ci" placeholder="Ask Axie a question…" onkeydown="if(event.key==='Enter')doChat()" style="flex:1;padding:11px 14px;font-size:13px;border-radius:var(--r6);border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--bdr2)'" onblur="this.style.borderColor='var(--bdr)'"/>
+    <button class="btn-hi" onclick="doChat()" style="padding:11px 18px">Ask 🦉</button>
   </div>
-  <div id="chat-busy" style="display:none;font-size:12px;color:var(--mut);font-style:italic;margin-top:8px">Axie is thinking...</div>`;
+  <div id="cb2" style="display:none;font-size:11px;color:var(--mut);font-style:italic;margin-top:7px">Axie is thinking…</div>`;
 }
-
-function formatChatReply(text){
-  const lines=text.split('\n').filter(l=>l.trim());
-  return lines.map(l=>{
-    const isBullet=l.trim().startsWith('-')||l.trim().startsWith('•')||l.trim().startsWith('*');
-    if(isBullet)return`<div style="display:flex;gap:8px;padding:4px 0"><span style="color:var(--accent);font-size:10px;padding-top:4px;flex-shrink:0">▸</span><span style="font-size:13px;color:var(--soft);line-height:1.6">${esc(l.replace(/^[-•*]\s*/,''))}</span></div>`;
-    return`<p style="margin:0 0 6px;font-size:13px;color:var(--soft);line-height:1.6">${esc(l)}</p>`;
+function fmtChat(t){
+  return t.split('\n').filter(l=>l.trim()).map(l=>{
+    const b=l.trim().startsWith('-')||l.trim().startsWith('•')||l.trim().startsWith('*');
+    return b?`<div class="chat-bline"><span class="arr">▸</span><span style="font-size:13px;color:var(--mid);line-height:1.65">${e(l.replace(/^[-•*]\s*/,''))}</span></div>`:`<p style="margin:0 0 5px;font-size:13px;color:var(--mid);line-height:1.65">${e(l)}</p>`;
   }).join('');
 }
-
-async function sendChat(){
-  const input=document.getElementById('chat-in');
-  const msg=input?.value?.trim();if(!msg)return;input.value='';
-  chatHistory.push({role:'user',content:msg});
-  const msgs=document.getElementById('chat-msgs');
-  msgs.innerHTML+=`<div style="display:flex;justify-content:flex-end"><div class="chat-bubble-user">${esc(msg)}</div></div>`;
-  const busy=document.getElementById('chat-busy');if(busy)busy.style.display='block';
+async function doChat(){
+  const inp=$('ci');const msg=inp?.value?.trim();if(!msg)return;inp.value='';
+  chatH.push({role:'user',content:msg});
+  const cm=$('cm');
+  cm.innerHTML+=`<div style="display:flex;justify-content:flex-end"><div class="bubble-u fadein">${e(msg)}</div></div>`;
+  const busy=$('cb2');if(busy)busy.style.display='block';
   try{
-    const sys=`You are Axie, a friendly AP Macro tutor owl 🦉 helping a high school student. Answer in plain English using SHORT bullet points — max 4 bullets, each under 15 words. Start with the direct answer in one sentence. No jargon without a simple explanation. Be encouraging. Lecture: ${currentSession.summary}`;
-    const reply=await callClaude(chatHistory,sys);
-    chatHistory.push({role:'assistant',content:reply});
-    msgs.innerHTML+=`<div style="display:flex;justify-content:flex-start"><div class="chat-bubble-ai"><span style="font-size:14px;margin-right:6px">🦉</span>${formatChatReply(reply)}</div></div>`;
+    const sys=`You are Axie, a friendly AP Macro tutor owl 🦉 helping a high school student named CoCo. Give SHORT bullet-point answers — max 4 bullets, each under 15 words. One direct sentence first, then bullets. Plain English, no jargon without explanation. Be warm and encouraging. Lecture: ${cur.summary}`;
+    const rep=await callClaude(chatH,sys);
+    chatH.push({role:'assistant',content:rep});
+    cm.innerHTML+=`<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start">
+      <span style="font-size:18px;flex-shrink:0;margin-top:2px">🦉</span>
+      <div class="bubble-a fadein">${fmtChat(rep)}</div>
+    </div>`;
     addXP(5,'Question asked!');
-  }catch(e){msgs.innerHTML+=`<div style="color:var(--a4);font-size:12px">${esc(e.message)}</div>`;}
+  }catch(err){cm.innerHTML+=`<div style="color:var(--c5);font-size:12px">${e(err.message)}</div>`;}
   if(busy)busy.style.display='none';
-  msgs.scrollTop=msgs.scrollHeight;
+  cm.scrollTop=cm.scrollHeight;
 }
 
-// ── RESOURCES ──────────────────────────────────────────────────────────────
-function renderResources(resources){
-  return`<div class="mono-label" style="margin-bottom:14px">📚 Curated Resources</div>
-  ${(resources||[]).map((r,i)=>`<div class="card" style="border-left:3px solid ${ac(i)};margin-bottom:12px">
-    <a href="${esc(r.url)}" target="_blank" style="font-weight:600;font-size:15px;color:${ac(i)}">${esc(r.name)}</a>
-    <p style="margin:6px 0 4px;font-size:13px;color:var(--soft);line-height:1.6">${esc(r.why)}</p>
-    <p style="margin:0;font-size:11px;color:var(--mut);font-family:monospace">${esc(r.url)}</p>
+// ── RESOURCES ─────────────────────────────────────────────────────────────
+function renderRes(resources){
+  return`<div class="lbl" style="margin-bottom:13px">📚 Curated Resources</div>
+  ${(resources||[]).map((r,i)=>`<div class="card fadein" style="border-left:3px solid ${ac(i)};margin-bottom:11px">
+    <a href="${e(r.url)}" target="_blank" style="font-weight:600;font-size:15px;color:${ac(i)};transition:opacity .15s" onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">${e(r.name)}</a>
+    <p style="margin:6px 0 4px;font-size:12px;color:var(--soft);line-height:1.65">${e(r.why)}</p>
+    <p style="margin:0;font-size:10px;color:var(--mut);font-family:monospace">${e(r.url)}</p>
   </div>`).join('')}`;
 }
 
-// ── TRANSCRIPT ─────────────────────────────────────────────────────────────
-function showTranscript(){
-  const s=currentSession;if(!s?.transcript)return;
-  render(`
-    <div class="tab-bar"><button class="tab active">📄 Transcript</button></div>
-    <div class="content has-unit-nav">
-      <button class="btn" onclick="showStudy()" style="font-size:11px;margin-bottom:16px">← Back to Session</button>
-      <div style="font-family:monospace;font-size:16px;font-weight:800;letter-spacing:1px;color:var(--txt);margin-bottom:16px">${esc(s.title?.toUpperCase())}</div>
-      <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:6px;padding:20px;font-size:13px;color:var(--soft);line-height:1.9;white-space:pre-wrap;font-family:monospace;max-height:70vh;overflow-y:auto">${esc(s.transcript)}</div>
-    </div>
-    ${unitNavBar(s.unit?.id)}`);
+// ── TRANSCRIPT ────────────────────────────────────────────────────────────
+function showTx(){
+  const s=cur;if(!s?.transcript)return;
+  R(`<div class="tabbar"><button class="tab on">📄 Transcript</button></div>
+  <div class="page has-unav fadein">
+    <button class="btn" onclick="showStudy()" style="font-size:12px;margin-bottom:16px">← Back to Session</button>
+    <div style="font-family:monospace;font-size:14px;font-weight:800;letter-spacing:.5px;color:var(--txt);margin-bottom:14px">${e(s.title?.toUpperCase())}</div>
+    <div style="background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r8);padding:20px;font-size:12px;color:var(--soft);line-height:1.95;white-space:pre-wrap;font-family:monospace;max-height:72vh;overflow-y:auto">${e(s.transcript)}</div>
+  </div>
+  ${uNavBar(s.unit?.id)}`);
 }
 
-// ── UNIT NAV ───────────────────────────────────────────────────────────────
-function jumpToUnit(id){
-  const s=sessions.find(x=>x.unit?.id===id);
-  if(s){openSession(sessions.indexOf(s));}else{showUnitOverview(id);}
-}
-
-// ── NOTION ─────────────────────────────────────────────────────────────────
-function toggleNotion(){
-  const p=document.getElementById('notion-panel');
-  if(p)p.style.display=p.style.display==='none'?'block':'none';
-}
-
-function buildNotionText(s){
-  const grade=s.instructorGrade;
+// ── NOTION ────────────────────────────────────────────────────────────────
+function buildNotion(s){
+  const gr=s.instructorGrade;
   return['Please save this study session to Notion as a structured page.',
-    `Title: ${s.title} — AP Macro [${s.date}]`,
-    `Unit: Unit ${s.unit?.id} — ${s.unit?.label}`,
-    `Summary: ${s.summary}`,
-    grade?`Instructor Grade: ${grade.score}/100 — ${grade.rationale}`:'',
+    `Title: ${s.title} — AP Macro [${s.date}]`,`Unit: Unit ${s.unit?.id} — ${s.unit?.lbl}`,
+    `Summary: ${s.summary}`,gr?`Instructor Grade: ${gr.score}/100 — ${gr.rationale}`:'',
     '','KEY TAKEAWAYS:',...(s.studyGuide?.keyTakeaways||[]).map((t,i)=>`${i+1}. ${t}`),
     '','SECTIONS:',...(s.studyGuide?.sections||[]).flatMap(sec=>[`## ${sec.title}`,...(sec.cards||[]).map(c=>`- ${c.title}: ${c.bullets?.join('; ')||c.text||''}`),...(sec.formulas||[]).map(f=>`Formula: ${f.eq} — ${f.label||''}`)]),
     '','FORMULAS:',...(s.studyGuide?.formulas||[]).map(f=>`${f.eq} — ${f.label||''}`),
@@ -1209,10 +1075,10 @@ function buildNotionText(s){
   ].filter(Boolean).join('\n');
 }
 
-// ── INIT ────────────────────────────────────────────────────────────────────
-updateHeroStats();
-setInterval(updateHeroStats,60000);
-setTimeout(()=>axieSpeak(),2000);
+// ── INIT ──────────────────────────────────────────────────────────────────
+updateHero();
+setInterval(updateHero,60000);
+setTimeout(()=>axieTap(),2200);
 if(!API_KEY)showSetup();else{checkStreak();showHome();}
 </script>
 </body>
