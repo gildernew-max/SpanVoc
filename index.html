@@ -16,7 +16,7 @@
   --shadow:0 2px 12px rgba(0,0,0,.4);
 }
 html{scroll-behavior:smooth}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 button,input,textarea,select{font-family:inherit}
 button{cursor:pointer}
 a{color:inherit;text-decoration:none}
@@ -516,7 +516,7 @@ function saveKey(){
 
 // ── HOME ──────────────────────────────────────────────────────────────────
 function showHome(){
-  cur=null;
+  cur=null;updateHero();
   R(`<div class="tabbar">
     <button class="tab${htab==='sessions'?' on':''}" onclick="switchH('sessions')">Sessions</button>
     <button class="tab${htab==='units'?' on':''}" onclick="switchH('units')">Unit Overviews</button>
@@ -668,7 +668,13 @@ Rules: 2-3 sections, 2-3 cards each. 4 takeaways. 3-5 global formulas. 6 flashca
 }
 
 // ── STUDY ─────────────────────────────────────────────────────────────────
-function openSess(i){cur=sessions[i];tab='visual';fcIdx=0;picks={};checked={};chatH=[];mcqP={};showStudy();}
+function openSess(i){
+  cur=sessions[i];tab='visual';
+  fcIdx=0;window._fcFlipped=false;
+  picks={};checked={};chatH=[];mcqP={};
+  qScore=0;qTotal=0;
+  showStudy();
+}
 
 const TABS=[['visual','Visual'],['flashcards','Flashcards'],['quiz','Quiz'],['apexam','AP Exam'],['gaps','Gaps'],['chat','Q&A'],['resources','Resources']];
 
@@ -697,7 +703,7 @@ function showStudy(){
         <button class="btn btn-notion" onclick="toggleNotion()">N Export for Notion</button>
         <div id="np" style="display:none;max-width:260px">
           <div class="lbl" style="margin-bottom:4px;margin-top:6px">Click → Ctrl+A → Copy → paste in Claude chat</div>
-          <textarea class="notion-ta" onclick="this.select()" readonly>${e(buildNotion(s))}</textarea>
+          <textarea class="notion-ta" onclick="this.select()" ontouchstart="this.select()" readonly>${e(buildNotion(s))}</textarea>
         </div>
       </div>
     </div>
@@ -745,12 +751,12 @@ function renderVisual(sg){
           ${c.bullets?`<ul class="blist">${c.bullets.map(b=>`<li><span>${bold(b)}</span></li>`).join('')}</ul>`:`<p style="font-size:12px;color:var(--soft);line-height:1.7;margin:0">${bold(c.text)}</p>`}
         </div>`).join('')}
     </div>
-    ${(sec.formulas||[]).map(f=>`<div class="formula" style="border-left-color:${a};color:${a}">${e(f.eq)}${f.label?`<s> — ${e(f.label)}</s>`:''}</div>`).join('')}
+    ${(sec.formulas||[]).map(f=>`<div class="formula" style="border-left-color:${a};color:${a}">${e(f.eq)}${f.label?`<span style="color:var(--mut);font-size:10px"> — ${e(f.label)}</span>`:''}</div>`).join('')}
   </div>`;}).join('');
 
   const cs=formulas.length?`<div style="padding-top:26px;border-top:2px solid var(--bdr)">
     <div style="font-family:monospace;font-size:13px;font-weight:800;letter-spacing:3px;color:var(--accent);margin-bottom:14px">⚡ FORMULA CHEAT SHEET</div>
-    <div class="g2">${formulas.map((f,i)=>`<div class="formula" style="border-left-color:${ac(i)};color:${ac(i)}">${e(f.eq)}${f.label?`<s> — ${e(f.label)}</s>`:''}</div>`).join('')}</div>
+    <div class="g2">${formulas.map((f,i)=>`<div class="formula" style="border-left-color:${ac(i)};color:${ac(i)}">${e(f.eq)}${f.label?`<span style="color:var(--mut);font-size:10px"> — ${e(f.label)}</span>`:''}</div>`).join('')}</div>
   </div>`:'';
   return tk+secs+cs;
 }
@@ -796,7 +802,7 @@ function renderFC(cards){
 }
 function flipFC(){
   window._fcFlipped=!window._fcFlipped;
-  const el=$('fci');if(el)el.classList.toggle('flipped');
+  const el=$('fci');if(el)el.classList.toggle('flipped',window._fcFlipped);
   if(window._fcFlipped){G.cards++;addXP(5,'Card reviewed!');}
 }
 function nextFC(){window._fcFlipped=false;fcIdx=Math.min(fcIdx+1,cur.flashcards.length-1);renderTab();}
@@ -1040,6 +1046,7 @@ async function doChat(){
 
 // ── RESOURCES ─────────────────────────────────────────────────────────────
 function renderRes(resources){
+  if(!resources?.length)return`<div class="card" style="text-align:center;padding:2rem;color:var(--mut)"><div style="font-size:36px;margin-bottom:10px">📚</div><div style="font-size:13px">No resources for this session yet.</div></div>`;
   return`<div class="lbl" style="margin-bottom:13px">📚 Curated Resources</div>
   ${(resources||[]).map((r,i)=>`<div class="card fadein" style="border-left:3px solid ${ac(i)};margin-bottom:11px">
     <a href="${e(r.url)}" target="_blank" style="font-weight:600;font-size:15px;color:${ac(i)};transition:opacity .15s" onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">${e(r.name)}</a>
@@ -1064,7 +1071,7 @@ function showTx(){
 function buildNotion(s){
   const gr=s.instructorGrade;
   return['Please save this study session to Notion as a structured page.',
-    `Title: ${s.title} — AP Macro [${s.date}]`,`Unit: Unit ${s.unit?.id} — ${s.unit?.lbl}`,
+    `Title: ${s.title} — AP Macro [${s.date}]`,    `Unit: Unit ${s.unit?.id} — ${s.unit?.lbl||s.unit?.label||''}`,
     `Summary: ${s.summary}`,gr?`Instructor Grade: ${gr.score}/100 — ${gr.rationale}`:'',
     '','KEY TAKEAWAYS:',...(s.studyGuide?.keyTakeaways||[]).map((t,i)=>`${i+1}. ${t}`),
     '','SECTIONS:',...(s.studyGuide?.sections||[]).flatMap(sec=>[`## ${sec.title}`,...(sec.cards||[]).map(c=>`- ${c.title}: ${c.bullets?.join('; ')||c.text||''}`),...(sec.formulas||[]).map(f=>`Formula: ${f.eq} — ${f.label||''}`)]),
