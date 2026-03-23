@@ -299,13 +299,13 @@ const state = {
   axIdx:     0,
   fcIdx:     0,
   fcFlipped: false,
-  picks:     {},
-  checked:   {},
   chatH:     [],
   mcqP:      {},
-  qScore:    0,
-  qTotal:    0,
   qIdx:      0,
+  // isolated quiz state — normal quiz
+  quiz:      { picks:{}, checked:{}, score:0, total:0 },
+  // isolated quiz state — targeted drill (never touches quiz)
+  drillQuiz: { picks:{}, checked:{}, score:0, total:0 },
 };
 
 // Convenience accessor — current session object (or null)
@@ -692,12 +692,10 @@ function resetSession() {
   state.tab       = 'visual';
   state.fcIdx     = 0;
   state.fcFlipped = false;
-  state.picks     = {};
-  state.checked   = {};
   state.chatH     = [];
   state.mcqP      = {};
-  state.qScore    = 0;
-  state.qTotal    = 0;
+  state.quiz      = { picks:{}, checked:{}, score:0, total:0 };
+  state.drillQuiz = { picks:{}, checked:{}, score:0, total:0 };
 }
 
 function jumpUnit(id) {
@@ -1166,6 +1164,9 @@ function renderStudy() {
 
 function switchTab(t) {
   state.tab = t;
+  // Reset both quiz objects when switching tabs — prevent stale state
+  state.quiz      = { picks:{}, checked:{}, score:0, total:0 };
+  state.drillQuiz = { picks:{}, checked:{}, score:0, total:0 };
   document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('on', TABS[i]?.[0] === t));
   const tc = $('tc'); if (tc) { tc.className = 'fadein'; renderTab(); }
 }
@@ -1293,7 +1294,8 @@ function shuffleFC() { cur().flashcards.sort(()=>Math.random()-.5); state.fcFlip
 // QUIZ TAB
 // ─────────────────────────────────────────────────────────────────────────────
 function renderQuiz(quiz) {
-  state.qScore=0; state.qTotal=quiz?.length||0;
+  // Reset isolated quiz state at render time — clean slate every time
+  state.quiz = { picks:{}, checked:{}, score:0, total: quiz?.length || 0 };
   return `<div style="display:flex;justify-content:space-between;margin-bottom:16px;align-items:center">
     <div class="lbl">${quiz?.length} Questions 📝</div>
     <div id="qs" class="lbl" style="color:var(--accent)"></div>
@@ -1308,20 +1310,24 @@ function renderQuiz(quiz) {
 }
 
 function pickQ(qi, l) {
-  if (state.checked[qi]) return;
-  state.picks[qi] = l;
+  if (state.quiz.checked[qi]) return; // already answered — no overwrite
+  state.quiz.picks[qi] = l;
   document.querySelectorAll(`[id^="op-${qi}-"]`).forEach((el,oi) => {
     const x = 'ABCD'[oi];
     el.style.background   = x===l ? 'rgba(79,195,247,.09)' : 'transparent';
     el.style.borderColor  = x===l ? '#4fc3f7' : 'var(--bdr)';
     el.style.color        = x===l ? '#4fc3f7' : 'var(--soft)';
   });
-  const b=$(`cb-${qi}`); if(b) b.style.display='inline-block';
+  const b = $(`cb-${qi}`); if (b) b.style.display = 'inline-block';
 }
 
 function checkQ(qi, correct, enc) {
-  state.checked[qi] = true;
-  const ch = state.picks[qi], ok = ch === correct;
+  if (state.quiz.checked[qi]) return; // idempotency guard — no double-counting
+  state.quiz.checked[qi] = true;
+
+  const ch = state.quiz.picks[qi];
+  const ok = ch === correct;
+  if (ok) state.quiz.score++;
 
   // ── TOPIC PERFORMANCE TRACKING ──
   const s   = cur();
@@ -1336,7 +1342,6 @@ function checkQ(qi, correct, enc) {
       p.topics[topic].total++; if (ok) p.topics[topic].correct++;
     }
     persistPerf();
-    // Reset ignored only on real demonstrated competence
     if (p.total >= 5 && (p.correct / p.total) > 0.7) { p.ignored = 0; persistPerf(); }
   }
 
@@ -1346,17 +1351,21 @@ function checkQ(qi, correct, enc) {
     else if (x===ch && !ok) { el.style.background='rgba(251,113,133,.09)'; el.style.borderColor='#fb7185'; el.style.color='#fb7185'; }
     el.classList.add('locked');
   });
-  const b=$(`cb-${qi}`); if(b) b.style.display='none';
-  const ex=$(`ex-${qi}`); if(ex){ ex.style.display='block'; ex.innerHTML=(ok?'✅ ':'❌ ')+e(decodeURIComponent(enc)); }
-  if (ok) { state.qScore++; addXP(15,'Correct! 🎯'); } else addXP(5,'Good try!');
-  const qs=$('qs'); if(qs) qs.textContent=`${state.qScore}/${Object.keys(state.checked).length} correct`;
-  if (Object.keys(state.checked).length===state.qTotal) {
+  const b  = $(`cb-${qi}`);  if (b)  b.style.display = 'none';
+  const ex = $(`ex-${qi}`);  if (ex) ex.style.display = 'block', ex.innerHTML = (ok?'✅ ':'❌ ')+e(decodeURIComponent(enc));
+
+  addXP(ok ? 15 : 5, ok ? 'Correct! 🎯' : 'Good try!');
+
+  const answeredCount = Object.keys(state.quiz.checked).length;
+  const qs = $('qs'); if (qs) qs.textContent = `${state.quiz.score}/${answeredCount} correct`;
+
+  if (answeredCount === state.quiz.total) {
     state.xp.quizzes++; persistXP();
-    setTimeout(()=>{
-      if (state.qScore===state.qTotal) launchConfetti();
-      else if (state.qScore>=state.qTotal*.8) axieSay(`${state.qScore}/${state.qTotal} — Nearly perfect! 🌟`);
-      else axieSay(`${state.qScore}/${state.qTotal} — Review the missed ones! 💪`);
-    },400);
+    setTimeout(() => {
+      if (state.quiz.score === state.quiz.total) launchConfetti();
+      else if (state.quiz.score >= state.quiz.total * 0.8) axieSay(`${state.quiz.score}/${state.quiz.total} — Nearly perfect! 🌟`);
+      else axieSay(`${state.quiz.score}/${state.quiz.total} — Review the missed ones! 💪`);
+    }, 400);
   }
 }
 
@@ -1608,9 +1617,8 @@ function renderTargetedPractice(questions, topic, unitId) {
 }
 
 function tpickQ(qi, l) {
-  if (window._tchecked?.[qi]) return;
-  if (!window._tpicks) window._tpicks = {};
-  window._tpicks[qi] = l;
+  if (state.drillQuiz.checked[qi]) return; // already answered — no overwrite
+  state.drillQuiz.picks[qi] = l;
   document.querySelectorAll(`[id^="top-${qi}-"]`).forEach((el,oi) => {
     const x = 'ABCD'[oi];
     el.style.background  = x===l ? 'rgba(79,195,247,.09)' : 'transparent';
@@ -1621,13 +1629,12 @@ function tpickQ(qi, l) {
 }
 
 function tcheckQ(qi, correct, enc, topic, unitId) {
-  if (!window._tchecked) window._tchecked = {};
-  if (!window._tresults) window._tresults = {};
-  // FIX: declare ch and ok before using them
-  const ch = window._tpicks?.[qi];
+  if (state.drillQuiz.checked[qi]) return; // idempotency guard
+  state.drillQuiz.checked[qi] = true;
+
+  const ch = state.drillQuiz.picks[qi];
   const ok = ch === correct;
-  window._tchecked[qi] = true;
-  window._tresults[qi] = ok;
+  if (ok) state.drillQuiz.score++;
 
   document.querySelectorAll(`[id^="top-${qi}-"]`).forEach((el,oi) => {
     const x = 'ABCD'[oi];
@@ -1635,10 +1642,10 @@ function tcheckQ(qi, correct, enc, topic, unitId) {
     else if (x===ch && !ok) { el.style.background='rgba(251,113,133,.09)'; el.style.borderColor='#fb7185'; el.style.color='#fb7185'; }
     el.style.cursor = 'default';
   });
-  const b  = $(`tcb-${qi}`); if(b) b.style.display='none';
-  const ex = $(`tex-${qi}`); if(ex){ ex.style.display='block'; ex.innerHTML=(ok?'✅ ':'❌ ')+e(decodeURIComponent(enc)); }
+  const b  = $(`tcb-${qi}`); if (b)  b.style.display = 'none';
+  const ex = $(`tex-${qi}`); if (ex) ex.style.display = 'block', ex.innerHTML = (ok?'✅ ':'❌ ')+e(decodeURIComponent(enc));
 
-  // Write back into perf — same path as checkQ
+  // Write back into perf — drill tracks performance same as normal quiz
   const nt = normTopic(topic);
   if (nt && unitId != null) {
     if (!state.perf[unitId]) state.perf[unitId] = { correct:0, total:0, ignored:0, topics:{} };
@@ -1649,32 +1656,28 @@ function tcheckQ(qi, correct, enc, topic, unitId) {
     persistPerf();
     if (p.total >= 5 && (p.correct / p.total) > 0.7) { p.ignored = 0; persistPerf(); }
   }
+  // NOTE: no addXP() here — drill does not touch XP or state.quiz
 
-  addXP(ok ? 15 : 5, ok ? 'Targeted drill! 🎯' : 'Keep drilling!');
-
-  // All 3 answered — show result using _tresults (not the current `correct`)
-  if (Object.keys(window._tchecked).length >= 3) {
-    const correct_count = Object.values(window._tresults).filter(Boolean).length;
-    const pct = Math.round((correct_count / 3) * 100);
-    const res = $('tp-result');
-    if (res) {
-      res.style.display = 'block';
-      res.innerHTML = `<div class="tip-box" style="margin-top:8px">
-        <div class="lbl" style="color:var(--c4);margin-bottom:6px">Drill complete</div>
-        <p style="font-size:13px;color:var(--soft);margin:0;line-height:1.65">
-          Scored <strong style="color:var(--accent)">${correct_count}/3</strong> on
-          <strong style="color:var(--txt)">${topic.replace(/_/g,' ')}</strong>.
-          ${pct >= 70 ? ' Pressure cleared. ✅' : ' Not there yet — keep going.'}
-        </p>
-      </div>`;
-      if (pct >= 70) {
-        setTimeout(() => axieSay(`✅ ${topic.replace(/_/g,' ')} — pressure cleared. Nice work.`), 400);
-      } else {
-        setTimeout(() => {
-          axieEnqueue(`📌 Still below 70% on ${topic.replace(/_/g,' ')}.`);
-          axieEnqueue('→ One more session will move this number.');
-        }, 400);
-      }
+  const answeredCount = Object.keys(state.drillQuiz.checked).length;
+  if (answeredCount >= state.drillQuiz.total) {
+    const pct = Math.round((state.drillQuiz.score / state.drillQuiz.total) * 100);
+    const res = $('tp-result'); if (!res) return;
+    res.style.display = 'block';
+    res.innerHTML = `<div class="tip-box" style="margin-top:8px">
+      <div class="lbl" style="color:var(--c4);margin-bottom:6px">Drill complete</div>
+      <p style="font-size:13px;color:var(--soft);margin:0;line-height:1.65">
+        Scored <strong style="color:var(--accent)">${state.drillQuiz.score}/${state.drillQuiz.total}</strong> on
+        <strong style="color:var(--txt)">${topic.replace(/_/g,' ')}</strong>.
+        ${pct >= 70 ? ' Pressure cleared. ✅' : ' Not there yet — keep going.'}
+      </p>
+    </div>`;
+    if (pct >= 70) {
+      setTimeout(() => axieSay(`✅ ${topic.replace(/_/g,' ')} — pressure cleared. Nice work.`), 400);
+    } else {
+      setTimeout(() => {
+        axieEnqueue(`📌 Still below 70% on ${topic.replace(/_/g,' ')}.`);
+        axieEnqueue('→ One more session will move this number.');
+      }, 400);
     }
   }
 }
@@ -1688,9 +1691,7 @@ async function launchDrill(unitId, topic) {
     <div class="spin" style="margin:0 auto 12px"></div>
     <div style="font-size:13px">Generating targeted questions on ${topic.replace(/_/g,' ')}…</div>
   </div>`;
-  window._tpicks   = {};
-  window._tchecked = {};
-  window._tresults = {};
+  state.drillQuiz = { picks:{}, checked:{}, score:0, total:3 };
   try {
     const questions = await genTargetedPractice(unitId, topic);
     tc.innerHTML = renderTargetedPractice(questions, topic, unitId);
