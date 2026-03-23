@@ -724,9 +724,7 @@ function launchConfetti(type = 'big') {
   for (let i = 0; i < count; i++) {
     const size = type === 'small' ? 5 : 7;
     const el = document.createElement('div'); el.className = 'cf';
-    el.style.width  = size + 'px';
-    el.style.height = size + 'px';
-    el.style.cssText += `left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*cols.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*.6}s`;
+    el.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*cols.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*.6}s`;
     document.body.appendChild(el); setTimeout(() => el.remove(), 3800);
   }
   // callers own their messages — no axieSay here
@@ -1315,7 +1313,7 @@ function renderQuiz(quiz) {
       <div>${(q.options||[]).map((opt,oi) => `<div id="op-${i}-${oi}" class="qopt" onclick="pickQ(${i},${oi})">${e(opt)}</div>`).join('')}</div>
       <button class="btn-hi" id="cb-${i}" style="display:none;margin-top:10px;font-size:12px;padding:7px 18px" onclick="checkQ(${i})">Check Answer ✓</button>
       <div id="ex-${i}" style="display:none;font-size:12px;color:var(--soft);border-top:1px solid var(--bdr);padding-top:10px;margin-top:10px;line-height:1.75"></div>
-    </div>`).join('')}\`;
+    </div>`).join('')}`;
 }
 
 function pickQ(qi, oi) {
