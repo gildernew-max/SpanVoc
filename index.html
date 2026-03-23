@@ -634,7 +634,7 @@ function addXP(pts, msg) {
   if (leveled) {
     renderHeroFullBar();
     setTimeout(() => {
-      launchConfetti();
+      launchConfetti('medium');
       const messages = {
         'Apprentice':   `🏆 Apprentice — you're building the habit. Keep going.`,
         'Strategist':   `🏆 Strategist — you're ahead of where you should be.`,
@@ -717,11 +717,16 @@ function showToast(msg) {
   document.body.appendChild(t); setTimeout(() => t.remove(), 2100);
 }
 
-function launchConfetti() {
-  const cols = ['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc','#ff8c42','#fff'];
-  for (let i = 0; i < 70; i++) {
+function launchConfetti(type = 'big') {
+  const config = { small: 20, medium: 40, big: 70 };
+  const count  = config[type] || 70;
+  const cols   = ['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc','#ff8c42','#fff'];
+  for (let i = 0; i < count; i++) {
+    const size = type === 'small' ? 5 : 7;
     const el = document.createElement('div'); el.className = 'cf';
-    el.style.cssText = `left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*cols.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*.6}s`;
+    el.style.width  = size + 'px';
+    el.style.height = size + 'px';
+    el.style.cssText += `left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*cols.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*.6}s`;
     document.body.appendChild(el); setTimeout(() => el.remove(), 3800);
   }
   // callers own their messages — no axieSay here
@@ -1294,40 +1299,51 @@ function shuffleFC() { cur().flashcards.sort(()=>Math.random()-.5); state.fcFlip
 // QUIZ TAB
 // ─────────────────────────────────────────────────────────────────────────────
 function renderQuiz(quiz) {
-  // Reset isolated quiz state at render time — clean slate every time
-  state.quiz = { picks:{}, checked:{}, score:0, total: quiz?.length || 0 };
+  const questions = quiz || [];
+  state.quiz = {
+    picks:{}, checked:{}, score:0, total:questions.length,
+    _answers:      questions.map(q => q.answer || ''),
+    _explanations: questions.map(q => q.explanation || '')
+  };
   return `<div style="display:flex;justify-content:space-between;margin-bottom:16px;align-items:center">
-    <div class="lbl">${quiz?.length} Questions 📝</div>
+    <div class="lbl">${questions.length} Questions 📝</div>
     <div id="qs" class="lbl" style="color:var(--accent)"></div>
   </div>
-  ${(quiz||[]).map((q,i) => `
+  ${questions.map((q,i) => `
     <div class="card fadein" style="border-left:3px solid ${ac(i)};margin-bottom:13px;padding:16px 18px">
       <p style="font-weight:600;font-size:14px;color:var(--txt);line-height:1.55;margin-bottom:12px">${i+1}. ${e(q.question)}</p>
-      <div>${(q.options||[]).map((opt,oi) => `<div id="op-${i}-${oi}" class="qopt" onclick="pickQ(${i},'${opt[0]}')">${e(opt)}</div>`).join('')}</div>
-      <button class="btn-hi" id="cb-${i}" style="display:none;margin-top:10px;font-size:12px;padding:7px 18px" onclick="checkQ(${i},'${q.answer}','${encodeURIComponent(q.explanation)}')">Check Answer ✓</button>
+      <div>${(q.options||[]).map((opt,oi) => `<div id="op-${i}-${oi}" class="qopt" onclick="pickQ(${i},${oi})">${e(opt)}</div>`).join('')}</div>
+      <button class="btn-hi" id="cb-${i}" style="display:none;margin-top:10px;font-size:12px;padding:7px 18px" onclick="checkQ(${i})">Check Answer ✓</button>
       <div id="ex-${i}" style="display:none;font-size:12px;color:var(--soft);border-top:1px solid var(--bdr);padding-top:10px;margin-top:10px;line-height:1.75"></div>
-    </div>`).join('')}`;
+    </div>`).join('')}\`;
 }
 
-function pickQ(qi, l) {
-  if (state.quiz.checked[qi]) return; // already answered — no overwrite
+function pickQ(qi, oi) {
+  if (state.quiz.checked[qi] === true) return;
+  const l = 'ABCD'[oi];
+  if (!l) return;
   state.quiz.picks[qi] = l;
-  document.querySelectorAll(`[id^="op-${qi}-"]`).forEach((el,oi) => {
-    const x = 'ABCD'[oi];
-    el.style.background   = x===l ? 'rgba(79,195,247,.09)' : 'transparent';
-    el.style.borderColor  = x===l ? '#4fc3f7' : 'var(--bdr)';
-    el.style.color        = x===l ? '#4fc3f7' : 'var(--soft)';
-  });
-  const b = $(`cb-${qi}`); if (b) b.style.display = 'inline-block';
+  for (let k = 0; k < 4; k++) {
+    const el = document.getElementById(`op-${qi}-${k}`);
+    if (!el) continue;
+    const x = 'ABCD'[k];
+    el.style.background  = x===l ? 'rgba(79,195,247,.09)' : 'transparent';
+    el.style.borderColor = x===l ? '#4fc3f7' : 'var(--bdr)';
+    el.style.color       = x===l ? '#4fc3f7' : 'var(--soft)';
+  }
+  const b = document.getElementById(`cb-${qi}`);
+  if (b) b.style.display = 'inline-block';
 }
 
-function checkQ(qi, correct, enc) {
-  if (state.quiz.checked[qi]) return; // idempotency guard — no double-counting
+function checkQ(qi) {
+  if (state.quiz.checked[qi] === true) return;
   state.quiz.checked[qi] = true;
 
-  const ch = state.quiz.picks[qi];
-  const ok = ch === correct;
-  if (ok) state.quiz.score++;
+  const correct = state.quiz._answers[qi];
+  const enc     = encodeURIComponent(state.quiz._explanations[qi] || '');
+  const ch      = state.quiz.picks[qi];
+  const ok      = ch === correct;
+  if (ok) { state.quiz.score++; launchConfetti('small'); }
 
   // ── TOPIC PERFORMANCE TRACKING ──
   const s   = cur();
@@ -1345,19 +1361,21 @@ function checkQ(qi, correct, enc) {
     if (p.total >= 5 && (p.correct / p.total) > 0.7) { p.ignored = 0; persistPerf(); }
   }
 
-  document.querySelectorAll(`[id^="op-${qi}-"]`).forEach((el,oi) => {
-    const x = 'ABCD'[oi];
+  for (let k = 0; k < 4; k++) {
+    const el = document.getElementById(`op-${qi}-${k}`);
+    if (!el) continue;
+    const x = 'ABCD'[k];
     if (x===correct)        { el.style.background='rgba(52,211,153,.09)'; el.style.borderColor='#34d399'; el.style.color='#34d399'; }
     else if (x===ch && !ok) { el.style.background='rgba(251,113,133,.09)'; el.style.borderColor='#fb7185'; el.style.color='#fb7185'; }
     el.classList.add('locked');
-  });
-  const b  = $(`cb-${qi}`);  if (b)  b.style.display = 'none';
-  const ex = $(`ex-${qi}`);  if (ex) ex.style.display = 'block', ex.innerHTML = (ok?'✅ ':'❌ ')+e(decodeURIComponent(enc));
+  }
+  const b  = document.getElementById(`cb-${qi}`);  if (b)  b.style.display = 'none';
+  const ex = document.getElementById(`ex-${qi}`);  if (ex) { ex.style.display = 'block'; ex.innerHTML = (ok?'✅ ':'❌ ')+e(decodeURIComponent(enc)); }
 
   addXP(ok ? 15 : 5, ok ? 'Correct! 🎯' : 'Good try!');
 
   const answeredCount = Object.keys(state.quiz.checked).length;
-  const qs = $('qs'); if (qs) qs.textContent = `${state.quiz.score}/${answeredCount} correct`;
+  const qs = document.getElementById('qs'); if (qs) qs.textContent = `${state.quiz.score}/${answeredCount} correct`;
 
   if (answeredCount === state.quiz.total) {
     state.xp.quizzes++; persistXP();
