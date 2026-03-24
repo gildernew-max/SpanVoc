@@ -7,28 +7,28 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#07070d;--surf:#0d0d18;--card:#131320;--card2:#191928;
-  --bdr:#1e1e30;--bdr2:#2a2a3e;
-  --txt:#f0f0f8;--mut:#4a4a6a;--soft:#8888aa;--mid:#b0b0c8;
-  --accent:#f0c040;
-  --c1:#f0c040;--c2:#4fc3f7;--c3:#a78bfa;--c4:#34d399;--c5:#fb7185;--c6:#c084fc;--c7:#ff8c42;
+  --bg:#1c1710;--surf:#221e14;--card:#2a2318;--card2:#322b1e;
+  --bdr:#3d3428;--bdr2:#4a3f30;
+  --txt:#f0e8d8;--mut:#6b5e48;--soft:#9a8a72;--mid:#c8b898;
+  --accent:#e8a020;
+  --c1:#e8a020;--c2:#4fc3f7;--c3:#c084fc;--c4:#34d399;--c5:#fb7185;--c6:#f59e0b;--c7:#ff8c42;
 }
 html{scroll-behavior:smooth}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 button,input,textarea,select{font-family:inherit}
 button{cursor:pointer}
 a{color:inherit;text-decoration:none}
-::selection{background:rgba(240,192,64,.25);color:var(--txt)}
+::selection{background:rgba(232,160,32,.2);color:var(--txt)}
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
 
 .hero{position:relative;padding:2rem 1.5rem 1.75rem;overflow:hidden;border-bottom:1px solid var(--bdr)}
-.hero::before{content:'';position:absolute;top:-80px;left:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(240,192,64,.06) 0%,transparent 65%);pointer-events:none}
+.hero::before{content:'';position:absolute;top:-80px;left:-80px;width:500px;height:500px;background:radial-gradient(circle,rgba(232,160,32,.07) 0%,transparent 65%);pointer-events:none}
 .hero::after{content:'';position:absolute;bottom:-60px;right:-60px;width:400px;height:400px;background:radial-gradient(circle,rgba(79,195,247,.04) 0%,transparent 65%);pointer-events:none}
 .hero-inner{max-width:860px;margin:0 auto;position:relative;z-index:1}
 .hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
-.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-family:monospace;letter-spacing:3px;text-transform:uppercase;color:var(--accent);background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);border-radius:2px;padding:4px 10px;margin-bottom:14px}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-family:monospace;letter-spacing:3px;text-transform:uppercase;color:var(--accent);background:rgba(232,160,32,.09);border:1px solid rgba(232,160,32,.28);border-radius:2px;padding:4px 10px;margin-bottom:14px}
 .hero-title{font-family:monospace;font-size:clamp(38px,8vw,62px);font-weight:900;letter-spacing:-1px;line-height:.95;color:var(--txt);margin-bottom:10px}
 .hero-title .a{color:var(--accent)}
 .hero-sub{font-size:14px;color:var(--soft);line-height:1.65;max-width:420px}
@@ -75,8 +75,8 @@ a{color:inherit;text-decoration:none}
 .btn:hover{border-color:var(--soft);color:var(--txt);background:rgba(255,255,255,.03)}
 .btn:active{transform:scale(.98)}
 .btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
-.btn-hi{background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.35);border-radius:6px;padding:11px 22px;font-size:14px;font-weight:600;color:var(--accent);transition:all .2s}
-.btn-hi:hover{background:rgba(240,192,64,.18);border-color:rgba(240,192,64,.6);transform:translateY(-1px);box-shadow:0 4px 16px rgba(240,192,64,.15)}
+.btn-hi{background:rgba(232,160,32,.10);border:1px solid rgba(232,160,32,.38);border-radius:6px;padding:11px 22px;font-size:14px;font-weight:600;color:var(--accent);transition:all .2s}
+.btn-hi:hover{background:rgba(232,160,32,.18);border-color:rgba(232,160,32,.6);transform:translateY(-1px);box-shadow:0 4px 16px rgba(240,192,64,.15)}
 .btn-hi:active{transform:scale(.98) translateY(0)}
 .btn-hi:disabled{opacity:.35;cursor:not-allowed;pointer-events:none;transform:none}
 .btn-full{display:block;width:100%;text-align:center}
@@ -103,7 +103,7 @@ a{color:inherit;text-decoration:none}
 .sh-n{font-family:monospace;font-size:34px;font-weight:900;opacity:.08;line-height:1;flex-shrink:0}
 .sh-t{font-family:monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
 
-.formula{background:rgba(0,0,0,.35);border:1px solid var(--bdr);border-radius:3px;padding:9px 15px;font-family:monospace;font-size:13px;letter-spacing:.5px;margin:5px 0;border-left:3px solid}
+.formula{background:rgba(0,0,0,.3);border:1px solid var(--bdr);border-radius:3px;padding:9px 15px;font-family:monospace;font-size:13px;letter-spacing:.5px;margin:5px 0;border-left:3px solid}
 .formula .fl{font-size:10px;color:var(--mut)}
 
 .lbl{font-family:monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--mut)}
@@ -142,7 +142,7 @@ ul.blist li::before{content:'›';position:absolute;left:0;color:var(--mut)}
 
 .notion-ta{background:#060610;border:1px solid rgba(167,139,250,.22);border-radius:4px;padding:10px;font-family:monospace;font-size:11px;color:var(--soft);width:100%;height:130px;resize:none;outline:none;margin-top:8px;line-height:1.6}
 
-.unav{position:fixed;bottom:0;left:0;right:0;background:rgba(6,6,12,.97);border-top:1px solid var(--bdr);display:flex;justify-content:center;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.unav{position:fixed;bottom:0;left:0;right:0;background:rgba(26,23,16,.97);border-top:1px solid var(--bdr);display:flex;justify-content:center;z-index:100;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .unav-btn{background:none;border:none;border-top:2px solid transparent;padding:7px 0;flex:1;max-width:100px;font-family:monospace;font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px}
 .unav-btn:hover{color:var(--soft)}
 .unav-btn.on{border-top-color:var(--accent);color:var(--accent)}
@@ -152,7 +152,7 @@ ul.blist li::before{content:'›';position:absolute;left:0;color:var(--mut)}
 .cf{position:fixed;width:7px;height:7px;border-radius:2px;pointer-events:none;z-index:9999;animation:cffall linear forwards}
 @keyframes cffall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(760deg);opacity:0}}
 
-.toast{position:fixed;top:18px;right:18px;background:rgba(240,192,64,.12);border:1px solid rgba(240,192,64,.35);border-radius:6px;padding:9px 15px;font-family:monospace;font-size:12px;color:var(--accent);z-index:9998;animation:tin .25s ease,tout .25s ease 1.75s forwards;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast{position:fixed;top:18px;right:18px;background:rgba(232,160,32,.13);border:1px solid rgba(232,160,32,.4);border-radius:6px;padding:9px 15px;font-family:monospace;font-size:12px;color:var(--accent);z-index:9998;animation:tin .25s ease,tout .25s ease 1.75s forwards;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.4)}
 @keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
 @keyframes tout{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(16px)}}
 
@@ -181,85 +181,351 @@ ul.blist li::before{content:'›';position:absolute;left:0;color:var(--mut)}
   .cd-swatches{display:none}
 }
 
-/* ═══════════════════════════════════════════
-   TRAIL HOME — Duolingo-style learning path
-   ═══════════════════════════════════════════ */
-.trail-wrap{max-width:520px;margin:0 auto;padding:1.5rem 1rem 6rem;position:relative}
+/* ═══════════════════════════════════════════════════
+   TRAIL — Warm dark · Gentle snake · v4
+   Premium notebook aesthetic: espresso + amber gold
+   ═══════════════════════════════════════════════════ */
 
-/* ── Connecting path line ── */
-.trail-spine{position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:3px;background:var(--bdr);z-index:0}
-.trail-spine-fill{position:absolute;left:0;top:0;width:100%;background:linear-gradient(180deg,var(--accent),var(--c2));border-radius:2px;transition:height 1.2s cubic-bezier(.4,0,.2,1)}
+/* ── Outer container ── */
+.trail-outer{
+  max-width:480px;
+  margin:0 auto;
+  padding:0 1rem 7rem;
+  position:relative;
+}
 
-/* ── Unit node (big circle) ── */
-.trail-unit{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;margin-bottom:0}
-.trail-unit-node{width:80px;height:80px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s;border:3px solid transparent;flex-shrink:0}
-.trail-unit-node:hover{transform:scale(1.08) translateY(-2px)}
-.trail-unit-node:active{transform:scale(.96)}
-.trail-unit-node.done{border-width:3px}
-.trail-unit-node.active{border-width:3px;animation:pulse-node 2.4s ease infinite}
-.trail-unit-node.locked{opacity:.38;cursor:default;filter:grayscale(.7)}
-.trail-unit-node:hover.locked{transform:none}
-@keyframes pulse-node{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.0)}50%{box-shadow:0 0 0 10px rgba(255,255,255,.0),0 0 28px var(--nc,#f0c040)}}
+/* ── SVG snake path (absolute, behind everything) ── */
+.trail-svg{
+  position:absolute;
+  top:0; left:0; right:0;
+  width:100%;
+  pointer-events:none;
+  z-index:0;
+  overflow:visible;
+}
 
-.trail-unit-em{font-size:26px;line-height:1;margin-bottom:1px}
-.trail-unit-lv{font-family:monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:.7}
+/* ── Node layer (absolutely positioned HTML on top of SVG) ── */
+.trail-nodes-layer{
+  position:relative;
+  width:100%;
+}
 
-/* ── Unit label strip ── */
-.trail-unit-label{margin-top:9px;text-align:center;z-index:2;position:relative}
-.trail-unit-label-name{font-family:monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;line-height:1.3}
-.trail-unit-label-ex{font-size:10px;color:var(--mut);margin-top:2px;font-family:monospace}
+/* ════════════════════════════════
+   UNIT NODE BUBBLE
+   ════════════════════════════════ */
+.trail-node-bubble{
+  position:absolute;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  transform:translateX(-50%);
+  z-index:10;
+}
 
-/* ── Session dots below unit label ── */
-.trail-unit-sessions{display:flex;gap:5px;justify-content:center;margin-top:8px;flex-wrap:wrap;max-width:180px}
-.trail-sess-dot{width:7px;height:7px;border-radius:50%;cursor:pointer;transition:transform .15s;flex-shrink:0}
-.trail-sess-dot:hover{transform:scale(1.4)}
+.trail-node-circle{
+  width:86px; height:86px;
+  border-radius:50%;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  position:relative;
+  cursor:pointer;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),
+             box-shadow .22s ease;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.trail-node-circle:active{ transform:scale(.91)!important }
 
-/* ── Topic waypoint (small diamond between units) ── */
-.trail-topic{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer}
-.trail-topic-diamond{width:18px;height:18px;border-radius:3px;transform:rotate(45deg);transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .2s;border:2px solid transparent;flex-shrink:0}
-.trail-topic-diamond:hover{transform:rotate(45deg) scale(1.4)}
-.trail-topic.done   .trail-topic-diamond{border-color:transparent}
-.trail-topic.locked .trail-topic-diamond{opacity:.28}
-.trail-topic-label{font-size:10px;font-family:monospace;letter-spacing:.5px;color:var(--mut);margin-left:14px;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
-.trail-topic.done .trail-topic-label{color:var(--soft)}
-.trail-topic.active .trail-topic-label{color:var(--txt)}
+/* DONE — solid fill, warm gold inner glow */
+.trail-node-circle.done{
+  box-shadow:
+    0 0 0 5px var(--uc,#e8a020)28,
+    0 0 0 11px var(--uc,#e8a020)10,
+    0 6px 26px var(--uc,#e8a020)50,
+    inset 0 2px 5px rgba(255,255,255,.22),
+    inset 0 -2px 5px rgba(0,0,0,.18);
+}
+.trail-node-circle.done:hover{ transform:scale(1.06) translateY(-3px) }
 
-/* ── Spacer between unit node and first topic / last topic and next unit ── */
-.trail-gap{height:20px;position:relative;z-index:1}
+/* ACTIVE — warm card bg, amber border, soft pulse */
+.trail-node-circle.active{
+  background:var(--card);
+  border:3px solid var(--uc,#e8a020);
+  box-shadow:
+    0 0 0 7px var(--uc,#e8a020)20,
+    0 6px 22px var(--uc,#e8a020)35;
+  animation:node-breathe 2.2s ease-in-out infinite;
+}
+.trail-node-circle.active:hover{ transform:scale(1.05) translateY(-2px) }
+@keyframes node-breathe{
+  0%,100%{ box-shadow:0 0 0 7px var(--uc,#e8a020)20, 0 6px 22px var(--uc,#e8a020)35 }
+  50%{     box-shadow:0 0 0 13px var(--uc,#e8a020)10, 0 6px 32px var(--uc,#e8a020)55 }
+}
 
-/* ── Start / Finish markers ── */
-.trail-start{text-align:center;margin-bottom:28px;position:relative;z-index:2}
-.trail-finish{text-align:center;margin-top:28px;position:relative;z-index:2}
+/* LOCKED — muted, grey-brown */
+.trail-node-circle.locked{
+  background:var(--surf);
+  border:3px solid var(--bdr);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.25);
+  cursor:pointer;
+  opacity:.55;
+}
 
-/* ── You-are-here indicator ── */
-.trail-yah{display:inline-flex;align-items:center;gap:6px;background:rgba(240,192,64,.12);border:1px solid rgba(240,192,64,.35);border-radius:20px;padding:4px 12px 4px 8px;font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--accent);margin-top:6px;animation:yah-bob .9s ease infinite alternate}
-@keyframes yah-bob{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+/* Emoji + unit label inside node */
+.trail-node-em{
+  font-size:30px; line-height:1;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.4));
+}
+.trail-node-unit{
+  font-family:monospace; font-size:9px; font-weight:800;
+  letter-spacing:1.5px; text-transform:uppercase; margin-top:1px;
+}
+.trail-node-circle.done   .trail-node-unit{ color:rgba(0,0,0,.55) }
+.trail-node-circle.active .trail-node-unit{ color:var(--uc,#e8a020) }
+.trail-node-circle.locked .trail-node-unit{ color:var(--mut) }
+.trail-node-circle.locked:hover{ transform:scale(1.04) translateY(-2px) }
 
-/* ── Sessions panel (slide in below unit when tapped) ── */
-.trail-sessions-panel{margin:12px auto 0;max-width:320px;animation:fadein .2s ease both}
+/* Check badge */
+.trail-badge{
+  position:absolute; top:-3px; right:-3px;
+  width:23px; height:23px; border-radius:50%;
+  border:3px solid var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:900; color:#fff;
+}
+.trail-badge.check{ background:#34d399; box-shadow:0 2px 8px rgba(52,211,153,.45) }
+.trail-badge.lock { background:var(--bdr2); font-size:9px }
 
-/* ── Add session button on trail ── */
-.trail-add-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.25);border-radius:20px;padding:5px 14px;font-family:monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);cursor:pointer;transition:all .15s;margin-top:10px}
-.trail-add-btn:hover{background:rgba(240,192,64,.16);border-color:rgba(240,192,64,.5)}
+/* ════════════════════════════════
+   UNIT LABEL (below bubble)
+   ════════════════════════════════ */
+.trail-node-label{
+  text-align:center; margin-top:10px;
+  max-width:150px; position:relative; z-index:10;
+}
+.trail-node-name{
+  font-family:monospace; font-size:11px; font-weight:800;
+  letter-spacing:.5px; text-transform:uppercase; line-height:1.3;
+}
+.trail-node-weight{
+  font-size:10px; color:var(--mut); margin-top:2px; font-family:monospace;
+}
 
-/* ── Streak fire on trail ── */
-.trail-streak{display:inline-flex;align-items:center;gap:5px;font-family:monospace;font-size:10px;color:var(--c7);background:rgba(255,140,66,.08);border:1px solid rgba(255,140,66,.2);border-radius:20px;padding:3px 10px;margin-top:4px}
+/* You-are-here badge */
+.trail-yah{
+  display:inline-flex; align-items:center; gap:5px;
+  margin-top:8px;
+  background:var(--uc,#e8a020);
+  border-radius:20px;
+  padding:5px 13px 5px 9px;
+  font-family:monospace; font-size:10px; font-weight:800;
+  letter-spacing:.5px; color:#fff;
+  box-shadow:0 4px 14px var(--uc,#e8a020)45;
+  animation:yah-bounce .75s ease-in-out infinite alternate;
+}
+@keyframes yah-bounce{
+  from{ transform:translateY(0) }
+  to  { transform:translateY(-5px) }
+}
 
-/* ── Progress summary bar at top ── */
-.trail-progress-bar{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:14px 18px;margin-bottom:22px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-.trail-progress-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
-.trail-progress-stat-n{font-family:monospace;font-size:22px;font-weight:900;line-height:1}
-.trail-progress-stat-l{font-family:monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
-.trail-progress-divider{width:1px;height:30px;background:var(--bdr2)}
-.trail-progress-pct{flex:1;min-width:120px}
-.trail-progress-pct-label{font-size:10px;color:var(--soft);margin-bottom:5px}
-.trail-progress-pct-track{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
-.trail-progress-pct-fill{height:100%;border-radius:3px;transition:width .9s cubic-bezier(.34,1.56,.64,1);background:linear-gradient(90deg,var(--accent),#ff9f40)}
+/* Session dots */
+.trail-dots{
+  display:flex; gap:5px; justify-content:center;
+  margin-top:7px; flex-wrap:wrap;
+}
+.trail-dot{
+  width:9px; height:9px; border-radius:50%;
+  cursor:pointer;
+  transition:transform .15s, box-shadow .15s;
+}
+.trail-dot:hover{
+  transform:scale(1.6);
+  box-shadow:0 0 8px var(--uc,#e8a020);
+}
 
-/* ── Session card in panel ── */
-.trail-scard{background:var(--card);border:1px solid var(--bdr);border-left:3px solid;border-radius:6px;padding:10px 14px;margin-bottom:6px;cursor:pointer;transition:background .15s,transform .15s;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.trail-scard:hover{background:var(--card2);transform:translateX(2px)}
+/* ════════════════════════════════
+   TOPIC WAYPOINT DOTS (on curve)
+   ════════════════════════════════ */
+.trail-wp-dot{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  z-index:8;
+  display:flex; flex-direction:column; align-items:center;
+  pointer-events:none;
+}
+.trail-wp-circle{
+  width:24px; height:24px; border-radius:50%;
+  border:3px solid transparent;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,.25);
+}
+.trail-wp-circle.done{
+  box-shadow:0 0 10px var(--uc,#e8a020)70, 0 2px 6px rgba(0,0,0,.2);
+}
+.trail-wp-circle.active{
+  background:var(--card);
+  border-color:var(--uc,#e8a020);
+  animation:wp-pulse 1.6s ease infinite;
+}
+@keyframes wp-pulse{
+  0%,100%{ box-shadow:0 0 0 0 var(--uc,#e8a020)50, 0 2px 6px rgba(0,0,0,.25) }
+  50%{     box-shadow:0 0 0 5px var(--uc,#e8a020)00, 0 2px 6px rgba(0,0,0,.25) }
+}
+.trail-wp-circle.locked{
+  background:var(--surf); border-color:var(--bdr); opacity:.4;
+}
+.trail-wp-lbl{
+  font-size:9px; font-family:monospace; color:var(--mut);
+  margin-top:4px; text-align:center; max-width:88px;
+  line-height:1.25; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis;
+}
 
+/* ════════════════════════════════
+   SESSION PANEL popup
+   ════════════════════════════════ */
+.trail-panel{
+  position:absolute;
+  z-index:30;
+  width:264px;
+  background:var(--card);
+  border-radius:12px;
+  border:1px solid var(--bdr2);
+  box-shadow:
+    0 12px 48px rgba(0,0,0,.55),
+    0 4px 16px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  padding:14px;
+  animation:panel-pop .2s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes panel-pop{
+  from{ opacity:0; transform:scale(.9) translateY(10px) }
+  to  { opacity:1; transform:scale(1) translateY(0) }
+}
+/* Pointer arrow — warm card color */
+.trail-panel::before{
+  content:'';
+  position:absolute; bottom:100%; left:50%;
+  transform:translateX(-50%);
+  border:9px solid transparent;
+  border-bottom-color:var(--bdr2);
+}
+.trail-panel::after{
+  content:'';
+  position:absolute; bottom:calc(100% - 1px); left:50%;
+  transform:translateX(-50%);
+  border:9px solid transparent;
+  border-bottom-color:var(--card);
+}
+.trail-panel-title{
+  font-family:monospace; font-size:10px; font-weight:800;
+  letter-spacing:1px; text-transform:uppercase;
+  margin-bottom:9px; padding-bottom:7px;
+  border-bottom:1px solid var(--bdr);
+}
+.trail-panel-card{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 10px; border-radius:7px;
+  cursor:pointer; margin-bottom:5px;
+  background:var(--card2);
+  border:1px solid var(--bdr);
+  transition:background .12s, transform .12s, border-color .12s;
+}
+.trail-panel-card:hover{
+  background:var(--bdr); border-color:var(--bdr2);
+  transform:translateX(2px);
+}
+.trail-panel-add{
+  width:100%; margin-top:7px; padding:9px;
+  border-radius:8px;
+  background:var(--uc,#e8a020)14;
+  border:1.5px dashed var(--uc,#e8a020)70;
+  font-family:monospace; font-size:10px; font-weight:800;
+  letter-spacing:1px; text-transform:uppercase;
+  color:var(--uc,#e8a020); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  transition:background .12s, border-color .12s;
+}
+.trail-panel-add:hover{
+  background:var(--uc,#e8a020)22;
+  border-color:var(--uc,#e8a020);
+}
+.trail-panel-close{
+  position:absolute; top:10px; right:10px;
+  background:var(--bdr); border:none;
+  border-radius:50%; width:20px; height:20px;
+  font-size:11px; color:var(--soft); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .12s;
+}
+.trail-panel-close:hover{ background:var(--bdr2); color:var(--txt) }
+
+/* ════════════════════════════════
+   PROGRESS BAR
+   ════════════════════════════════ */
+.trail-progress-bar{
+  background:var(--card);
+  border:1px solid var(--bdr);
+  border-radius:10px;
+  padding:14px 18px;
+  margin-bottom:28px;
+  display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+  box-shadow:0 4px 18px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.trail-progress-stat{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+.trail-progress-stat-n{
+  font-family:monospace; font-size:24px; font-weight:900; line-height:1;
+}
+.trail-progress-stat-l{
+  font-family:monospace; font-size:8px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--mut);
+}
+.trail-progress-divider{ width:1px; height:32px; background:var(--bdr2) }
+.trail-progress-pct{ flex:1; min-width:100px }
+.trail-progress-pct-label{
+  font-size:10px; color:var(--soft); margin-bottom:6px;
+}
+.trail-progress-pct-track{
+  height:9px; background:var(--surf); border-radius:5px; overflow:hidden;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.35);
+}
+.trail-progress-pct-fill{
+  height:100%; border-radius:5px;
+  background:linear-gradient(90deg, #c27a10, var(--accent), #f0c040);
+  transition:width 1.1s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 0 8px rgba(232,160,32,.4);
+}
+
+/* ════════════════════════════════
+   FINISH NODE
+   ════════════════════════════════ */
+.trail-finish-node{
+  position:absolute;
+  transform:translateX(-50%);
+  z-index:10;
+  display:flex; flex-direction:column; align-items:center;
+}
+.trail-finish-circle{
+  width:68px; height:68px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px;
+  background:var(--surf); border:3px solid var(--bdr);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.3);
+  transition:all .5s;
+}
+.trail-finish-circle.done{
+  background:var(--accent); border-color:var(--accent);
+  box-shadow:0 0 40px rgba(232,160,32,.5), inset 0 2px 4px rgba(255,255,255,.2);
+  animation:node-breathe 2.4s ease infinite;
+  --uc:#e8a020;
+}
+.trail-finish-lbl{
+  font-family:monospace; font-size:9px; letter-spacing:2px;
+  text-transform:uppercase; margin-top:8px; text-align:center;
+}
 </style>
 </head>
 <body>
@@ -273,32 +539,110 @@ ul.blist li::before{content:'›';position:absolute;left:0;color:var(--mut)}
         <div class="hero-sub">Turn any lecture into a complete study system.</div>
       </div>
       <div class="axie" onclick="axieTap()" id="axie">
-        <svg width="82" height="82" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="40" cy="51" rx="21" ry="19" fill="#12122a" stroke="var(--accent)" stroke-width="1.4"/>
-          <ellipse cx="40" cy="28" rx="18" ry="17" fill="#12122a" stroke="var(--accent)" stroke-width="1.4"/>
-          <polygon points="25,15 20,4 29,13" fill="var(--accent)" opacity=".9"/>
-          <polygon points="55,15 60,4 51,13" fill="var(--accent)" opacity=".9"/>
-          <rect x="23" y="12" width="34" height="5" rx="1.5" fill="var(--accent)"/>
-          <rect x="36" y="7" width="8" height="6" rx="1" fill="var(--accent)"/>
-          <line x1="57" y1="14" x2="62" y2="21" stroke="var(--accent)" stroke-width="2"/>
-          <circle cx="62" cy="22" r="2.5" fill="var(--accent)"/>
-          <circle cx="32" cy="27" r="6.5" fill="#08081a" stroke="var(--c2)" stroke-width="1.5"/>
-          <circle cx="48" cy="27" r="6.5" fill="#08081a" stroke="var(--c2)" stroke-width="1.5"/>
-          <circle cx="33" cy="26" r="3.2" fill="var(--c2)"/>
-          <circle cx="49" cy="26" r="3.2" fill="var(--c2)"/>
-          <circle cx="34.2" cy="24.8" r="1.2" fill="white" opacity=".85"/>
-          <circle cx="50.2" cy="24.8" r="1.2" fill="white" opacity=".85"/>
-          <polygon points="40,33 37,37 43,37" fill="var(--accent)"/>
-          <ellipse cx="19" cy="53" rx="7" ry="11" fill="var(--accent)" opacity=".15" transform="rotate(-12 19 53)"/>
-          <ellipse cx="61" cy="53" rx="7" ry="11" fill="var(--accent)" opacity=".15" transform="rotate(12 61 53)"/>
-          <line x1="32" y1="68" x2="27" y2="75" stroke="var(--accent)" stroke-width="1.8"/>
-          <line x1="32" y1="68" x2="32" y2="76" stroke="var(--accent)" stroke-width="1.8"/>
-          <line x1="32" y1="68" x2="37" y2="75" stroke="var(--accent)" stroke-width="1.8"/>
-          <line x1="48" y1="68" x2="43" y2="75" stroke="var(--accent)" stroke-width="1.8"/>
-          <line x1="48" y1="68" x2="48" y2="76" stroke="var(--accent)" stroke-width="1.8"/>
-          <line x1="48" y1="68" x2="53" y2="75" stroke="var(--accent)" stroke-width="1.8"/>
-        </svg>
-        <div class="axie-msg" id="axie-msg">Hoot! Let's ace this 🎓</div>
+        <svg width="92" height="92" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="furGrad" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#f5b84c"/>
+      <stop offset="60%" stop-color="#e8952a"/>
+      <stop offset="100%" stop-color="#c97820"/>
+    </radialGradient>
+    <radialGradient id="maneGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e8952a"/>
+      <stop offset="100%" stop-color="#b86010"/>
+    </radialGradient>
+    <radialGradient id="bellyGrad" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#fdd89a"/>
+      <stop offset="100%" stop-color="#f5b84c"/>
+    </radialGradient>
+    <radialGradient id="eyeGrad" cx="38%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#7a4a1a"/>
+      <stop offset="100%" stop-color="#3d2008"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ── Mane (fluffy, behind head) ── -->
+  <!-- Outer mane petals -->
+  <ellipse cx="45" cy="36" rx="26" ry="24" fill="url(#maneGrad)" opacity=".85"/>
+  <ellipse cx="22" cy="30" rx="11" ry="9" fill="#c97820" opacity=".9" transform="rotate(-20 22 30)"/>
+  <ellipse cx="68" cy="30" rx="11" ry="9" fill="#c97820" opacity=".9" transform="rotate(20 68 30)"/>
+  <ellipse cx="18" cy="42" rx="10" ry="8" fill="#b86010" opacity=".8" transform="rotate(-35 18 42)"/>
+  <ellipse cx="72" cy="42" rx="10" ry="8" fill="#b86010" opacity=".8" transform="rotate(35 72 42)"/>
+  <ellipse cx="26" cy="20" rx="9" ry="7" fill="#c97820" opacity=".75" transform="rotate(-10 26 20)"/>
+  <ellipse cx="64" cy="20" rx="9" ry="7" fill="#c97820" opacity=".75" transform="rotate(10 64 20)"/>
+
+  <!-- ── Ears (behind head, small round) ── -->
+  <circle cx="24" cy="18" r="9" fill="#e8952a"/>
+  <circle cx="66" cy="18" r="9" fill="#e8952a"/>
+  <!-- Inner ear pink -->
+  <circle cx="24" cy="18" r="5.5" fill="#f0a0a0" opacity=".8"/>
+  <circle cx="66" cy="18" r="5.5" fill="#f0a0a0" opacity=".8"/>
+
+  <!-- ── Head (big round, chubby) ── -->
+  <ellipse cx="45" cy="36" rx="22" ry="21" fill="url(#furGrad)"/>
+
+  <!-- ── Body ── -->
+  <ellipse cx="45" cy="68" rx="16" ry="14" fill="url(#furGrad)"/>
+  <!-- Belly patch -->
+  <ellipse cx="45" cy="69" rx="10" ry="9" fill="url(#bellyGrad)"/>
+
+  <!-- ── Arms ── -->
+  <ellipse cx="26" cy="68" rx="7" ry="5" fill="#e8952a" transform="rotate(-30 26 68)"/>
+  <ellipse cx="64" cy="68" rx="7" ry="5" fill="#e8952a" transform="rotate(30 64 68)"/>
+  <!-- Paws -->
+  <ellipse cx="21" cy="73" rx="6" ry="5" fill="#f5b84c"/>
+  <ellipse cx="69" cy="73" rx="6" ry="5" fill="#f5b84c"/>
+
+  <!-- ── Tail ── -->
+  <path d="M61,75 Q78,72 76,83 Q74,90 68,87" fill="none" stroke="#e8952a" stroke-width="5" stroke-linecap="round"/>
+  <!-- Tail tuft -->
+  <ellipse cx="70" cy="87" rx="6" ry="5" fill="#c97820"/>
+  <ellipse cx="70" cy="87" rx="4" ry="3" fill="#b86010" opacity=".7"/>
+
+  <!-- ── Eyes ── -->
+  <!-- Eye whites -->
+  <ellipse cx="36" cy="33" rx="8" ry="8.5" fill="white"/>
+  <ellipse cx="54" cy="33" rx="8" ry="8.5" fill="white"/>
+  <!-- Irises -->
+  <circle cx="36" cy="34" r="6" fill="url(#eyeGrad)"/>
+  <circle cx="54" cy="34" r="6" fill="url(#eyeGrad)"/>
+  <!-- Pupils -->
+  <circle cx="36.5" cy="34.5" r="3.8" fill="#1a0a00"/>
+  <circle cx="54.5" cy="34.5" r="3.8" fill="#1a0a00"/>
+  <!-- Catchlights (big warm) -->
+  <circle cx="35" cy="32.5" r="1.8" fill="white" opacity=".95"/>
+  <circle cx="53" cy="32.5" r="1.8" fill="white" opacity=".95"/>
+  <!-- Tiny secondary catchlight -->
+  <circle cx="38" cy="36" r=".9" fill="white" opacity=".6"/>
+  <circle cx="56" cy="36" r=".9" fill="white" opacity=".6"/>
+  <!-- Eye shine arc (extra warmth) -->
+  <path d="M31,30 Q36,27 41,30" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M49,30 Q54,27 59,30" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- ── Nose ── -->
+  <ellipse cx="45" cy="41" rx="4" ry="3" fill="#c04060"/>
+  <!-- Nose highlight -->
+  <ellipse cx="44" cy="40" rx="1.5" ry="1" fill="rgba(255,255,255,.5)"/>
+
+  <!-- ── Smile ── -->
+  <path d="M38,45 Q42,49 45,47 Q48,49 52,45" fill="none" stroke="#a03050" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Mouth center line -->
+  <line x1="45" y1="44" x2="45" y2="47" stroke="#a03050" stroke-width="1.4" stroke-linecap="round"/>
+
+  <!-- ── Blush cheeks ── -->
+  <ellipse cx="27" cy="43" rx="7" ry="5" fill="#f08080" opacity=".28"/>
+  <ellipse cx="63" cy="43" rx="7" ry="5" fill="#f08080" opacity=".28"/>
+
+  <!-- ── Forehead fur tuft ── -->
+  <path d="M40,15 Q45,10 50,15" fill="none" stroke="#c97820" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M43,13 Q45,7 47,13" fill="none" stroke="#c97820" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- ── Whiskers ── -->
+  <line x1="20" y1="43" x2="32" y2="44" stroke="#8a6030" stroke-width=".9" opacity=".6" stroke-linecap="round"/>
+  <line x1="20" y1="46" x2="32" y2="45" stroke="#8a6030" stroke-width=".9" opacity=".6" stroke-linecap="round"/>
+  <line x1="70" y1="43" x2="58" y2="44" stroke="#8a6030" stroke-width=".9" opacity=".6" stroke-linecap="round"/>
+  <line x1="70" y1="46" x2="58" y2="45" stroke="#8a6030" stroke-width=".9" opacity=".6" stroke-linecap="round"/>
+</svg>
+        <div class="axie-msg" id="axie-msg">Roar! Let's ace this 🦁</div>
       </div>
     </div>
     <div class="stats" id="stats"></div>
@@ -482,7 +826,7 @@ function renderHero() {
   const xpEl = $('xp');
   if (xpEl) xpEl.innerHTML =
     `<div class="xp-top"><span>${getTier(G.lv)} · Level ${G.lv}${bonusTxt}</span><span>${G.xp} / ${xpNeeded(G.lv)}</span></div>
-     <div class="xp-track"><div class="xp-fill" style="width:${pct}%;background:linear-gradient(90deg,${state.accent},#ff9f40)"></div></div>`;
+     <div class="xp-track"><div class="xp-fill" style="width:${pct}%;background:linear-gradient(90deg,${state.accent},#f0c040)"></div></div>`;
 
   // ── STREAK RISK: fires once per load if not studied today ──
   if (G.last !== new Date().toDateString() && G.streak > 0) {
@@ -688,7 +1032,7 @@ function renderHeroFullBar() {
   if (!xpEl) return;
   xpEl.innerHTML =
     `<div class="xp-top"><span>${getTier(G.lv)} · Level ${G.lv}</span><span style="color:var(--accent)">LEVEL UP</span></div>
-     <div class="xp-track"><div class="xp-fill" style="width:100%;background:linear-gradient(90deg,${state.accent},#ff9f40)"></div></div>`;
+     <div class="xp-track"><div class="xp-fill" style="width:100%;background:linear-gradient(90deg,${state.accent},#f0c040)"></div></div>`;
   setTimeout(() => renderHero(), 400);
 }
 
@@ -845,9 +1189,10 @@ function toggleNotion() {
 // AXIE — FIX A: state.axIdx replaces top-level `let _axIdx`
 // ─────────────────────────────────────────────────────────────────────────────
 const AXIE_LINES = [
-  "Hoot! You're on a roll 🎓","Every card = more confidence! ⚡","AP 5 incoming! 🏆",
-  "Owl believe in you always 🦉","Economics is actually fun — I promise 🤓",
-  "You're smarter than yesterday 🧠","Great job showing up today! ✨"
+  "Roar! You're on a roll 🦁","Every card = more confidence! ⚡","AP 5 incoming! 🏆",
+  "Leo believes in you always 🦁","Economics is actually fun — I promise 🤓",
+  "You're smarter than yesterday 🧠","Great job showing up today! ✨",
+  "Purrr… that's a good answer 🦁","Big mane energy today! 💛","Keep going, pride of one! 🦁"
 ];
 
 function axieTap() {
@@ -980,16 +1325,52 @@ function renderSetup(err = '') {
   state._setupErr = ''; // consume so it doesn't persist across re-renders
   setApp(`<div class="setup fadein">
     <div style="text-align:center;margin-bottom:24px">
-      <svg width="64" height="64" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="40" cy="51" rx="21" ry="19" fill="#12122a" stroke="#f0c040" stroke-width="1.4"/>
-        <ellipse cx="40" cy="28" rx="18" ry="17" fill="#12122a" stroke="#f0c040" stroke-width="1.4"/>
-        <polygon points="25,15 20,4 29,13" fill="#f0c040"/><polygon points="55,15 60,4 51,13" fill="#f0c040"/>
-        <rect x="23" y="12" width="34" height="5" rx="1.5" fill="#f0c040"/>
-        <circle cx="32" cy="27" r="6" fill="#08081a" stroke="#4fc3f7" stroke-width="1.5"/>
-        <circle cx="48" cy="27" r="6" fill="#08081a" stroke="#4fc3f7" stroke-width="1.5"/>
-        <circle cx="33" cy="26" r="3" fill="#4fc3f7"/><circle cx="49" cy="26" r="3" fill="#4fc3f7"/>
-        <polygon points="40,33 37,37 43,37" fill="#f0c040"/>
-      </svg>
+      <svg width="72" height="72" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="furG2" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#f5b84c"/>
+      <stop offset="60%" stop-color="#e8952a"/>
+      <stop offset="100%" stop-color="#c97820"/>
+    </radialGradient>
+    <radialGradient id="eyeG2" cx="38%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#7a4a1a"/>
+      <stop offset="100%" stop-color="#3d2008"/>
+    </radialGradient>
+  </defs>
+  <!-- Mane -->
+  <ellipse cx="40" cy="44" rx="26" ry="22" fill="#c97820" opacity=".85"/>
+  <ellipse cx="18" cy="38" rx="10" ry="8" fill="#b86010" opacity=".8" transform="rotate(-25 18 38)"/>
+  <ellipse cx="62" cy="38" rx="10" ry="8" fill="#b86010" opacity=".8" transform="rotate(25 62 38)"/>
+  <ellipse cx="22" cy="27" rx="8" ry="6" fill="#c97820" opacity=".75" transform="rotate(-10 22 27)"/>
+  <ellipse cx="58" cy="27" rx="8" ry="6" fill="#c97820" opacity=".75" transform="rotate(10 58 27)"/>
+  <!-- Ears -->
+  <circle cx="21" cy="22" r="8.5" fill="#e8952a"/>
+  <circle cx="59" cy="22" r="8.5" fill="#e8952a"/>
+  <circle cx="21" cy="22" r="5" fill="#f0a0a0" opacity=".8"/>
+  <circle cx="59" cy="22" r="5" fill="#f0a0a0" opacity=".8"/>
+  <!-- Head -->
+  <ellipse cx="40" cy="43" rx="21" ry="20" fill="url(#furG2)"/>
+  <!-- Eyes -->
+  <ellipse cx="32" cy="40" rx="7.5" ry="8" fill="white"/>
+  <ellipse cx="48" cy="40" rx="7.5" ry="8" fill="white"/>
+  <circle cx="32" cy="41" r="5.5" fill="url(#eyeG2)"/>
+  <circle cx="48" cy="41" r="5.5" fill="url(#eyeG2)"/>
+  <circle cx="32.5" cy="41.5" r="3.4" fill="#1a0a00"/>
+  <circle cx="48.5" cy="41.5" r="3.4" fill="#1a0a00"/>
+  <circle cx="31" cy="39.5" r="1.6" fill="white" opacity=".95"/>
+  <circle cx="47" cy="39.5" r="1.6" fill="white" opacity=".95"/>
+  <!-- Nose -->
+  <ellipse cx="40" cy="48" rx="3.5" ry="2.8" fill="#c04060"/>
+  <ellipse cx="39" cy="47" rx="1.3" ry=".9" fill="rgba(255,255,255,.5)"/>
+  <!-- Smile -->
+  <path d="M34,52 Q37,56 40,54 Q43,56 46,52" fill="none" stroke="#a03050" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="40" y1="51" x2="40" y2="54" stroke="#a03050" stroke-width="1.3" stroke-linecap="round"/>
+  <!-- Blush -->
+  <ellipse cx="24" cy="50" rx="6" ry="4.5" fill="#f08080" opacity=".28"/>
+  <ellipse cx="56" cy="50" rx="6" ry="4.5" fill="#f08080" opacity=".28"/>
+  <!-- Tuft -->
+  <path d="M35,21 Q40,15 45,21" fill="none" stroke="#c97820" stroke-width="3" stroke-linecap="round"/>
+</svg>
       <div style="font-family:monospace;font-size:26px;font-weight:900;color:var(--accent);letter-spacing:2px;margin-top:8px">APEX</div>
       <div style="font-size:12px;color:var(--mut);margin-top:3px">Your AP Exam Edge · powered by Axie 🦉</div>
     </div>
@@ -1101,7 +1482,7 @@ function renderTrailHTML() {
   const pct       = Math.round((doneSess / UNITS.length) * 100);
   const G         = state.xp;
 
-  // ── Progress summary bar ──
+  // Progress bar
   const progressBar = `
     <div class="trail-progress-bar fadein">
       <div class="trail-progress-stat">
@@ -1115,7 +1496,7 @@ function renderTrailHTML() {
       </div>
       <div class="trail-progress-divider"></div>
       <div class="trail-progress-stat">
-        <div class="trail-progress-stat-n" style="color:var(--c7)">${G.streak}</div>
+        <div class="trail-progress-stat-n" style="color:var(--c7)">${G.streak > 0 ? G.streak + ' 🔥' : '0'}</div>
         <div class="trail-progress-stat-l">Day Streak</div>
       </div>
       <div class="trail-progress-divider"></div>
@@ -1125,150 +1506,269 @@ function renderTrailHTML() {
           <div class="trail-progress-pct-fill" style="width:${pct}%"></div>
         </div>
       </div>
+      ${!state.apiKey ? `<button class="btn" onclick="state.page='setup';state._setupErr='';render()" style="font-size:11px;white-space:nowrap">🔑 Add Key</button>` : ''}
     </div>`;
 
-  // ── Build trail nodes ──
-  let trailHTML = '';
-  trail.forEach((u, idx) => {
-    const topics     = TRAIL_TOPICS[u.id] || [];
-    const isFirst    = idx === 0;
-    const isLast     = idx === trail.length - 1;
-    const isExpanded = _trailExpanded === u.id;
-    const nodeBg     = u.state === 'locked'
-      ? 'var(--card)'
-      : u.state === 'done'
-        ? u.col
-        : 'var(--card)';
-    const nodeBorder = u.state === 'locked' ? 'var(--bdr)' : u.col;
-    const nodeEmColor = u.state === 'done' ? '#000' : u.col;
+  // ── Snake geometry — gentle S-curve ──
+  const W      = 420;        // SVG viewBox width
+  const CX     = W / 2;     // 210
+  const OFFSET = 90;         // gentle drift (not dramatic zigzag)
+  const VSTEP  = 230;        // vertical spacing between units
+  const CP     = 0.35;       // bezier control point pull factor
 
-    // ── Topic waypoints (above unit — except for first unit) ──
-    let topicsHTML = '';
-    if (!isFirst) {
-      topicsHTML = topics.map(tp => {
-        const tstate = u.state; // topic inherits unit state
-        const filled = tstate === 'done';
-        const tactive = tstate === 'active';
-        return `
-          <div class="trail-topic ${tstate}" style="height:32px">
-            <div class="trail-topic-diamond" style="
-              background:${filled ? u.col : tactive ? u.col + '40' : 'var(--bdr)'};
-              border-color:${tactive ? u.col : 'transparent'};
-              box-shadow:${filled ? '0 0 8px ' + u.col + '60' : 'none'};
-            "></div>
-            <div class="trail-topic-label">${tp.lbl}</div>
-          </div>`;
-      }).join('');
+  const nodeX  = idx => idx % 2 === 0 ? CX - OFFSET : CX + OFFSET;
+  const nodeY  = idx => 70 + idx * VSTEP;
+  const finishY = 70 + trail.length * VSTEP + 60;
+  const svgH    = finishY + 110;
+
+  // Cubic bezier point for waypoint positioning
+  function bez(t, x0, y0, cpx0, cpy0, cpx1, cpy1, x1, y1) {
+    const u = 1 - t;
+    return {
+      x: u*u*u*x0 + 3*u*u*t*cpx0 + 3*u*t*t*cpx1 + t*t*t*x1,
+      y: u*u*u*y0 + 3*u*u*t*cpy0 + 3*u*t*t*cpy1 + t*t*t*y1,
+    };
+  }
+
+  // ── Build SVG ──
+  // Defs: glow filter + gradient for done road
+  let svgDefs = `<defs>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-sm" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>`;
+
+  let svgRoads = '', svgNodes = '';
+
+  // Draw roads between units
+  for (let i = 0; i < trail.length - 1; i++) {
+    const u  = trail[i];
+    const x0 = nodeX(i),   y0 = nodeY(i);
+    const x1 = nodeX(i+1), y1 = nodeY(i+1);
+    const cpx0 = CX, cpy0 = y0 + VSTEP * CP;
+    const cpx1 = CX, cpy1 = y1 - VSTEP * CP;
+
+    const isDone   = u.state === 'done';
+    const isActive = u.state === 'active';
+    const roadCol  = isDone ? u.col : '#3d3428';
+    const roadOpacity = isDone ? '1' : isActive ? '0.5' : '0.25';
+
+    // Outer glow for done roads
+    if (isDone) {
+      svgRoads += `<path d="M${x0},${y0} C${cpx0},${cpy0} ${cpx1},${cpy1} ${x1},${y1}"
+        fill="none" stroke="${u.col}" stroke-width="26" stroke-linecap="round"
+        opacity="0.22" filter="url(#glow)"/>`;
+    }
+    // Main road
+    svgRoads += `<path d="M${x0},${y0} C${cpx0},${cpy0} ${cpx1},${cpy1} ${x1},${y1}"
+      fill="none" stroke="${roadCol}" stroke-width="16" stroke-linecap="round"
+      opacity="${roadOpacity}"/>`;
+    // Center highlight stripe (done only)
+    if (isDone) {
+      svgRoads += `<path d="M${x0},${y0} C${cpx0},${cpy0} ${cpx1},${cpy1} ${x1},${y1}"
+        fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"
+        stroke-dasharray="10 18" stroke-linecap="round"/>`;
+    }
+    // Dashed line for locked/active
+    if (!isDone) {
+      svgRoads += `<path d="M${x0},${y0} C${cpx0},${cpy0} ${cpx1},${cpy1} ${x1},${y1}"
+        fill="none" stroke="#4a3f30" stroke-width="3"
+        stroke-dasharray="6 10" stroke-linecap="round" opacity="0.6"/>`;
+    }
+  }
+
+  // Road from last unit to finish
+  {
+    const last = trail[trail.length - 1];
+    const x0 = nodeX(trail.length - 1), y0 = nodeY(trail.length - 1);
+    const x1 = CX, y1 = finishY;
+    const cpx0 = CX, cpy0 = y0 + 60;
+    const cpx1 = CX, cpy1 = y1 - 60;
+    const isDone = last.state === 'done';
+    svgRoads += `<path d="M${x0},${y0} C${cpx0},${cpy0} ${cpx1},${cpy1} ${x1},${y1}"
+      fill="none" stroke="${isDone ? last.col : '#3d3428'}" stroke-width="16" stroke-linecap="round"
+      opacity="${isDone ? '1' : '0.25'}"/>`;
+    if (!isDone) {
+      svgRoads += `<path d="M${x0},${y0} C${cpx0},${cpy0} ${cpx1},${cpy1} ${x1},${y1}"
+        fill="none" stroke="#4a3f30" stroke-width="3"
+        stroke-dasharray="6 10" stroke-linecap="round" opacity="0.6"/>`;
+    }
+  }
+
+  // Node shadows on SVG (soft drop)
+  trail.forEach((u, idx) => {
+    if (u.state === 'locked') return;
+    const x = nodeX(idx), y = nodeY(idx);
+    svgNodes += `<circle cx="${x}" cy="${y+4}" r="46" fill="rgba(0,0,0,.35)" filter="url(#glow)"/>`;
+  });
+
+  const allDone = trail.every(u => u.state === 'done');
+  const fx = CX, fy = finishY;
+  if (allDone) {
+    svgNodes += `<circle cx="${fx}" cy="${fy+4}" r="38" fill="rgba(0,0,0,.35)" filter="url(#glow)"/>`;
+  }
+
+  const fullSVG = `<svg class="trail-svg" viewBox="0 0 ${W} ${svgH}"
+    xmlns="http://www.w3.org/2000/svg" style="height:${svgH}px">
+    ${svgDefs}${svgRoads}${svgNodes}
+  </svg>`;
+
+  // ── HTML nodes layer ──
+  let nodesHTML = `<div class="trail-nodes-layer" style="height:${svgH}px">`;
+
+  trail.forEach((u, idx) => {
+    const x      = nodeX(idx);
+    const y      = nodeY(idx);
+    const uc     = u.col;
+    const isExp  = _trailExpanded === u.id;
+    const topics = TRAIL_TOPICS[u.id] || [];
+
+    // ── Topic waypoints (dots on the curve above this unit) ──
+    if (idx > 0) {
+      const px   = nodeX(idx - 1), py = nodeY(idx - 1);
+      const cpx0 = CX, cpy0 = py + VSTEP * CP;
+      const cpx1 = CX, cpy1 = y  - VSTEP * CP;
+      // 3 waypoints at t=0.25, 0.5, 0.75 — even spacing, gentle
+      [0.25, 0.5, 0.75].forEach((t, ti) => {
+        const pt     = bez(t, px, py, cpx0, cpy0, cpx1, cpy1, x, y);
+        const tp     = topics[ti] || { lbl: '' };
+        const orbBg  = u.state === 'done' ? uc : u.state === 'active' ? 'var(--card)' : 'var(--surf)';
+        const orbBdr = u.state !== 'locked' ? uc : 'var(--bdr)';
+        const orbSh  = u.state === 'done' ? `0 0 10px ${uc}80` : 'none';
+        nodesHTML += `<div class="trail-wp-dot" style="left:${pt.x}px;top:${pt.y}px;--uc:${uc}">
+          <div class="trail-wp-circle ${u.state}"
+            style="background:${orbBg};border-color:${orbBdr};box-shadow:${orbSh}">
+            ${u.state === 'done' ? '✓' : ''}
+          </div>
+          ${tp.lbl ? `<div class="trail-wp-lbl" style="color:${u.state==='done'?uc:u.state==='active'?'var(--mid)':'var(--mut)'}">${tp.lbl}</div>` : ''}
+        </div>`;
+      });
     }
 
-    // ── Sessions panel ──
-    let sessPanel = '';
-    if (isExpanded) {
-      sessPanel = `<div class="trail-sessions-panel">`;
+    // ── Session panel ──
+    let panelHTML = '';
+    if (isExp) {
+      // Anchor panel: if node is on left side, open panel to the right; vice versa
+      const panelSide = x < CX
+        ? 'left:calc(50% + 56px);right:auto;transform:none'
+        : 'right:calc(50% + 56px);left:auto;transform:none';
+
+      let cards = '';
       if (u.sessions.length) {
-        sessPanel += u.sessions.map(({s, i}) => {
+        cards = u.sessions.slice(0, 5).map(({s, i}) => {
           const gr = s.instructorGrade;
-          const gc = gr ? (gr.score >= 90 ? '#34d399' : gr.score >= 75 ? '#f0c040' : '#fb7185') : u.col;
-          return `<div class="trail-scard" style="border-left-color:${u.col}" onclick="goStudy(${i})">
+          const gc = gr ? (gr.score >= 90 ? '#34d399' : gr.score >= 75 ? '#e8a020' : '#fb7185') : uc;
+          return `<div class="trail-panel-card" onclick="goStudy(${i})">
+            <div style="width:8px;height:8px;border-radius:50%;background:${uc};flex-shrink:0;box-shadow:0 0 6px ${uc}80"></div>
             <div style="min-width:0;flex:1">
-              <div style="font-weight:600;font-size:13px;color:var(--txt);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e(s.title)}</div>
-              <div class="lbl">${new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})} · ${s.flashcards?.length||0} cards${gr ? ' · <span style="color:'+gc+'">'+gr.score+'/100</span>' : ''}</div>
+              <div style="font-weight:700;font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e(s.title)}</div>
+              <div style="font-family:monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin-top:2px">
+                ${new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}${gr ? ` · <span style="color:${gc}">${gr.score}/100</span>` : ''}
+              </div>
             </div>
-            <div style="font-size:16px;flex-shrink:0">→</div>
+            <span style="color:${uc};font-size:13px">→</span>
           </div>`;
         }).join('');
+        if (u.sessions.length > 5) {
+          cards += `<div style="font-size:10px;color:var(--mut);text-align:center;padding:4px 0;font-family:monospace">+${u.sessions.length-5} more</div>`;
+        }
       } else {
-        sessPanel += `<div style="font-size:12px;color:var(--mut);text-align:center;padding:10px 0">No sessions yet</div>`;
+        cards = `<div style="font-size:11px;color:var(--mut);text-align:center;padding:10px 0;font-style:italic">No sessions yet</div>`;
       }
-      sessPanel += `<button class="trail-add-btn" onclick="goNew()">+ New Session ✨</button>`;
-      sessPanel += `</div>`;
+
+      panelHTML = `<div class="trail-panel" style="${panelSide};top:${-10}px;--uc:${uc}">
+        <button class="trail-panel-close" onclick="event.stopPropagation();_trailExpanded=null;setApp(renderTrailHTML())">✕</button>
+        <div class="trail-panel-title" style="color:${uc}">${u.em} ${u.lbl}</div>
+        ${cards}
+        <div class="trail-panel-add" style="--uc:${uc}" onclick="goNew()">+ New Session ✨</div>
+      </div>`;
     }
 
-    // ── You-are-here badge (only on active unit) ──
-    const yahBadge = u.state === 'active'
-      ? `<div class="trail-yah">📍 You are here</div>`
-      : '';
+    // ── You-are-here ──
+    const yah = u.state === 'active'
+      ? `<div class="trail-yah" style="--uc:${uc}">📍 You are here</div>` : '';
 
-    // ── Unit node ──
-    const unitNode = `
-      <div class="trail-unit" id="trail-u-${u.id}">
-        ${!isFirst ? `<div class="trail-gap"></div>` : ''}
-        ${topicsHTML}
-        <div class="trail-gap"></div>
-        <div class="trail-unit-node ${u.state}"
-          style="
-            background:${nodeBg};
-            border-color:${nodeBorder};
-            box-shadow:${u.state !== 'locked' ? '0 0 0 4px ' + u.col + '18, 0 4px 20px ' + u.col + '30' : 'none'};
-            --nc:${u.col};
-          "
+    // ── Session dots ──
+    const dots = u.sessions.length
+      ? `<div class="trail-dots">
+          ${u.sessions.slice(0,6).map(({s,i}) =>
+            `<div class="trail-dot" style="background:${uc};box-shadow:0 0 5px ${uc}60;--uc:${uc}"
+              onclick="event.stopPropagation();goStudy(${i})" title="${e(s.title)}"></div>`
+          ).join('')}
+          ${u.sessions.length > 6 ? `<span style="font-family:monospace;font-size:9px;color:${uc}">+${u.sessions.length-6}</span>` : ''}
+        </div>` : '';
+
+    // ── Node bg / styling ──
+    const nodeBg = u.state === 'done'   ? uc
+                 : u.state === 'active' ? 'var(--card)'
+                 : 'var(--surf)';
+    const checkBadge = u.state === 'done'   ? `<div class="trail-badge check">✓</div>` : '';
+    const lockBadge  = ''; // removed — free travel, no lock badge
+
+    nodesHTML += `
+      <div class="trail-node-bubble" id="trail-u-${u.id}"
+        style="left:${x}px;top:${y - 50}px;--uc:${uc}">
+        <div class="trail-node-circle ${u.state}"
+          style="background:${nodeBg};--uc:${uc}"
           onclick="trailTapUnit(${u.id})">
-          <div class="trail-unit-em">${u.em}</div>
-          <div class="trail-unit-lv" style="color:${u.state === 'done' ? '#000' : u.col}">U${u.id}</div>
-          ${u.state === 'done' ? `<div style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--c4);display:flex;align-items:center;justify-content:center;font-size:9px;border:2px solid var(--bg)">✓</div>` : ''}
+          <div class="trail-node-em">${u.em}</div>
+          <div class="trail-node-unit">U${u.id}</div>
+          ${checkBadge}
         </div>
-        <div class="trail-unit-label">
-          <div class="trail-unit-label-name" style="color:${u.state === 'locked' ? 'var(--mut)' : u.col}">${u.lbl}</div>
-          <div class="trail-unit-label-ex">${u.ex} of exam</div>
-          ${yahBadge}
-          ${u.sessions.length ? `<div style="display:flex;gap:4px;justify-content:center;margin-top:6px;flex-wrap:wrap">
-            ${u.sessions.slice(0,5).map(({s,i}) => `<div class="trail-sess-dot" style="background:${u.col};opacity:${0.5 + 0.1*Math.min(4,i)}" onclick="event.stopPropagation();goStudy(${i})" title="${e(s.title)}"></div>`).join('')}
-            ${u.sessions.length > 5 ? `<div style="font-family:monospace;font-size:8px;color:${u.col}">+${u.sessions.length-5}</div>` : ''}
-          </div>` : ''}
-          ${u.state === 'locked' ? `<div style="font-size:9px;color:var(--mut);font-family:monospace;margin-top:4px">locked</div>` : ''}
+        <div class="trail-node-label">
+          <div class="trail-node-name" style="color:${u.state==='locked'?'var(--mut)':uc}">${u.lbl}</div>
+          <div class="trail-node-weight">${u.ex} of exam</div>
+          ${yah}
+          ${dots}
         </div>
-        ${sessPanel}
+        ${panelHTML}
       </div>`;
-
-    trailHTML += unitNode;
   });
 
   // ── Finish node ──
-  const allDone = trail.every(u => u.state === 'done');
-  const finishNode = `
-    <div class="trail-finish">
-      <div class="trail-gap"></div>
-      <div style="width:60px;height:60px;border-radius:50%;background:${allDone ? 'var(--accent)' : 'var(--card)'};border:3px solid ${allDone ? 'var(--accent)' : 'var(--bdr)'};display:flex;align-items:center;justify-content:center;font-size:${allDone ? '28' : '20'}px;margin:0 auto;box-shadow:${allDone ? '0 0 32px rgba(240,192,64,.4)' : 'none'};transition:all .4s">
+  const finLbl = allDone ? '✨ AP Exam Ready!' : `AP Macro · ${countdown().d} days`;
+  nodesHTML += `
+    <div class="trail-finish-node" style="left:${fx}px;top:${fy - 38}px">
+      <div class="trail-finish-circle${allDone ? ' done' : ''}">
         ${allDone ? '🏆' : '🎓'}
       </div>
-      <div style="margin-top:10px;font-family:monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:${allDone ? 'var(--accent)' : 'var(--mut)'}">
-        ${allDone ? 'AP Exam Ready!' : 'AP Macro Exam · ' + countdown().d + ' days'}
+      <div class="trail-finish-lbl" style="color:${allDone?'var(--accent)':'var(--mut)'}">
+        ${finLbl}
       </div>
-      <div style="margin-top:16px">
-        <button class="btn-hi" onclick="goNew()" style="font-size:13px">+ New Session ✨</button>
+      <div style="margin-top:14px">
+        <button class="btn-hi" onclick="goNew()" style="font-size:12px;padding:9px 22px">
+          + New Session ✨
+        </button>
       </div>
     </div>`;
+
+  nodesHTML += '</div>';
 
   return `<div style="max-width:860px;margin:0 auto">
     <div class="page fadein" style="padding-bottom:5rem">
       ${progressBar}
-      <div class="trail-wrap">
-        <div class="trail-spine" id="trail-spine">
-          <div class="trail-spine-fill" id="trail-spine-fill" style="height:0%"></div>
-        </div>
-        ${trailHTML}
-        ${finishNode}
+      <div class="trail-outer">
+        ${fullSVG}
+        ${nodesHTML}
       </div>
     </div>
   </div>`;
 }
 
 function trailTapUnit(id) {
-  const trail = getTrailState();
-  const u = trail.find(u => u.id === id);
-  if (u?.state === 'locked') {
-    axieSay('Complete earlier units first 🔒');
-    return;
-  }
+  // Free travel — no locked gate. Students can jump to any unit.
   if (_trailExpanded === id) {
     _trailExpanded = null;
   } else {
     _trailExpanded = id;
   }
-  // Re-render just the trail without full navigation
   setApp(renderTrailHTML());
   setTimeout(() => { animateTrailSpine(); }, 80);
-  // Scroll to the tapped unit
   setTimeout(() => {
     const el = document.getElementById(`trail-u-${id}`);
     if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
@@ -1276,14 +1776,8 @@ function trailTapUnit(id) {
 }
 
 function animateTrailSpine() {
-  const trail = getTrailState();
-  const doneCount = trail.filter(u => u.state === 'done').length;
-  const pct = Math.min(95, Math.round((doneCount / UNITS.length) * 100));
-  const fill = document.getElementById('trail-spine-fill');
-  if (fill) {
-    // Small delay for visual pop
-    setTimeout(() => { fill.style.height = pct + '%'; }, 50);
-  }
+  // Road segments are now styled directly — no single spine element to animate
+  // Trail visual state is fully driven by CSS classes set in renderTrailHTML
 }
 
 
@@ -1464,13 +1958,38 @@ function renderStudy() {
   const gr = s.instructorGrade;
   const gc = !gr ? 'var(--mut)' : gr.score >= 90 ? '#34d399' : gr.score >= 75 ? '#f0c040' : gr.score >= 60 ? '#4fc3f7' : '#fb7185';
 
-  setApp(`<div class="tabbar">${TABS.map(([id, lbl]) =>
+  setApp(`<div class="tabbar">
+  <button onclick="goHome()" style="background:none;border:none;border-bottom:2px solid transparent;padding:8px 12px;cursor:pointer;color:var(--soft);display:flex;align-items:center;flex-shrink:0;transition:color .15s" onmouseenter="this.style.color='var(--accent)'" onmouseleave="this.style.color='var(--soft)'">
+    <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+      <path d="M8 1.5L1.5 7H3v6.5h3.5V10h3v3.5H13V7h1.5L8 1.5z" fill="currentColor"/>
+    </svg>
+  </button>
+  ${TABS.map(([id, lbl]) =>
     `<button class="tab${state.tab===id?' on':''}" onclick="switchTab('${id}')">${lbl}</button>`
   ).join('')}</div>
   <div class="page has-unav fadein">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--bdr);margin-bottom:20px">
       <div style="flex:1;min-width:0">
-        <button class="btn" onclick="goHome()" style="font-size:11px;margin-bottom:10px">← Sessions</button>
+        <button onclick="goHome()" style="
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--card);
+  border:1.5px solid var(--bdr2);
+  border-radius:10px;
+  padding:9px 16px 9px 12px;
+  font-family:monospace;font-size:12px;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+  color:var(--soft);
+  cursor:pointer;
+  transition:all .18s;
+  margin-bottom:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+" onmouseenter="this.style.background='var(--card2)';this.style.color='var(--txt)';this.style.borderColor='var(--accent)';this.style.transform='translateY(-1px)'"
+  onmouseleave="this.style.background='var(--card)';this.style.color='var(--soft)';this.style.borderColor='var(--bdr2)';this.style.transform='translateY(0)'">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 1.5L1.5 7H3v6.5h3.5V10h3v3.5H13V7h1.5L8 1.5z" fill="currentColor"/>
+  </svg>
+  Trail
+</button>
         <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap">
           <span style="font-family:monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:${u.col};background:${u.col}15;border:1px solid ${u.col}25;padding:3px 8px;border-radius:2px">${u.em} Unit ${u.id} — ${u.lbl}</span>
           ${s.transcript ? `<button class="btn" onclick="goTx()" style="font-size:10px;padding:3px 9px;color:var(--mut)">📄 Transcript</button>` : ''}
@@ -2052,17 +2571,17 @@ async function launchDrill(unitId, topic) {
 
 function renderChat() {
   state.chatH = [];
-  return `<div class="lbl" style="margin-bottom:13px">🦉 Ask Axie Anything</div>
+  return `<div class="lbl" style="margin-bottom:13px">🦁 Ask Leo Anything</div>
   <div id="cm" style="display:flex;flex-direction:column;gap:11px;min-height:80px;margin-bottom:14px">
     <div class="card fadein" style="border-left:3px solid var(--c3);padding:13px 16px">
-      <p style="margin:0;font-size:13px;color:var(--soft);line-height:1.65">Ask me anything about this lecture or AP Macro! I'll keep answers short, clear, and useful. 🦉</p>
+      <p style="margin:0;font-size:13px;color:var(--soft);line-height:1.65">Ask me anything about this lecture or AP Macro! I'll keep it short, clear, and useful. 🦁</p>
     </div>
   </div>
   <div style="display:flex;gap:8px">
-    <input id="ci" placeholder="Ask Axie a question…" onkeydown="if(event.key==='Enter')doChat()" style="flex:1;padding:11px 14px;font-size:13px;border-radius:6px;border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);outline:none"/>
-    <button class="btn-hi" onclick="doChat()" style="padding:11px 18px">Ask 🦉</button>
+    <input id="ci" placeholder="Ask Leo a question…" onkeydown="if(event.key==='Enter')doChat()" style="flex:1;padding:11px 14px;font-size:13px;border-radius:6px;border:1px solid var(--bdr2);background:var(--surf);color:var(--txt);outline:none"/>
+    <button class="btn-hi" onclick="doChat()" style="padding:11px 18px">Ask 🦁</button>
   </div>
-  <div id="cb2" style="display:none;font-size:11px;color:var(--mut);font-style:italic;margin-top:7px">Axie is thinking…</div>`;
+  <div id="cb2" style="display:none;font-size:11px;color:var(--mut);font-style:italic;margin-top:7px">Leo is thinking…</div>`;
 }
 
 function fmtChat(t) {
@@ -2082,7 +2601,7 @@ async function doChat() {
   cm.innerHTML+=`<div style="display:flex;justify-content:flex-end"><div class="bubble-u fadein">${e(msg)}</div></div>`;
   const busy=$('cb2'); if(busy)busy.style.display='block';
   try {
-    const sys=`You are Axie, a friendly AP Macro tutor owl 🦉 helping a high school student named CoCo. Give SHORT bullet-point answers — max 4 bullets, each under 15 words. One direct sentence first, then bullets. Plain English. Be warm and encouraging. Lecture: ${cur()?.summary}`;
+    const sys=`You are Leo, a warm and encouraging AP Macro tutor lion cub 🦁 helping a high school student named CoCo. Give SHORT bullet-point answers — max 4 bullets, each under 15 words. One direct sentence first, then bullets. Plain English. Be warm and encouraging. Lecture: ${cur()?.summary}`;
     const rep=await callClaude(state.chatH,sys);
     state.chatH.push({role:'assistant',content:rep});
     cm.innerHTML+=`<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start">
@@ -2137,15 +2656,15 @@ function buildNotion(s) {
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   renderHero();
-  if (!state.apiKey) {
-    state.page = 'setup';
-    render();
-  } else {
-    checkStreak();
-    render();
-  }
+  // Always start on home/trail — API key only required when making API calls
+  checkStreak();
+  render(); // state.page defaults to 'home' → shows trail immediately
   setInterval(renderHero, 60000);
   setTimeout(axieTap, 2400);
+  // Soft reminder if no key (don't block the trail)
+  if (!state.apiKey) {
+    setTimeout(() => axieSay('💡 Add your API key to unlock AI features →'), 3000);
+  }
 });
 </script>
 </body>
