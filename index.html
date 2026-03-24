@@ -180,6 +180,86 @@ ul.blist li::before{content:'›';position:absolute;left:0;color:var(--mut)}
   .grade-badge{min-width:120px}
   .cd-swatches{display:none}
 }
+
+/* ═══════════════════════════════════════════
+   TRAIL HOME — Duolingo-style learning path
+   ═══════════════════════════════════════════ */
+.trail-wrap{max-width:520px;margin:0 auto;padding:1.5rem 1rem 6rem;position:relative}
+
+/* ── Connecting path line ── */
+.trail-spine{position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:0;width:3px;background:var(--bdr);z-index:0}
+.trail-spine-fill{position:absolute;left:0;top:0;width:100%;background:linear-gradient(180deg,var(--accent),var(--c2));border-radius:2px;transition:height 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* ── Unit node (big circle) ── */
+.trail-unit{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;margin-bottom:0}
+.trail-unit-node{width:80px;height:80px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s;border:3px solid transparent;flex-shrink:0}
+.trail-unit-node:hover{transform:scale(1.08) translateY(-2px)}
+.trail-unit-node:active{transform:scale(.96)}
+.trail-unit-node.done{border-width:3px}
+.trail-unit-node.active{border-width:3px;animation:pulse-node 2.4s ease infinite}
+.trail-unit-node.locked{opacity:.38;cursor:default;filter:grayscale(.7)}
+.trail-unit-node:hover.locked{transform:none}
+@keyframes pulse-node{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.0)}50%{box-shadow:0 0 0 10px rgba(255,255,255,.0),0 0 28px var(--nc,#f0c040)}}
+
+.trail-unit-em{font-size:26px;line-height:1;margin-bottom:1px}
+.trail-unit-lv{font-family:monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:.7}
+
+/* ── Unit label strip ── */
+.trail-unit-label{margin-top:9px;text-align:center;z-index:2;position:relative}
+.trail-unit-label-name{font-family:monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;line-height:1.3}
+.trail-unit-label-ex{font-size:10px;color:var(--mut);margin-top:2px;font-family:monospace}
+
+/* ── Session dots below unit label ── */
+.trail-unit-sessions{display:flex;gap:5px;justify-content:center;margin-top:8px;flex-wrap:wrap;max-width:180px}
+.trail-sess-dot{width:7px;height:7px;border-radius:50%;cursor:pointer;transition:transform .15s;flex-shrink:0}
+.trail-sess-dot:hover{transform:scale(1.4)}
+
+/* ── Topic waypoint (small diamond between units) ── */
+.trail-topic{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer}
+.trail-topic-diamond{width:18px;height:18px;border-radius:3px;transform:rotate(45deg);transition:transform .2s cubic-bezier(.34,1.56,.64,1),opacity .2s;border:2px solid transparent;flex-shrink:0}
+.trail-topic-diamond:hover{transform:rotate(45deg) scale(1.4)}
+.trail-topic.done   .trail-topic-diamond{border-color:transparent}
+.trail-topic.locked .trail-topic-diamond{opacity:.28}
+.trail-topic-label{font-size:10px;font-family:monospace;letter-spacing:.5px;color:var(--mut);margin-left:14px;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.trail-topic.done .trail-topic-label{color:var(--soft)}
+.trail-topic.active .trail-topic-label{color:var(--txt)}
+
+/* ── Spacer between unit node and first topic / last topic and next unit ── */
+.trail-gap{height:20px;position:relative;z-index:1}
+
+/* ── Start / Finish markers ── */
+.trail-start{text-align:center;margin-bottom:28px;position:relative;z-index:2}
+.trail-finish{text-align:center;margin-top:28px;position:relative;z-index:2}
+
+/* ── You-are-here indicator ── */
+.trail-yah{display:inline-flex;align-items:center;gap:6px;background:rgba(240,192,64,.12);border:1px solid rgba(240,192,64,.35);border-radius:20px;padding:4px 12px 4px 8px;font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--accent);margin-top:6px;animation:yah-bob .9s ease infinite alternate}
+@keyframes yah-bob{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+
+/* ── Sessions panel (slide in below unit when tapped) ── */
+.trail-sessions-panel{margin:12px auto 0;max-width:320px;animation:fadein .2s ease both}
+
+/* ── Add session button on trail ── */
+.trail-add-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.25);border-radius:20px;padding:5px 14px;font-family:monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);cursor:pointer;transition:all .15s;margin-top:10px}
+.trail-add-btn:hover{background:rgba(240,192,64,.16);border-color:rgba(240,192,64,.5)}
+
+/* ── Streak fire on trail ── */
+.trail-streak{display:inline-flex;align-items:center;gap:5px;font-family:monospace;font-size:10px;color:var(--c7);background:rgba(255,140,66,.08);border:1px solid rgba(255,140,66,.2);border-radius:20px;padding:3px 10px;margin-top:4px}
+
+/* ── Progress summary bar at top ── */
+.trail-progress-bar{background:var(--card);border:1px solid var(--bdr);border-radius:8px;padding:14px 18px;margin-bottom:22px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.trail-progress-stat{display:flex;flex-direction:column;align-items:center;gap:2px}
+.trail-progress-stat-n{font-family:monospace;font-size:22px;font-weight:900;line-height:1}
+.trail-progress-stat-l{font-family:monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--mut)}
+.trail-progress-divider{width:1px;height:30px;background:var(--bdr2)}
+.trail-progress-pct{flex:1;min-width:120px}
+.trail-progress-pct-label{font-size:10px;color:var(--soft);margin-bottom:5px}
+.trail-progress-pct-track{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.trail-progress-pct-fill{height:100%;border-radius:3px;transition:width .9s cubic-bezier(.34,1.56,.64,1);background:linear-gradient(90deg,var(--accent),#ff9f40)}
+
+/* ── Session card in panel ── */
+.trail-scard{background:var(--card);border:1px solid var(--bdr);border-left:3px solid;border-radius:6px;padding:10px 14px;margin-bottom:6px;cursor:pointer;transition:background .15s,transform .15s;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.trail-scard:hover{background:var(--card2);transform:translateX(2px)}
+
 </style>
 </head>
 <body>
@@ -674,6 +754,7 @@ function goHome(htab) {
   if (state.page === 'study') {
     setTimeout(() => axieSay('⚡ One more session = +2x momentum'), 800);
   }
+  _trailExpanded = null;  // close any open panel
   state.page = 'home';
   if (htab) state.htab = htab;
   render();
@@ -939,21 +1020,273 @@ function saveKey() {
 }
 
 // HOME
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TRAIL DATA — 3 key topics per unit for path waypoints
+// ─────────────────────────────────────────────────────────────────────────────
+const TRAIL_TOPICS = {
+  1: [
+    {id:'scarcity_opportunity',   lbl:'Scarcity & Opportunity Cost'},
+    {id:'ppc',                    lbl:'Production Possibilities Curve'},
+    {id:'supply_demand',          lbl:'Supply & Demand'},
+  ],
+  2: [
+    {id:'gdp',                    lbl:'GDP & National Income'},
+    {id:'unemployment',           lbl:'Unemployment & Labor'},
+    {id:'inflation_business',     lbl:'Inflation & Business Cycle'},
+  ],
+  3: [
+    {id:'asad_model',             lbl:'AS/AD Model'},
+    {id:'fiscal_policy',          lbl:'Fiscal Policy'},
+    {id:'multiplier_effect',      lbl:'Multiplier & MPC/MPS'},
+  ],
+  4: [
+    {id:'money_banking',          lbl:'Money & Banking'},
+    {id:'t_accounts',             lbl:'T-Accounts & Money Creation'},
+    {id:'fed_tools',              lbl:'Federal Reserve Tools'},
+  ],
+  5: [
+    {id:'phillips_curve',         lbl:'Phillips Curve'},
+    {id:'crowding_out',           lbl:'Crowding Out'},
+    {id:'long_run_growth',        lbl:'Long-Run Growth & LRAS'},
+  ],
+  6: [
+    {id:'exchange_rates',         lbl:'Exchange Rates'},
+    {id:'balance_of_payments',    lbl:'Balance of Payments'},
+    {id:'interest_rate_chain',    lbl:'Interest Rate → Forex Chain'},
+  ],
+};
+
+// Compute trail progress state:
+// A unit is 'done' if it has ≥1 session
+// A unit is 'active' if it's the first with 0 sessions (or all done = unit 6 active)
+// Topics inherit from their unit: done if unit done, active if unit active, else locked
+function getTrailState() {
+  const us = UNITS.map(u => ({
+    ...u,
+    sessCount: state.sessions.filter(s => s.unit?.id === u.id).length,
+    sessions:  state.sessions.map((s,i) => ({s,i})).filter(({s}) => s.unit?.id === u.id),
+  }));
+  // Find the first unit with 0 sessions — that's the active unit
+  let activeIdx = us.findIndex(u => u.sessCount === 0);
+  if (activeIdx === -1) activeIdx = us.length - 1; // all done → last is active
+  us.forEach((u, i) => {
+    u.state = i < activeIdx ? 'done' : i === activeIdx ? 'active' : 'locked';
+  });
+  return us;
+}
+
+// Which unit is currently expanded in the trail
+let _trailExpanded = null;
+
 function renderHome() {
-  setApp(`<div class="tabbar">
-    <button class="tab${state.htab === 'sessions' ? ' on' : ''}" onclick="state.htab='sessions';renderHomeContent()">Sessions</button>
-    <button class="tab${state.htab === 'units'    ? ' on' : ''}" onclick="state.htab='units';renderHomeContent()">Unit Overviews</button>
-  </div>
-  <div class="page fadein" id="hcontent"></div>`);
-  setTimeout(renderHomeContent, 0);
+  setApp(renderTrailHTML());
+  setTimeout(() => { animateTrailSpine(); }, 80);
 }
 
 function renderHomeContent() {
-  document.querySelectorAll('.tab').forEach((b, i) =>
-    b.classList.toggle('on', (i===0 && state.htab==='sessions') || (i===1 && state.htab==='units')));
-  const el = $('hcontent'); if (!el) return;
-  el.innerHTML = state.htab === 'sessions' ? renderSessions() : renderUnitTiles();
+  // Legacy: kept for any residual calls — trail replaces this
+  setApp(renderTrailHTML());
+  setTimeout(animateTrailSpine, 80);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TRAIL RENDERING — full path home screen
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderTrailHTML() {
+  const trail     = getTrailState();
+  const totalSess = state.sessions.length;
+  const doneSess  = trail.filter(u => u.state === 'done').length;
+  const pct       = Math.round((doneSess / UNITS.length) * 100);
+  const G         = state.xp;
+
+  // ── Progress summary bar ──
+  const progressBar = `
+    <div class="trail-progress-bar fadein">
+      <div class="trail-progress-stat">
+        <div class="trail-progress-stat-n" style="color:var(--accent)">${doneSess}</div>
+        <div class="trail-progress-stat-l">Units Done</div>
+      </div>
+      <div class="trail-progress-divider"></div>
+      <div class="trail-progress-stat">
+        <div class="trail-progress-stat-n" style="color:var(--c2)">${totalSess}</div>
+        <div class="trail-progress-stat-l">Sessions</div>
+      </div>
+      <div class="trail-progress-divider"></div>
+      <div class="trail-progress-stat">
+        <div class="trail-progress-stat-n" style="color:var(--c7)">${G.streak}</div>
+        <div class="trail-progress-stat-l">Day Streak</div>
+      </div>
+      <div class="trail-progress-divider"></div>
+      <div class="trail-progress-pct">
+        <div class="trail-progress-pct-label">Course progress — ${pct}%</div>
+        <div class="trail-progress-pct-track">
+          <div class="trail-progress-pct-fill" style="width:${pct}%"></div>
+        </div>
+      </div>
+    </div>`;
+
+  // ── Build trail nodes ──
+  let trailHTML = '';
+  trail.forEach((u, idx) => {
+    const topics     = TRAIL_TOPICS[u.id] || [];
+    const isFirst    = idx === 0;
+    const isLast     = idx === trail.length - 1;
+    const isExpanded = _trailExpanded === u.id;
+    const nodeBg     = u.state === 'locked'
+      ? 'var(--card)'
+      : u.state === 'done'
+        ? u.col
+        : 'var(--card)';
+    const nodeBorder = u.state === 'locked' ? 'var(--bdr)' : u.col;
+    const nodeEmColor = u.state === 'done' ? '#000' : u.col;
+
+    // ── Topic waypoints (above unit — except for first unit) ──
+    let topicsHTML = '';
+    if (!isFirst) {
+      topicsHTML = topics.map(tp => {
+        const tstate = u.state; // topic inherits unit state
+        const filled = tstate === 'done';
+        const tactive = tstate === 'active';
+        return `
+          <div class="trail-topic ${tstate}" style="height:32px">
+            <div class="trail-topic-diamond" style="
+              background:${filled ? u.col : tactive ? u.col + '40' : 'var(--bdr)'};
+              border-color:${tactive ? u.col : 'transparent'};
+              box-shadow:${filled ? '0 0 8px ' + u.col + '60' : 'none'};
+            "></div>
+            <div class="trail-topic-label">${tp.lbl}</div>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Sessions panel ──
+    let sessPanel = '';
+    if (isExpanded) {
+      sessPanel = `<div class="trail-sessions-panel">`;
+      if (u.sessions.length) {
+        sessPanel += u.sessions.map(({s, i}) => {
+          const gr = s.instructorGrade;
+          const gc = gr ? (gr.score >= 90 ? '#34d399' : gr.score >= 75 ? '#f0c040' : '#fb7185') : u.col;
+          return `<div class="trail-scard" style="border-left-color:${u.col}" onclick="goStudy(${i})">
+            <div style="min-width:0;flex:1">
+              <div style="font-weight:600;font-size:13px;color:var(--txt);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e(s.title)}</div>
+              <div class="lbl">${new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})} · ${s.flashcards?.length||0} cards${gr ? ' · <span style="color:'+gc+'">'+gr.score+'/100</span>' : ''}</div>
+            </div>
+            <div style="font-size:16px;flex-shrink:0">→</div>
+          </div>`;
+        }).join('');
+      } else {
+        sessPanel += `<div style="font-size:12px;color:var(--mut);text-align:center;padding:10px 0">No sessions yet</div>`;
+      }
+      sessPanel += `<button class="trail-add-btn" onclick="goNew()">+ New Session ✨</button>`;
+      sessPanel += `</div>`;
+    }
+
+    // ── You-are-here badge (only on active unit) ──
+    const yahBadge = u.state === 'active'
+      ? `<div class="trail-yah">📍 You are here</div>`
+      : '';
+
+    // ── Unit node ──
+    const unitNode = `
+      <div class="trail-unit" id="trail-u-${u.id}">
+        ${!isFirst ? `<div class="trail-gap"></div>` : ''}
+        ${topicsHTML}
+        <div class="trail-gap"></div>
+        <div class="trail-unit-node ${u.state}"
+          style="
+            background:${nodeBg};
+            border-color:${nodeBorder};
+            box-shadow:${u.state !== 'locked' ? '0 0 0 4px ' + u.col + '18, 0 4px 20px ' + u.col + '30' : 'none'};
+            --nc:${u.col};
+          "
+          onclick="trailTapUnit(${u.id})">
+          <div class="trail-unit-em">${u.em}</div>
+          <div class="trail-unit-lv" style="color:${u.state === 'done' ? '#000' : u.col}">U${u.id}</div>
+          ${u.state === 'done' ? `<div style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--c4);display:flex;align-items:center;justify-content:center;font-size:9px;border:2px solid var(--bg)">✓</div>` : ''}
+        </div>
+        <div class="trail-unit-label">
+          <div class="trail-unit-label-name" style="color:${u.state === 'locked' ? 'var(--mut)' : u.col}">${u.lbl}</div>
+          <div class="trail-unit-label-ex">${u.ex} of exam</div>
+          ${yahBadge}
+          ${u.sessions.length ? `<div style="display:flex;gap:4px;justify-content:center;margin-top:6px;flex-wrap:wrap">
+            ${u.sessions.slice(0,5).map(({s,i}) => `<div class="trail-sess-dot" style="background:${u.col};opacity:${0.5 + 0.1*Math.min(4,i)}" onclick="event.stopPropagation();goStudy(${i})" title="${e(s.title)}"></div>`).join('')}
+            ${u.sessions.length > 5 ? `<div style="font-family:monospace;font-size:8px;color:${u.col}">+${u.sessions.length-5}</div>` : ''}
+          </div>` : ''}
+          ${u.state === 'locked' ? `<div style="font-size:9px;color:var(--mut);font-family:monospace;margin-top:4px">locked</div>` : ''}
+        </div>
+        ${sessPanel}
+      </div>`;
+
+    trailHTML += unitNode;
+  });
+
+  // ── Finish node ──
+  const allDone = trail.every(u => u.state === 'done');
+  const finishNode = `
+    <div class="trail-finish">
+      <div class="trail-gap"></div>
+      <div style="width:60px;height:60px;border-radius:50%;background:${allDone ? 'var(--accent)' : 'var(--card)'};border:3px solid ${allDone ? 'var(--accent)' : 'var(--bdr)'};display:flex;align-items:center;justify-content:center;font-size:${allDone ? '28' : '20'}px;margin:0 auto;box-shadow:${allDone ? '0 0 32px rgba(240,192,64,.4)' : 'none'};transition:all .4s">
+        ${allDone ? '🏆' : '🎓'}
+      </div>
+      <div style="margin-top:10px;font-family:monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:${allDone ? 'var(--accent)' : 'var(--mut)'}">
+        ${allDone ? 'AP Exam Ready!' : 'AP Macro Exam · ' + countdown().d + ' days'}
+      </div>
+      <div style="margin-top:16px">
+        <button class="btn-hi" onclick="goNew()" style="font-size:13px">+ New Session ✨</button>
+      </div>
+    </div>`;
+
+  return `<div style="max-width:860px;margin:0 auto">
+    <div class="page fadein" style="padding-bottom:5rem">
+      ${progressBar}
+      <div class="trail-wrap">
+        <div class="trail-spine" id="trail-spine">
+          <div class="trail-spine-fill" id="trail-spine-fill" style="height:0%"></div>
+        </div>
+        ${trailHTML}
+        ${finishNode}
+      </div>
+    </div>
+  </div>`;
+}
+
+function trailTapUnit(id) {
+  const trail = getTrailState();
+  const u = trail.find(u => u.id === id);
+  if (u?.state === 'locked') {
+    axieSay('Complete earlier units first 🔒');
+    return;
+  }
+  if (_trailExpanded === id) {
+    _trailExpanded = null;
+  } else {
+    _trailExpanded = id;
+  }
+  // Re-render just the trail without full navigation
+  setApp(renderTrailHTML());
+  setTimeout(() => { animateTrailSpine(); }, 80);
+  // Scroll to the tapped unit
+  setTimeout(() => {
+    const el = document.getElementById(`trail-u-${id}`);
+    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 120);
+}
+
+function animateTrailSpine() {
+  const trail = getTrailState();
+  const doneCount = trail.filter(u => u.state === 'done').length;
+  const pct = Math.min(95, Math.round((doneCount / UNITS.length) * 100));
+  const fill = document.getElementById('trail-spine-fill');
+  if (fill) {
+    // Small delay for visual pop
+    setTimeout(() => { fill.style.height = pct + '%'; }, 50);
+  }
+}
+
+
 
 function renderSessions() {
   let out = `<button class="btn-hi btn-full" onclick="goNew()" style="margin-bottom:22px">+ New Session ✨</button>`;
@@ -1291,7 +1624,7 @@ function flipFC() {
 function nextFC()    { state.fcFlipped=false; state.fcIdx=Math.min(state.fcIdx+1,(cur()?.flashcards?.length||1)-1); renderTab(); }
 function prevFC()    { state.fcFlipped=false; state.fcIdx=Math.max(state.fcIdx-1,0); renderTab(); }
 function goFC(i)     { state.fcFlipped=false; state.fcIdx=i; renderTab(); }
-function shuffleFC() { cur().flashcards.sort(()=>Math.random()-.5); state.fcFlipped=false; state.fcIdx=0; renderTab(); axieSay('Shuffled! Keep going 🦉'); }
+function shuffleFC() { const s=cur(); if(!s?.flashcards) return; s.flashcards.sort(()=>Math.random()-.5); state.fcFlipped=false; state.fcIdx=0; renderTab(); axieSay('Shuffled! Keep going 🦉'); }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // QUIZ TAB
