@@ -187,7 +187,29 @@ body{ padding-top:67px; }
 .fc-face:hover{border-color:var(--bdr2)}
 .fc-back{transform:rotateY(180deg);background:var(--card2)}
 
-.qopt{padding:10px 14px;border-radius:4px;border:1px solid var(--bdr);cursor:pointer;font-size:13px;color:var(--soft);transition:all .15s;margin-bottom:7px;line-height:1.5}
+.qopt{padding:10px 14px;border-radius:4px;border:1px solid var(--bdr);cursor:pointer;font-size:13px;color:var(--soft);transition:all 0.2s ease;margin-bottom:7px;line-height:1.5}
+/* ── Quiz interaction states ── */
+.qopt-selected{
+  background:rgba(79,195,247,.13)!important;
+  border-color:#4fc3f7!important;
+  color:#e0f7ff!important;
+  font-weight:700;
+}
+.qopt-dim{
+  opacity:0.38;
+}
+.qopt-correct{
+  background:rgba(52,211,153,.13)!important;
+  border-color:#34d399!important;
+  color:#34d399!important;
+  font-weight:700;
+  transition:all 0.2s ease,transform 0.2s ease!important;
+}
+.qopt-wrong{
+  background:rgba(251,113,133,.1)!important;
+  border-color:#fb7185!important;
+  color:#fb7185!important;
+}
 .qopt:hover:not(.locked){background:rgba(255,255,255,.03);border-color:var(--bdr2);color:var(--mid)}
 .qopt.locked{cursor:default}
 
@@ -219,7 +241,7 @@ ul.blist li::before{content:'›';position:absolute;left:0;color:var(--mut)}
 .has-unav{padding-bottom:58px}
 
 .cf{position:fixed;width:7px;height:7px;border-radius:2px;pointer-events:none;z-index:9999;animation:cffall linear forwards}
-@keyframes cffall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(760deg);opacity:0}}
+@keyframes cffall{0%{transform:translateY(0) rotate(0deg) translateX(0);opacity:1}50%{opacity:1}100%{transform:translateY(105vh) rotate(720deg) translateX(40px);opacity:0}}
 
 .toast{position:fixed;top:18px;right:18px;background:rgba(232,160,32,.13);border:1px solid rgba(232,160,32,.4);border-radius:6px;padding:9px 15px;font-family:monospace;font-size:12px;color:var(--accent);z-index:9998;animation:tin .25s ease,tout .25s ease 1.75s forwards;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.4)}
 @keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
@@ -843,8 +865,11 @@ function loadState() {
     .map(s => s.unit ? s : { ...s, unit: detectUnit(s) });
   // Merge: default sessions first (as base), user sessions on top
   // User sessions with matching unit replace default; extras append
-  const userUnitIds = new Set(userSessions.map(s => s.unit?.id).filter(Boolean));
-  const defaults = DEFAULT_CURRICULUM.filter(d => !userUnitIds.has(d.unit?.id));
+  // Always include ALL default sessions so waypoint links remain valid.
+  // User sessions appear first (shown preferentially in the trail panel);
+  // defaults are appended so goWaypoint(sessId) can always find them.
+  const userIds = new Set(userSessions.map(s => s.id));
+  const defaults = DEFAULT_CURRICULUM.filter(d => !userIds.has(d.id)); // skip if user somehow has same id
   state.sessions = [...userSessions, ...defaults];
   // Inject unit flashcards onto default sessions that have none
   state.sessions.forEach(s => {
@@ -1242,16 +1267,29 @@ function showToast(msg) {
 }
 
 function launchConfetti(type = 'big') {
-  const config = { small: 20, medium: 40, big: 70 };
-  const count  = config[type] || 70;
+  const config = { small: 30, medium: 50, big: 80 };
+  const count  = config[type] || 80;
   const cols   = ['#f0c040','#4fc3f7','#a78bfa','#34d399','#fb7185','#c084fc','#ff8c42','#fff'];
+  const shapes = ['2px','50%','0']; // square, circle, ribbon
   for (let i = 0; i < count; i++) {
-    const size = type === 'small' ? 5 : 7;
-    const el = document.createElement('div'); el.className = 'cf';
-    el.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}vw;background:${cols[Math.floor(Math.random()*cols.length)]};transform:rotate(${Math.random()*360}deg);animation-duration:${1.4+Math.random()*2}s;animation-delay:${Math.random()*.6}s`;
-    document.body.appendChild(el); setTimeout(() => el.remove(), 3800);
+    const size   = type === 'small' ? (3 + Math.random() * 5) : (4 + Math.random() * 7);
+    const isRibbon = Math.random() < 0.3;
+    const w = isRibbon ? size * 3 : size;
+    const h = size;
+    const col = cols[Math.floor(Math.random() * cols.length)];
+    const br  = isRibbon ? '1px' : (Math.random() < 0.5 ? '50%' : '2px');
+    const dur  = (type === 'small' ? 1.0 : 1.6) + Math.random() * 1.2;
+    const delay = Math.random() * 0.4;
+    const startX = 20 + Math.random() * 60; // vw — burst from center area
+    const el = document.createElement('div');
+    el.className = 'cf';
+    // Do NOT set transform here — let @keyframes cffall own it
+    el.style.cssText = `width:${w}px;height:${h}px;top:-10px;left:${startX}vw;` +
+      `background:${col};border-radius:${br};` +
+      `animation-duration:${dur}s;animation-delay:${delay}s;`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), (dur + delay + 0.5) * 1000);
   }
-  // callers own their messages — no axieSay here
 }
 
 function ring(pct, col, sz = 38) {
@@ -1629,13 +1667,12 @@ function renderHomeContent() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function goWaypoint(sessId) {
-  markLessonVisited(sessId);   // track that this lesson was visited
+  console.log('[goWaypoint] sessId='+sessId+' sessions='+state.sessions.length);
+  markLessonVisited(sessId);
   const idx = state.sessions.findIndex(s => s.id === sessId);
-  if (idx !== -1) {
-    goStudy(idx);
-    return;
-  }
-  axieSay('Session not found — try adding one from your notes! 🦁');
+  console.log('[goWaypoint] found idx='+idx);
+  if (idx !== -1) { goStudy(idx); return; }
+  axieSay('Session not found — try adding one from your notes! 👹');
   goNew();
 }
 
@@ -2416,7 +2453,7 @@ function renderTrailHTML() {
   </svg>`;
 
   // ── HTML nodes layer ──
-  let nodesHTML = `<div style="position:relative;height:${svgH}px;width:${OUTER}px;margin:0 auto;">`;
+  let nodesHTML = `<div id="trail-nodes-layer" style="position:relative;height:${svgH}px;width:${OUTER}px;margin:0 auto;">`;
 
   trail.forEach((u, idx) => {
     const uc      = u.col;
@@ -2448,7 +2485,7 @@ function renderTrailHTML() {
       const dotColor = passed ? 'rgba(0,0,0,.65)' : 'transparent';
 
       // Dot (tappable)
-      nodesHTML += `<div onclick="goWaypoint(${tp.sessId})"
+      nodesHTML += `<div data-sessid="${tp.sessId}" onclick="goWaypoint(${tp.sessId})"
         onmouseenter="this.style.transform='translate(-50%,-50%) scale(1.2)'"
         onmouseleave="this.style.transform='translate(-50%,-50%) scale(1)'"
         title="${tp.lbl}"
@@ -2472,7 +2509,7 @@ function renderTrailHTML() {
         } else {
           lblStyle = `position:absolute;left:${dotHtmlX+R_DOT+GAP_DOT}px;top:${dotHtmlY-14}px;width:${W_LBL}px;text-align:left;`;
         }
-        nodesHTML += `<div onclick="goWaypoint(${tp.sessId})"
+        nodesHTML += `<div data-sessid="${tp.sessId}" onclick="goWaypoint(${tp.sessId})"
           style="${lblStyle}z-index:11;cursor:pointer;
           color:${passed?uc:'var(--mut)'};
           font-size:11px;font-weight:${passed?700:500};
@@ -2929,17 +2966,24 @@ function renderStudy() {
 }
 
 function switchTab(t) {
+  // Fix 5: always reset both quiz states on tab switch
+  state.quiz      = { picks:{}, checked:{}, score:0, total:0 };
+  state.drillQuiz = { picks:{}, checked:{}, score:0, total:0 };
+
   state.tab = t;
   if (t === 'quiz') {
     const s = cur();
-    state.quiz = { picks:{}, checked:{}, score:0, total:(s?.quiz||[]).length,
-      _answers:(s?.quiz||[]).map(q=>q.answer||''),
-      _explanations:(s?.quiz||[]).map(q=>q.explanation||'') };
+    if (s) {
+      // Fix 2: total from live quiz length
+      state.quiz = {
+        picks:{}, checked:{}, score:0,
+        total: s.quiz ? s.quiz.length : 0,
+        _answers:      (s.quiz||[]).map(q => q.answer||''),
+        _explanations: (s.quiz||[]).map(q => q.explanation||'')
+      };
+    }
     const nu = document.getElementById('next-up-card');
     if (nu) nu.remove();
-  } else {
-    state.quiz      = { picks:{}, checked:{}, score:0, total:0 };
-    state.drillQuiz = { picks:{}, checked:{}, score:0, total:0 };
   }
   document.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('on', TABS[i]?.[0] === t));
   const tc = $('tc'); if (tc) { tc.className = 'fadein'; renderTab(); }
@@ -3067,40 +3111,63 @@ function shuffleFC() { const s=cur(); if(!s?.flashcards) return; s.flashcards.so
 // QUIZ TAB
 // ─────────────────────────────────────────────────────────────────────────────
 function renderQuiz(quiz) {
+  // Fix 1: null session guard
+  const s = cur();
+  if (!s) return '<div class="lbl" style="padding:16px">No active session.</div>';
+
   const questions = quiz || [];
+  // Fix 2: total always from live array length
   state.quiz = {
-    picks:{}, checked:{}, score:0, total:questions.length,
+    picks:{}, checked:{}, score:0,
+    total: s.quiz ? s.quiz.length : questions.length,
     _answers:      questions.map(q => q.answer || ''),
     _explanations: questions.map(q => q.explanation || '')
   };
-  return `<div style="display:flex;justify-content:space-between;margin-bottom:16px;align-items:center">
-    <div class="lbl">${questions.length} Questions 📝</div>
+
+  return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div id="q-progress" class="lbl" style="color:var(--soft)">Question 1 of ${questions.length}</div>
     <div id="qs" class="lbl" style="color:var(--accent)"></div>
   </div>
-  ${questions.map((q,i) => `
-    <div class="card fadein" style="border-left:3px solid ${ac(i)};margin-bottom:13px;padding:16px 18px">
+  ${questions.map((q, i) => {
+    // Fix 7: skip question if index out of bounds
+    if (i >= state.quiz.total) return '';
+    return `<div class="card fadein" id="qcard-${i}" style="border-left:3px solid ${ac(i)};margin-bottom:13px;padding:16px 18px">
       <p style="font-weight:600;font-size:14px;color:var(--txt);line-height:1.55;margin-bottom:12px">${i+1}. ${e(q.question)}</p>
-      <div>${(q.options||[]).map((opt,oi) => `<div id="op-${i}-${oi}" class="qopt" onclick="pickQ(${i},${oi})">${e(opt)}</div>`).join('')}</div>
+      <div id="qopts-${i}">${(q.options||[]).map((opt,oi) => `<div id="op-${i}-${oi}" class="qopt" onclick="pickQ(${i},${oi})">${e(opt)}</div>`).join('')}</div>
       <button class="btn-hi" id="cb-${i}" style="display:none;margin-top:10px;font-size:12px;padding:7px 18px" onclick="checkQ(${i})">Check Answer ✓</button>
       <div id="ex-${i}" style="display:none;font-size:12px;color:var(--soft);border-top:1px solid var(--bdr);padding-top:10px;margin-top:10px;line-height:1.75"></div>
-    </div>`).join('')}`;
+    </div>`;
+  }).join('')}`;
 }
 
 function pickQ(qi, oi) {
-  if (state.quiz.checked[qi] === true) return;
+  // Fix 1: null session guard
+  const s = cur();
+  if (!s) return;
+  // Fix 3: prevent clicks after answer checked
+  if (state.quiz.checked[qi]) return;
+  // Fix 8: safety log
+  console.log('pickQ', qi, state.quiz);
+
   const l = 'ABCD'[oi];
   if (!l) return;
+
+  // Fix 6: register pick before anything else
   state.quiz.picks[qi] = l;
+
   for (let k = 0; k < 4; k++) {
     const el = document.getElementById(`op-${qi}-${k}`);
     if (!el) continue;
-    const x = 'ABCD'[k];
-    el.style.background  = x===l ? 'rgba(79,195,247,.09)' : 'transparent';
-    el.style.borderColor = x===l ? '#4fc3f7' : 'var(--bdr)';
-    el.style.color       = x===l ? '#4fc3f7' : 'var(--soft)';
+    if (k === oi) {
+      el.classList.add('qopt-selected');
+      el.classList.remove('qopt-dim');
+    } else {
+      el.classList.remove('qopt-selected');
+      el.classList.add('qopt-dim');
+    }
   }
   const b = document.getElementById(`cb-${qi}`);
-  if (b) b.style.display = 'inline-block';
+  if (b) { b.style.display = 'inline-block'; b.style.opacity = '1'; }
 }
 
 
@@ -3280,124 +3347,177 @@ function checkUnitComplete(uid) {
 }
 
 function checkQ(qi) {
-  if (state.quiz.checked[qi] === true) return;
+  // Fix 1: null session guard
+  const s = cur();
+  if (!s) return;
+  // Fix 7: bounds check — last question safety
+  if (qi >= state.quiz.total) return;
+  // Fix 3 + 4: checked guard at very top, before anything
+  if (state.quiz.checked[qi]) return;
+  // Fix 8: safety log
+  console.log('checkQ', qi, state.quiz);
+
+  // Read answer directly from session — immune to state.quiz wipe
+  const correct = s.quiz[qi]?.answer || state.quiz._answers[qi] || '';
+  const enc     = encodeURIComponent(s.quiz[qi]?.explanation || state.quiz._explanations?.[qi] || '');
+  const ch      = state.quiz.picks[qi];
+
+  // Fix 4: set checked BEFORE incrementing score (idempotent)
   state.quiz.checked[qi] = true;
 
-  const correct = state.quiz._answers[qi];
-  const enc     = encodeURIComponent(state.quiz._explanations[qi] || '');
-  const ch      = state.quiz.picks[qi];
-  const ok      = ch === correct;
-  if (ok) { state.quiz.score++; launchConfetti('small'); lionRoar(); }
-  logQuizToday();
-
-  // ── TOPIC PERFORMANCE TRACKING ──
-  const s   = cur();
-  const uid = s?.unit?.id;
-  if (uid != null) {
-    if (!state.perf[uid]) state.perf[uid] = { correct:0, total:0, ignored:0, topics:{} };
-    const p = state.perf[uid];
-    p.total++; if (ok) p.correct++;
-    const topic = normTopic(s.quiz?.[qi]?.topic);
-    if (topic) {
-      if (!p.topics[topic]) p.topics[topic] = { correct:0, total:0 };
-      p.topics[topic].total++; if (ok) p.topics[topic].correct++;
+  // Fallback: if picks was wiped, read selected option from DOM
+  const chFinal = ch || (() => {
+    for (let k = 0; k < 4; k++) {
+      const el = document.getElementById(`op-${qi}-${k}`);
+      if (el && el.classList.contains('qopt-selected')) return 'ABCD'[k];
     }
-    persistPerf();
-    if (p.total >= 5 && (p.correct / p.total) > 0.7) { p.ignored = 0; persistPerf(); }
-  }
+    return null;
+  })();
 
+  const ok = chFinal === correct;
+  console.log('checkQ ok='+ok+' ch='+chFinal+' correct='+correct);
+
+  // Lock all options immediately — prevents any further clicks
   for (let k = 0; k < 4; k++) {
     const el = document.getElementById(`op-${qi}-${k}`);
-    if (!el) continue;
-    const x = 'ABCD'[k];
-    if (x===correct)        { el.style.background='rgba(52,211,153,.09)'; el.style.borderColor='#34d399'; el.style.color='#34d399'; }
-    else if (x===ch && !ok) { el.style.background='rgba(251,113,133,.09)'; el.style.borderColor='#fb7185'; el.style.color='#fb7185'; }
-    el.classList.add('locked');
+    if (el) el.classList.add('locked');
   }
-  const b  = document.getElementById(`cb-${qi}`);  if (b)  b.style.display = 'none';
-  const ex = document.getElementById(`ex-${qi}`);  if (ex) { ex.style.display = 'block'; ex.innerHTML = (ok?'✅ ':'❌ ')+e(decodeURIComponent(enc)); }
 
-  addXP(ok ? 15 : 5, ok ? 'Correct! 🎯' : 'Good try!');
+  // Disable check button during delay
+  const b = document.getElementById(`cb-${qi}`);
+  if (b) { b.disabled = true; b.style.opacity = '0.5'; }
 
-  const answeredCount = Object.keys(state.quiz.checked).length;
-  const qs = document.getElementById('qs'); if (qs) qs.textContent = `${state.quiz.score}/${answeredCount} correct`;
+  // 150ms commit moment — tension before reveal
+  setTimeout(() => {
 
-  if (answeredCount === state.quiz.total) {
-    state.xp.quizzes++; persistXP();
-    const sc = state.quiz.score, tot = state.quiz.total;
-    const pct = Math.round(sc/tot*100);
-    // Mark lesson passed if score ≥ 80% — drives the ✓ on trail dots
-    if (pct >= 80) {
-      const passedSess = cur();
-      if (passedSess?.id) markLessonPassed(passedSess.id);
+    if (ok) {
+      state.quiz.score++;
+      addXP(10, 'Correct');
+      launchConfetti('small');  // direct call — no nested setTimeout
+      lionRoar();
     }
-    setTimeout(() => {
-      if (sc === tot) launchConfetti();
-      if      (pct === 100) axieSay('Perfect score! You owned it 🦁🏆');
-      else if (pct >= 80)   axieSay(`${sc}/${tot} — Nearly perfect! 🌟`);
-      else                  axieSay(`${sc}/${tot} — Review the ones you missed 💪`);
+    logQuizToday();
 
-      // ── Inject "Next Up" card after the score display ──
-      const qsEl = document.getElementById('qs');
-      if (qsEl && !document.getElementById('next-up-card')) {
-        const s         = cur();
-        const uid       = s?.unit?.id;
-        const trail     = getTrailState();
-        const activeU   = trail.find(u => u.state === 'active');
-        const missedQ   = Object.keys(state.quiz.checked)
-          .filter(i => !state.quiz.checked[i]).length;
-
-        // Decide what to suggest
-        let nextAction, nextLabel, nextIcon;
-        if (missedQ > 0) {
-          nextAction = `switchTab('gaps')`;
-          nextLabel  = `Review ${missedQ} missed question${missedQ>1?'s':''} in Gaps`;
-          nextIcon   = '🔍';
-        } else if (activeU && activeU.id !== uid) {
-          nextAction = `trailTapUnit(${activeU.id});goHome()`;
-          nextLabel  = `Start ${activeU.em} ${activeU.lbl}`;
-          nextIcon   = '→';
-        } else {
-          nextAction = `goNew()`;
-          nextLabel  = 'Add a new session from today\u2019s notes';
-          nextIcon   = '✨';
-        }
-
-        const card = document.createElement('div');
-        card.id = 'next-up-card';
-        card.style.cssText = `
-          margin-top:20px;padding:14px 18px;
-          background:var(--card2);border:1px solid var(--bdr2);
-          border-radius:10px;border-left:3px solid var(--accent);
-          display:flex;align-items:center;gap:12px;cursor:pointer;
-          transition:background .15s;
-          animation:fadein .3s ease both;
-        `;
-        card.onclick = new Function(nextAction);
-        card.onmouseenter = () => card.style.background='var(--bdr)';
-        card.onmouseleave = () => card.style.background='var(--card2)';
-        card.innerHTML = `
-          <div style="font-size:22px;flex-shrink:0">${nextIcon}</div>
-          <div style="flex:1">
-            <div style="font-family:monospace;font-size:10px;font-weight:800;
-              letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);
-              margin-bottom:3px">Next Up</div>
-            <div style="font-size:13px;color:var(--txt);font-weight:600">${nextLabel}</div>
-          </div>
-          <div style="color:var(--mut);font-size:18px">›</div>
-        `;
-        // Insert after score element
-        qsEl.parentNode.insertBefore(card, qsEl.nextSibling);
-        const rb = document.createElement('button');
-        rb.textContent = '↺  Restart Quiz';
-        rb.style.cssText = 'display:block;margin-top:10px;background:none;border:1px solid var(--bdr2);border-radius:6px;padding:7px 16px;font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mut);cursor:pointer;transition:all .15s;';
-        rb.onmouseenter = () => { rb.style.borderColor='var(--soft)'; rb.style.color='var(--txt)'; };
-        rb.onmouseleave = () => { rb.style.borderColor='var(--bdr2)'; rb.style.color='var(--mut)'; };
-        rb.onclick = () => switchTab('quiz');
-        qsEl.parentNode.insertBefore(rb, card.nextSibling);
+    // ── TOPIC PERFORMANCE TRACKING ──
+    const uid = s?.unit?.id;
+    if (uid != null) {
+      if (!state.perf[uid]) state.perf[uid] = { correct:0, total:0, ignored:0, topics:{} };
+      const p = state.perf[uid];
+      p.total++; if (ok) p.correct++;
+      const topic = normTopic(s.quiz?.[qi]?.topic);
+      if (topic) {
+        if (!p.topics[topic]) p.topics[topic] = { correct:0, total:0 };
+        p.topics[topic].total++; if (ok) p.topics[topic].correct++;
       }
-    }, 400);
-  }
+      persistPerf();
+      if (p.total >= 5 && (p.correct / p.total) > 0.7) { p.ignored = 0; persistPerf(); }
+    }
+
+    // ── Reveal styling ──
+    for (let k = 0; k < 4; k++) {
+      const el = document.getElementById(`op-${qi}-${k}`);
+      if (!el) continue;
+      const x = 'ABCD'[k];
+      el.classList.remove('qopt-selected', 'qopt-dim');
+      if (x === correct) {
+        el.classList.add('qopt-correct');
+        if (ok && x === chFinal) el.style.transform = 'scale(1.02)';
+      } else if (x === chFinal && !ok) {
+        el.classList.add('qopt-wrong');
+      } else {
+        el.style.opacity = '0.45';
+      }
+    }
+    if (b) b.style.display = 'none';
+    const ex = document.getElementById(`ex-${qi}`);
+    if (ex) { ex.style.display = 'block'; ex.innerHTML = (ok ? '✅ ' : '❌ ') + e(decodeURIComponent(enc)); }
+
+    // ── Progress counter ──
+    const answeredCount = Object.keys(state.quiz.checked).length;
+    const qs = document.getElementById('qs');
+    if (qs) qs.textContent = `${state.quiz.score}/${answeredCount} correct`;
+    const qp = document.getElementById('q-progress');
+    if (qp) {
+      qp.textContent = answeredCount < state.quiz.total
+        ? `Question ${answeredCount + 1} of ${state.quiz.total}`
+        : `All ${state.quiz.total} answered`;
+    }
+
+    // ── Auto-scroll to next question ──
+    const nextCard = document.getElementById(`qcard-${qi + 1}`);
+    if (nextCard) {
+      setTimeout(() => nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' }), 800);
+    }
+
+    // ── Quiz complete ──
+    if (answeredCount === state.quiz.total) {
+      state.xp.quizzes++; persistXP();
+      const sc  = state.quiz.score;
+      const tot = state.quiz.total;
+      const pct = Math.round(sc / tot * 100);
+      if (pct >= 80) {
+        const passedSess = cur();
+        if (passedSess?.id) markLessonPassed(passedSess.id);
+      }
+      setTimeout(() => {
+        if (sc === tot) launchConfetti();
+        if      (pct === 100) axieSay('Perfect score! You owned it 🏆');
+        else if (pct >= 80)   axieSay(`${sc}/${tot} — Nearly perfect! 🌟`);
+        else                  axieSay(`${sc}/${tot} — Review the ones you missed 💪`);
+
+        const qsEl = document.getElementById('qs');
+        if (qsEl && !document.getElementById('next-up-card')) {
+          const sess    = cur();
+          const unitId  = sess?.unit?.id;
+          const trail   = getTrailState();
+          const activeU = trail.find(u => u.state === 'active');
+
+          let nextAction, nextLabel, nextIcon;
+          if (activeU && activeU.id !== unitId) {
+            nextAction = `trailTapUnit(${activeU.id});goHome()`;
+            nextLabel  = `Start ${activeU.em} ${activeU.lbl}`;
+            nextIcon   = '→';
+          } else {
+            nextAction = `goNew()`;
+            nextLabel  = 'Add a new session from today’s notes';
+            nextIcon   = '✨';
+          }
+
+          const card = document.createElement('div');
+          card.id = 'next-up-card';
+          card.style.cssText = `
+            margin-top:20px;padding:14px 18px;
+            background:var(--card2);border:1px solid var(--bdr2);
+            border-radius:10px;border-left:3px solid var(--accent);
+            display:flex;align-items:center;gap:12px;cursor:pointer;
+            transition:background .15s;animation:fadein .3s ease both;
+          `;
+          card.onclick = new Function(nextAction);
+          card.onmouseenter = () => card.style.background = 'var(--bdr)';
+          card.onmouseleave = () => card.style.background = 'var(--card2)';
+          card.innerHTML = `
+            <div style="font-size:22px;flex-shrink:0">${nextIcon}</div>
+            <div style="flex:1">
+              <div style="font-family:monospace;font-size:10px;font-weight:800;
+                letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);
+                margin-bottom:3px">Next Up</div>
+              <div style="font-size:13px;color:var(--txt);font-weight:600">${nextLabel}</div>
+            </div>
+            <div style="color:var(--mut);font-size:18px">›</div>
+          `;
+          qsEl.parentNode.insertBefore(card, qsEl.nextSibling);
+          const rb = document.createElement('button');
+          rb.textContent = '↺  Restart Quiz';
+          rb.style.cssText = 'display:block;margin-top:10px;background:none;border:1px solid var(--bdr2);border-radius:6px;padding:7px 16px;font-family:monospace;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mut);cursor:pointer;transition:all .15s;';
+          rb.onmouseenter = () => { rb.style.borderColor = 'var(--soft)'; rb.style.color = 'var(--txt)'; };
+          rb.onmouseleave = () => { rb.style.borderColor = 'var(--bdr2)'; rb.style.color = 'var(--mut)'; };
+          rb.onclick = () => switchTab('quiz');
+          qsEl.parentNode.insertBefore(rb, card.nextSibling);
+        }
+      }, 400);
+    }
+
+  }, 150);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -3819,6 +3939,20 @@ function buildNotion(s) {
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   renderHero();
+
+  // Single permanent delegated listener for waypoint dots/labels
+  // Attached to #app which persists across all trail re-renders
+  const appEl = document.getElementById('app');
+  if (appEl) {
+    appEl.addEventListener('click', function(ev) {
+      const el = ev.target.closest('[data-sessid]');
+      if (el) {
+        const sid = parseInt(el.getAttribute('data-sessid'), 10);
+        console.log('[trail-delegate] click sessId=' + sid);
+        if (!isNaN(sid)) goWaypoint(sid);
+      }
+    });
+  }
   // Always start on home/trail — API key only required when making API calls
   checkStreak();
   render(); // state.page defaults to 'home' → shows trail immediately
