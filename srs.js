@@ -1,326 +1,437 @@
 // srs.js
-// SM-2 Spaced Repetition Engine
-// Compatible with vocab-1-250.js and vocab-251-500.js (and future chunks)
-// 
-// SM-2 Algorithm:
-//   - Each card has an ease factor (EF), interval, and repetitions count
-//   - User rates recall 0-5 after each card
-//   - Cards rated < 3 are reset and reviewed again soon
-//   - Interval grows exponentially for well-remembered cards
-//
-// Public API:
-//   SRS.init(allCards)          — load vocab, restore progress from localStorage
-//   SRS.getNextCard()           — returns next card due for review, or null if done
-//   SRS.recordAnswer(id, q)     — record answer quality (0-5), update schedule
-//   SRS.getStats()              — returns { due, new, learned, streak, xp, level }
-//   SRS.resetAll()              — wipe all progress (confirmation required in UI)
-//   SRS.addCards(moreCards)     — add new vocab chunks without resetting progress
+// Cleaned SM-2 Spaced Repetition Engine
+// Compatible with vocab arrays whose card IDs live on `rank`
 
 const SRS = (() => {
+  // ── Constants ─────────────────────────────────────────────────────────────
 
-  // ── Constants ──────────────────────────────────────────────────────────────
+  const STORAGE_KEY = "lexico_srs_v2";
 
-  const STORAGE_KEY = 'lexico_srs_v1';
-  const STREAK_KEY  = 'lexico_streak_v1';
-  const XP_KEY      = 'lexico_xp_v1';
+  const DAY_MS = 24 * 60 * 60 * 1000;
 
-  const DEFAULT_EF       = 2.5;   // Starting ease factor
-  const MIN_EF           = 1.3;   // Floor for ease factor
-  const NEW_CARDS_PER_SESSION = 20; // Max new cards introduced per session
+  const DEFAULT_EF = 2.5;
+  const MIN_EF = 1.3;
+  const NEW_CARDS_PER_SESSION = 20;
 
-  // XP rewards
-  const XP_EASY    = 10;
-  const XP_GOOD    = 7;
-  const XP_HARD    = 3;
-  const XP_MISS    = 0;
+  const XP_EASY = 10;
+  const XP_GOOD = 7;
+  const XP_HARD = 3;
+  const XP_MISS = 0;
 
-  // Level thresholds (XP required to reach each level)
   const LEVELS = [
-    { level: 1,  title: 'Principiante',   xp: 0     },
-    { level: 2,  title: 'Aprendiz',       xp: 100   },
-    { level: 3,  title: 'Estudiante',     xp: 300   },
-    { level: 4,  title: 'Conocedor',      xp: 600   },
-    { level: 5,  title: 'Competente',     xp: 1000  },
-    { level: 6,  title: 'Avanzado',       xp: 1500  },
-    { level: 7,  title: 'Experto',        xp: 2200  },
-    { level: 8,  title: 'Maestro',        xp: 3000  },
-    { level: 9,  title: 'Erudito',        xp: 4000  },
-    { level: 10, title: 'Políglota',      xp: 5500  },
+    { level: 1, title: "Principiante", xp: 0 },
+    { level: 2, title: "Aprendiz", xp: 100 },
+    { level: 3, title: "Estudiante", xp: 300 },
+    { level: 4, title: "Conocedor", xp: 600 },
+    { level: 5, title: "Competente", xp: 1000 },
+    { level: 6, title: "Avanzado", xp: 1500 },
+    { level: 7, title: "Experto", xp: 2200 },
+    { level: 8, title: "Maestro", xp: 3000 },
+    { level: 9, title: "Erudito", xp: 4000 },
+    { level: 10, title: "Políglota", xp: 5500 },
   ];
 
-  // ── Internal State ─────────────────────────────────────────────────────────
+  // ── State ────────────────────────────────────────────────────────────────
 
-  let _allCards    = [];   // Full vocab array (all loaded chunks)
-  let _cardMap     = {};   // id → card object (for fast lookup)
-  let _schedules   = {};   // id → { ef, interval, repetitions, nextReview, lastReview }
-  let _sessionNew  = 0;    // New cards introduced this session
-  let _totalXP     = 0;
-  let _streak      = { count: 0, lastDate: null };
+  let state = createEmptyState();
 
-  // ── Persistence ────────────────────────────────────────────────────────────
-
-  function _save() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(_schedules));
-      localStorage.setItem(XP_KEY,      JSON.stringify(_totalXP));
-      localStorage.setItem(STREAK_KEY,  JSON.stringify(_streak));
-    } catch(e) {
-      console.warn('SRS: localStorage write failed', e);
-    }
+  function createEmptyState() {
+    return {
+      cards: [],
+      cardMap: {},
+      progress: {
+        schedules: {}, // id -> schedule
+        xp: 0,
+        streak: {
+          count: 0,
+          lastDate: null,
+        },
+      },
+      session: {
+        newCardsSeen: 0,
+      },
+    };
   }
 
-  function _load() {
-    try {
-      const s = localStorage.getItem(STORAGE_KEY);
-      const x = localStorage.getItem(XP_KEY);
-      const k = localStorage.getItem(STREAK_KEY);
-      if (s) _schedules = JSON.parse(s);
-      if (x) _totalXP   = JSON.parse(x);
-      if (k) _streak    = JSON.parse(k);
-    } catch(e) {
-      console.warn('SRS: localStorage read failed', e);
-    }
+  // ── Schedule Model ───────────────────────────────────────────────────────
+
+  function createDefaultSchedule() {
+    return {
+      ef: DEFAULT_EF,
+      interval: 0,
+      repetitions: 0,
+      nextReview: 0,
+      lastReview: null,
+      introduced: false, // prevents accidental "ghost due" behavior
+    };
   }
 
-  // ── SM-2 Core ──────────────────────────────────────────────────────────────
+  function cloneSchedule(schedule) {
+    return {
+      ef: schedule.ef,
+      interval: schedule.interval,
+      repetitions: schedule.repetitions,
+      nextReview: schedule.nextReview,
+      lastReview: schedule.lastReview,
+      introduced: schedule.introduced,
+    };
+  }
 
-  // q = answer quality: 0-5
-  //   5 = perfect, instant recall
-  //   4 = correct with slight hesitation
-  //   3 = correct with difficulty
-  //   2 = incorrect but easy to recall when shown
-  //   1 = incorrect, difficult
-  //   0 = complete blackout
-  //
-  // UI maps to: 0=Miss(0), 1=Hard(2), 2=Good(4), 3=Easy(5)
+  // Pure function
+  function updateSchedule(schedule, quality, now) {
+    const current = cloneSchedule(schedule ?? createDefaultSchedule());
 
-  function _sm2(schedule, q) {
-    let { ef, interval, repetitions } = schedule;
+    let { ef, interval, repetitions } = current;
 
-    if (q >= 3) {
-      // Correct answer — advance interval
+    if (quality >= 3) {
       if (repetitions === 0) {
         interval = 1;
       } else if (repetitions === 1) {
         interval = 6;
       } else {
-        interval = Math.round(interval * ef);
+        interval = Math.max(1, Math.round(interval * ef));
       }
       repetitions += 1;
     } else {
-      // Incorrect — reset repetitions, short interval
       repetitions = 0;
       interval = 1;
     }
 
-    // Update ease factor
-    ef = ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-    if (ef < MIN_EF) ef = MIN_EF;
+    ef = ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+    ef = Math.max(ef, MIN_EF);
 
-    const now = Date.now();
-    const nextReview = now + interval * 24 * 60 * 60 * 1000;
-
-    return { ef, interval, repetitions, nextReview, lastReview: now };
-  }
-
-  function _defaultSchedule() {
     return {
-      ef:          DEFAULT_EF,
-      interval:    0,
-      repetitions: 0,
-      nextReview:  0,   // 0 = never reviewed = due immediately
-      lastReview:  null,
+      ef,
+      interval,
+      repetitions,
+      nextReview: now + interval * DAY_MS,
+      lastReview: now,
+      introduced: true,
     };
   }
 
-  // ── Card Selection ─────────────────────────────────────────────────────────
+  // ── Persistence ──────────────────────────────────────────────────────────
 
-  function _isDue(id) {
-    const s = _schedules[id];
-    if (!s) return false;                    // Not initialized
-    return Date.now() >= s.nextReview;
+  function serializeProgress(progress) {
+    return JSON.stringify(progress);
   }
 
-  function _isNew(id) {
-    return !_schedules[id];
-  }
-
-  function _getDueCards() {
-    return _allCards.filter(c => _schedules[c.rank] && _isDue(c.rank));
-  }
-
-  function _getNewCards() {
-    return _allCards.filter(c => _isNew(c.rank));
-  }
-
-  // Sort due cards: lowest next review first (most overdue first)
-  function _sortByDue(cards) {
-    return [...cards].sort((a, b) => {
-      const sa = _schedules[a.rank];
-      const sb = _schedules[b.rank];
-      return (sa?.nextReview || 0) - (sb?.nextReview || 0);
-    });
-  }
-
-  // ── Streak Logic ───────────────────────────────────────────────────────────
-
-  function _updateStreak() {
-    const today = new Date().toDateString();
-    const last  = _streak.lastDate;
-
-    if (last === today) return; // Already recorded today
-
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    if (last === yesterday) {
-      _streak.count += 1;
-    } else if (last !== today) {
-      _streak.count = 1; // Reset — missed a day
+  function normalizeLoadedProgress(raw) {
+    if (!raw || typeof raw !== "object") {
+      return {
+        schedules: {},
+        xp: 0,
+        streak: { count: 0, lastDate: null },
+      };
     }
-    _streak.lastDate = today;
+
+    const schedules =
+      raw.schedules && typeof raw.schedules === "object" ? raw.schedules : {};
+
+    const xp = Number.isFinite(raw.xp) ? raw.xp : 0;
+
+    const streak =
+      raw.streak && typeof raw.streak === "object"
+        ? {
+            count: Number.isFinite(raw.streak.count) ? raw.streak.count : 0,
+            lastDate:
+              typeof raw.streak.lastDate === "string" ? raw.streak.lastDate : null,
+          }
+        : { count: 0, lastDate: null };
+
+    const normalizedSchedules = {};
+
+    for (const [id, value] of Object.entries(schedules)) {
+      if (!value || typeof value !== "object") continue;
+
+      normalizedSchedules[id] = {
+        ef: Number.isFinite(value.ef) ? value.ef : DEFAULT_EF,
+        interval: Number.isFinite(value.interval) ? value.interval : 0,
+        repetitions: Number.isFinite(value.repetitions) ? value.repetitions : 0,
+        nextReview: Number.isFinite(value.nextReview) ? value.nextReview : 0,
+        lastReview: Number.isFinite(value.lastReview) ? value.lastReview : null,
+        introduced: value.introduced !== false,
+      };
+    }
+
+    return {
+      schedules: normalizedSchedules,
+      xp,
+      streak,
+    };
   }
 
-  // ── XP & Levels ───────────────────────────────────────────────────────────
+  function saveProgress() {
+    try {
+      localStorage.setItem(STORAGE_KEY, serializeProgress(state.progress));
+      return true;
+    } catch (error) {
+      console.warn("SRS: failed to save progress", error);
+      return false;
+    }
+  }
 
-  function _xpForQuality(q) {
-    if (q >= 5) return XP_EASY;
-    if (q >= 4) return XP_GOOD;
-    if (q >= 3) return XP_HARD;
+  function loadProgress() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return normalizeLoadedProgress(null);
+
+      const parsed = JSON.parse(raw);
+      return normalizeLoadedProgress(parsed);
+    } catch (error) {
+      console.warn("SRS: failed to load progress", error);
+      return normalizeLoadedProgress(null);
+    }
+  }
+
+  // ── Utilities ────────────────────────────────────────────────────────────
+
+  function getCardId(card) {
+    return String(card.rank);
+  }
+
+  function todayString(now) {
+    return new Date(now).toDateString();
+  }
+
+  function yesterdayString(now) {
+    return new Date(now - DAY_MS).toDateString();
+  }
+
+  function getSchedule(id) {
+    return state.progress.schedules[id] || null;
+  }
+
+  function hasSchedule(id) {
+    return !!state.progress.schedules[id];
+  }
+
+  function isIntroduced(id) {
+    const schedule = getSchedule(id);
+    return !!(schedule && schedule.introduced);
+  }
+
+  function isDue(id, now) {
+    const schedule = getSchedule(id);
+    if (!schedule) return false;
+    if (!schedule.introduced) return false;
+    return now >= schedule.nextReview;
+  }
+
+  function isNew(id) {
+    return !hasSchedule(id);
+  }
+
+  function getXPForQuality(quality) {
+    if (quality >= 5) return XP_EASY;
+    if (quality >= 4) return XP_GOOD;
+    if (quality >= 3) return XP_HARD;
     return XP_MISS;
   }
 
-  function _getLevel(xp) {
+  function getLevelInfo(xp) {
     let current = LEVELS[0];
-    for (const l of LEVELS) {
-      if (xp >= l.xp) current = l;
+
+    for (const level of LEVELS) {
+      if (xp >= level.xp) current = level;
       else break;
     }
-    const nextLevel = LEVELS.find(l => l.xp > xp) || null;
+
+    const next = LEVELS.find((level) => level.xp > xp) || null;
+
     return {
-      level:       current.level,
-      title:       current.title,
+      level: current.level,
+      title: current.title,
       xpThreshold: current.xp,
-      nextXP:      nextLevel ? nextLevel.xp : null,
-      nextTitle:   nextLevel ? nextLevel.title : null,
+      nextXP: next ? next.xp : null,
+      nextTitle: next ? next.title : null,
     };
   }
 
-  // ── Public API ─────────────────────────────────────────────────────────────
+  function updateStreak(now) {
+    const today = todayString(now);
+    const yesterday = yesterdayString(now);
+    const streak = state.progress.streak;
 
-  function init(allCards) {
-    _allCards = allCards;
-    _cardMap  = {};
-    allCards.forEach(c => { _cardMap[c.rank] = c; });
-    _load();
-    _sessionNew = 0;
+    if (streak.lastDate === today) return;
+
+    if (streak.lastDate === yesterday) {
+      streak.count += 1;
+    } else {
+      streak.count = 1;
+    }
+
+    streak.lastDate = today;
   }
 
-  // Add more vocab chunks without resetting existing progress
-  function addCards(moreCards) {
-    moreCards.forEach(c => {
-      if (!_cardMap[c.rank]) {
-        _allCards.push(c);
-        _cardMap[c.rank] = c;
-      }
+  function ensureCardMap(cards) {
+    const map = {};
+    for (const card of cards) {
+      map[getCardId(card)] = card;
+    }
+    return map;
+  }
+
+  function sortDueCards(cards, now) {
+    return [...cards].sort((a, b) => {
+      const aSchedule = getSchedule(getCardId(a));
+      const bSchedule = getSchedule(getCardId(b));
+
+      const aNext = aSchedule ? aSchedule.nextReview : now;
+      const bNext = bSchedule ? bSchedule.nextReview : now;
+
+      return aNext - bNext;
     });
   }
 
-  // Returns the next card object to show, or null if session is done
-  function getNextCard() {
-    // 1. Due cards first (most overdue)
-    const due = _sortByDue(_getDueCards());
-    if (due.length > 0) return due[0];
+  // ── Card Queries ──────────────────────────────────────────────────────────
 
-    // 2. New cards (up to session limit)
-    if (_sessionNew < NEW_CARDS_PER_SESSION) {
-      const newCards = _getNewCards();
-      if (newCards.length > 0) {
-        // Initialize schedule for this card
-        const card = newCards[0];
-        _schedules[card.rank] = _defaultSchedule();
-        _sessionNew++;
-        return card;
+  function getDueCards(now = Date.now()) {
+    return state.cards.filter((card) => isDue(getCardId(card), now));
+  }
+
+  function getNewCards() {
+    return state.cards.filter((card) => isNew(getCardId(card)));
+  }
+
+  function getLearnedCount() {
+    return Object.values(state.progress.schedules).filter(
+      (schedule) => schedule && schedule.repetitions >= 2
+    ).length;
+  }
+
+  // ── Public API ────────────────────────────────────────────────────────────
+
+  function init(allCards) {
+    if (!Array.isArray(allCards)) {
+      throw new Error("SRS.init(allCards): allCards must be an array");
+    }
+
+    state = createEmptyState();
+    state.cards = [...allCards];
+    state.cardMap = ensureCardMap(state.cards);
+    state.progress = loadProgress();
+    state.session.newCardsSeen = 0;
+  }
+
+  function addCards(moreCards) {
+    if (!Array.isArray(moreCards)) {
+      throw new Error("SRS.addCards(moreCards): moreCards must be an array");
+    }
+
+    for (const card of moreCards) {
+      const id = getCardId(card);
+      if (!state.cardMap[id]) {
+        state.cards.push(card);
+        state.cardMap[id] = card;
       }
     }
-
-    // 3. Nothing left for this session
-    return null;
   }
 
-  // Record answer. q = 0 (miss) | 2 (hard) | 4 (good) | 5 (easy)
-  function recordAnswer(id, q) {
-    if (!_schedules[id]) {
-      _schedules[id] = _defaultSchedule();
+  function getNextCard(now = Date.now()) {
+    const dueCards = sortDueCards(getDueCards(now), now);
+    if (dueCards.length > 0) {
+      return dueCards[0];
     }
 
-    // Update SM-2 schedule
-    _schedules[id] = _sm2(_schedules[id], q);
+    if (state.session.newCardsSeen >= NEW_CARDS_PER_SESSION) {
+      return null;
+    }
 
-    // Award XP
-    const earned = _xpForQuality(q);
-    _totalXP += earned;
+    const newCards = getNewCards();
+    if (newCards.length === 0) {
+      return null;
+    }
 
-    // Update streak
-    _updateStreak();
+    const nextNewCard = newCards[0];
+    const id = getCardId(nextNewCard);
 
-    // Persist
-    _save();
+    state.progress.schedules[id] = {
+      ...createDefaultSchedule(),
+      introduced: true,
+    };
 
-    return { xpEarned: earned, totalXP: _totalXP };
+    state.session.newCardsSeen += 1;
+    saveProgress();
+
+    return nextNewCard;
   }
 
-  function getStats() {
-    const due     = _getDueCards().length;
-    const newCount= _getNewCards().length;
-    const learned = Object.keys(_schedules).filter(id => {
-      const s = _schedules[id];
-      return s && s.repetitions >= 2;
-    }).length;
+  // quality expected: 0, 2, 4, 5 (or any 0-5 number)
+  function recordAnswer(id, quality, now = Date.now()) {
+    const cardId = String(id);
 
-    const levelInfo = _getLevel(_totalXP);
+    if (!state.cardMap[cardId]) {
+      throw new Error(`SRS.recordAnswer: unknown card id "${cardId}"`);
+    }
+
+    const currentSchedule = getSchedule(cardId) || {
+      ...createDefaultSchedule(),
+      introduced: true,
+    };
+
+    const updatedSchedule = updateSchedule(currentSchedule, quality, now);
+    state.progress.schedules[cardId] = updatedSchedule;
+
+    const earned = getXPForQuality(quality);
+    state.progress.xp += earned;
+
+    updateStreak(now);
+    saveProgress();
+
+    return {
+      xpEarned: earned,
+      totalXP: state.progress.xp,
+      schedule: cloneSchedule(updatedSchedule),
+    };
+  }
+
+  function getStats(now = Date.now()) {
+    const due = getDueCards(now).length;
+    const newCount = getNewCards().length;
+    const learned = getLearnedCount();
+    const levelInfo = getLevelInfo(state.progress.xp);
 
     return {
       due,
-      new:     newCount,
+      new: newCount,
       learned,
-      total:   _allCards.length,
-      streak:  _streak.count,
-      xp:      _totalXP,
-      level:   levelInfo.level,
-      title:   levelInfo.title,
-      nextXP:  levelInfo.nextXP,
+      total: state.cards.length,
+      streak: state.progress.streak.count,
+      xp: state.progress.xp,
+      level: levelInfo.level,
+      title: levelInfo.title,
+      nextXP: levelInfo.nextXP,
       nextTitle: levelInfo.nextTitle,
       xpThreshold: levelInfo.xpThreshold,
     };
   }
 
   function resetAll() {
-    _schedules  = {};
-    _totalXP    = 0;
-    _streak     = { count: 0, lastDate: null };
-    _sessionNew = 0;
-    _save();
+    state.progress = {
+      schedules: {},
+      xp: 0,
+      streak: {
+        count: 0,
+        lastDate: null,
+      },
+    };
+
+    state.session.newCardsSeen = 0;
+    saveProgress();
   }
 
-  // Expose LEVELS for UI progress bars
   function getLevels() {
     return [...LEVELS];
   }
 
-  return { init, addCards, getNextCard, recordAnswer, getStats, resetAll, getLevels };
-
+  return {
+    init,
+    addCards,
+    getNextCard,
+    recordAnswer,
+    getStats,
+    resetAll,
+    getLevels,
+  };
 })();
-
-// Usage example:
-//
-//   SRS.init([...VOCAB_1_250, ...VOCAB_251_500]);
-//
-//   const card = SRS.getNextCard();
-//   // show card to user...
-//   const result = SRS.recordAnswer(card.rank, 4); // 4 = Good
-//   console.log(result.xpEarned, result.totalXP);
-//
-//   const stats = SRS.getStats();
-//   console.log(stats.streak, stats.level, stats.title);
-//
-// To add vocab later (no progress reset):
-//   SRS.addCards(VOCAB_501_750);
