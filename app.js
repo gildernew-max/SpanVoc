@@ -1,282 +1,267 @@
 // app.js
 // Session Manager — connects SRS engine to the UI
-// Depends on: vocab-1-250.js, vocab-251-500.js, srs.js
-// Called by: index.html
+// Depends on: srs.js, vocab-1-250.js, vocab-251-500.js
 //
 // Responsibilities:
 //   - Initialize SRS with all loaded vocab chunks
-//   - Manage current card state and session flow
-//   - Translate user button presses into SRS quality scores
-//   - Emit UI update events (no direct DOM manipulation here)
-//   - Handle boss battle mode (every 50 cards reviewed)
+//   - Manage current session (current card, answer state)
+//   - Drive gamification display (XP bar, level-up alerts, streak)
+//   - Expose a simple API that index.html event handlers call directly
 //
-// UI contract:
-//   App.init()                  — call once on page load
-//   App.getCurrentCard()        — returns current card or null
-//   App.answer(rating)          — rating: 'easy'|'good'|'hard'|'miss'
-//   App.skip()                  — skip current card (no SRS impact)
-//   App.getStats()              — returns stats object for UI rendering
-//   App.filterByDeck(deck)      — 'all' | 'nouns' | 'verbs' | 'adjectives' | 'phrases' | 'rules'
-//   App.isBossBattle()          — returns true if boss battle mode is active
-//   App.on(event, callback)     — subscribe to app events
-//
-// Events emitted:
-//   'cardChanged'   — new card ready, payload: { card, stats }
-//   'cardAnswered'  — answer recorded, payload: { card, rating, xpEarned, stats }
-//   'sessionDone'   — no more cards this session, payload: { stats }
-//   'bossBattle'    — boss battle triggered, payload: { cards }
-//   'levelUp'       — user leveled up, payload: { level, title }
-//   'streakUpdated' — streak changed, payload: { streak }
+// To add more vocab later, just add the chunk to VOCAB_CHUNKS below.
+// No other changes needed anywhere in the codebase.
 
+// ── Vocab Registry ────────────────────────────────────────────────────────────
+// Add new chunks here as you build them. Order doesn't matter.
+const VOCAB_CHUNKS = [
+  ...VOCAB_1_250,
+  ...VOCAB_251_500,
+  // ...VOCAB_501_750,   // uncomment when ready
+  // ...VOCAB_751_1000,  // uncomment when ready
+];
+
+// ── App State ─────────────────────────────────────────────────────────────────
 const App = (() => {
 
-  // ── Internal State ─────────────────────────────────────────────────────────
+  let _currentCard   = null;   // Card object currently being shown
+  let _isRevealed    = false;  // Whether answer side is showing
+  let _sessionScore  = { correct: 0, incorrect: 0, total: 0 };
+  let _prevXP        = 0;      // XP before last answer (for level-up detection)
 
-  let _currentCard   = null;
-  let _activeDeck    = 'all';
-  let _cardsAnswered = 0;       // This session
-  let _prevLevel     = 1;
-  let _listeners     = {};      // event → [callbacks]
-  let _bossBattle    = false;
-  let _bossDeck      = [];      // Cards queued for boss battle
-  let _bossIndex     = 0;
-
-  // Boss battle triggers every N correct answers
-  const BOSS_TRIGGER = 50;
-  const BOSS_CARDS   = 10;      // Number of rapid-fire cards in boss battle
-
-  // Rating → SM-2 quality score
-  const QUALITY = {
-    easy: 5,
-    good: 4,
-    hard: 2,
-    miss: 0,
-  };
-
-  // ── Event System ───────────────────────────────────────────────────────────
-
-  function on(event, callback) {
-    if (!_listeners[event]) _listeners[event] = [];
-    _listeners[event].push(callback);
-  }
-
-  function _emit(event, payload) {
-    (_listeners[event] || []).forEach(cb => {
-      try { cb(payload); } catch(e) { console.error('App event error:', e); }
-    });
-  }
-
-  // ── Vocab Loading ──────────────────────────────────────────────────────────
-
-  function _getAllVocab() {
-    // Collect all loaded vocab chunks in order
-    // New chunks (vocab-501-750.js etc.) just need to be included in index.html
-    // and added to this array — no other changes needed
-    const chunks = [];
-    if (typeof VOCAB_1_250   !== 'undefined') chunks.push(...VOCAB_1_250);
-    if (typeof VOCAB_251_500 !== 'undefined') chunks.push(...VOCAB_251_500);
-    if (typeof VOCAB_501_750 !== 'undefined') chunks.push(...VOCAB_501_750);
-    if (typeof VOCAB_751_1000 !== 'undefined') chunks.push(...VOCAB_751_1000);
-    return chunks;
-  }
-
-  function _filterByDeck(cards) {
-    if (_activeDeck === 'all') return cards;
-    return cards.filter(c => c.pos && c.pos.toLowerCase().includes(_activeDeck.replace('s','')));
-  }
-
-  // ── Session Flow ───────────────────────────────────────────────────────────
-
-  function _advance() {
-    if (_bossBattle) {
-      _nextBossCard();
-      return;
-    }
-
-    _currentCard = SRS.getNextCard();
-
-    if (!_currentCard) {
-      _emit('sessionDone', { stats: getStats() });
-      return;
-    }
-
-    _emit('cardChanged', { card: _currentCard, stats: getStats() });
-  }
-
-  function _checkLevelUp(statsBefore, statsAfter) {
-    if (statsAfter.level > statsBefore.level) {
-      _emit('levelUp', { level: statsAfter.level, title: statsAfter.title });
-    }
-  }
-
-  function _checkBossBattle() {
-    if (_cardsAnswered > 0 && _cardsAnswered % BOSS_TRIGGER === 0) {
-      _triggerBossBattle();
-    }
-  }
-
-  // ── Boss Battle ────────────────────────────────────────────────────────────
-
-  function _triggerBossBattle() {
-    // Pick BOSS_CARDS random cards from learned cards for rapid-fire review
-    const all = _getAllVocab();
-    const learned = all.filter(c => {
-      const stats = SRS.getStats();
-      // Use cards that have been seen at least once
-      return true; // In practice, filter by schedule data — simplified here
-    });
-
-    // Shuffle and take first BOSS_CARDS
-    const shuffled = [...all].sort(() => Math.random() - 0.5);
-    _bossDeck  = shuffled.slice(0, BOSS_CARDS);
-    _bossIndex = 0;
-    _bossBattle = true;
-
-    _emit('bossBattle', { cards: _bossDeck });
-    _nextBossCard();
-  }
-
-  function _nextBossCard() {
-    if (_bossIndex >= _bossDeck.length) {
-      _bossBattle = false;
-      _advance();
-      return;
-    }
-    _currentCard = _bossDeck[_bossIndex++];
-    _emit('cardChanged', { card: _currentCard, stats: getStats(), isBoss: true });
-  }
-
-  // ── Public API ─────────────────────────────────────────────────────────────
+  // ── Init ───────────────────────────────────────────────────────────────────
 
   function init() {
-    const allVocab = _getAllVocab();
-    if (allVocab.length === 0) {
-      console.error('App: No vocab loaded. Make sure vocab-1-250.js is included.');
+    SRS.init(VOCAB_CHUNKS);
+    _prevXP = SRS.getStats().xp;
+    _nextCard();
+    _refreshStats();
+  }
+
+  // ── Card Flow ──────────────────────────────────────────────────────────────
+
+  function _nextCard() {
+    _currentCard = SRS.getNextCard();
+    _isRevealed  = false;
+
+    if (!_currentCard) {
+      _showSessionComplete();
       return;
     }
 
-    SRS.init(allVocab);
-    _prevLevel = SRS.getStats().level;
-    _cardsAnswered = 0;
-    _bossBattle = false;
-
-    _advance();
+    _renderCard(_currentCard);
+    _setButtons('prompt');
   }
 
-  function getCurrentCard() {
-    return _currentCard;
+  function reveal() {
+    if (!_currentCard || _isRevealed) return;
+    _isRevealed = true;
+    _setButtons('answer');
+    _flipCard();
   }
 
-  function answer(rating) {
-    if (!_currentCard) return;
+  // q: 0=Miss, 2=Hard, 4=Good, 5=Easy
+  function answer(q) {
+    if (!_currentCard || !_isRevealed) return;
 
-    const q = QUALITY[rating];
-    if (q === undefined) {
-      console.warn('App.answer: invalid rating', rating);
-      return;
-    }
+    const id     = _currentCard.rank;
+    const result = SRS.recordAnswer(id, q);
 
-    const statsBefore = getStats();
-    const result = SRS.recordAnswer(_currentCard.rank, q);
-    const statsAfter  = getStats();
+    // Session score
+    _sessionScore.total++;
+    if (q >= 3) _sessionScore.correct++;
+    else        _sessionScore.incorrect++;
 
-    _cardsAnswered++;
+    // Gamification
+    _showXPGain(result.xpEarned);
+    _checkLevelUp(result.totalXP);
+    _refreshStats();
 
-    _emit('cardAnswered', {
-      card:     _currentCard,
-      rating,
-      xpEarned: result.xpEarned,
-      stats:    statsAfter,
-    });
-
-    _checkLevelUp(statsBefore, statsAfter);
-    _checkBossBattle();
-    _emit('streakUpdated', { streak: statsAfter.streak });
-
-    _advance();
+    // Advance after brief pause
+    setTimeout(_nextCard, 400);
   }
 
-  function skip() {
-    if (!_currentCard) return;
-    // No SRS impact — just move on
-    _advance();
+  // ── Rendering ──────────────────────────────────────────────────────────────
+
+  function _renderCard(card) {
+    document.getElementById('card-spanish').textContent = card.spanish;
+    document.getElementById('card-pos').textContent     = card.pos;
+    document.getElementById('card-rank').textContent    = `#${card.rank}`;
+    document.getElementById('card-english').textContent = card.english;
+    document.getElementById('card-example').textContent = card.example;
+    document.getElementById('card-tip').textContent     = card.tip ? '💡 ' + card.tip : '';
+
+    // Reset flip
+    document.getElementById('card').classList.remove('flipped');
   }
 
-  function getStats() {
+  function _flipCard() {
+    document.getElementById('card').classList.add('flipped');
+  }
+
+  function _setButtons(mode) {
+    document.getElementById('btn-prompt').style.display = mode === 'prompt' ? 'flex' : 'none';
+    document.getElementById('btn-answer').style.display = mode === 'answer' ? 'flex' : 'none';
+  }
+
+  // ── Stats & Gamification ──────────────────────────────────────────────────
+
+  function _refreshStats() {
     const s = SRS.getStats();
 
-    // Add session-level data
-    return {
-      ...s,
-      sessionAnswered: _cardsAnswered,
-      isBossBattle:    _bossBattle,
-    };
+    // Streak & level
+    document.getElementById('stat-streak').textContent  = s.streak;
+    document.getElementById('stat-level').textContent   = s.level;
+    document.getElementById('stat-title').textContent   = s.title;
+
+    // XP bar
+    const xpMin = s.xpThreshold;
+    const xpMax = s.nextXP || s.xp + 1;
+    const pct   = Math.min(100, Math.round(((s.xp - xpMin) / (xpMax - xpMin)) * 100));
+    document.getElementById('xp-bar-fill').style.width = pct + '%';
+    document.getElementById('xp-label').textContent    = s.nextXP
+      ? `${s.xp} / ${s.nextXP} XP`
+      : `${s.xp} XP — MAX`;
+
+    // Card counts
+    document.getElementById('stat-due').textContent     = s.due;
+    document.getElementById('stat-new').textContent     = s.new;
+    document.getElementById('stat-learned').textContent = s.learned;
+
+    // Session score
+    document.getElementById('session-correct').textContent   = _sessionScore.correct;
+    document.getElementById('session-incorrect').textContent = _sessionScore.incorrect;
+    document.getElementById('session-total').textContent     = _sessionScore.total;
   }
 
-  function filterByDeck(deck) {
-    _activeDeck = deck;
-    // Restart session with filtered deck
-    // Note: SRS progress is global — filter only affects card selection display
-    // For true deck filtering, re-init SRS with filtered cards
-    const allVocab = _getAllVocab();
-    const filtered = _filterByDeck(allVocab);
-    SRS.init(filtered);
-    _cardsAnswered = 0;
-    _advance();
+  function _showXPGain(xp) {
+    if (xp <= 0) return;
+    const el = document.getElementById('xp-toast');
+    if (!el) return;
+    el.textContent = `+${xp} XP`;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 1200);
   }
 
-  function isBossBattle() {
-    return _bossBattle;
+  function _checkLevelUp(newXP) {
+    const levels   = SRS.getLevels();
+    const prevLevel = [...levels].reverse().find(l => l.xp <= _prevXP);
+    const currLevel = [...levels].reverse().find(l => l.xp <= newXP);
+    _prevXP = newXP;
+    if (currLevel && prevLevel && currLevel.level > prevLevel.level) {
+      _showLevelUp(currLevel);
+    }
   }
 
-  // Add a new vocab chunk at runtime (e.g., user unlocks next 250 words)
-  function loadChunk(chunkArray) {
-    SRS.addCards(chunkArray);
+  function _showLevelUp(levelInfo) {
+    const el = document.getElementById('levelup-banner');
+    if (!el) return;
+    document.getElementById('levelup-title').textContent = levelInfo.title;
+    document.getElementById('levelup-level').textContent = `Level ${levelInfo.level}`;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
   }
 
-  return {
-    init,
-    getCurrentCard,
-    answer,
-    skip,
-    getStats,
-    filterByDeck,
-    isBossBattle,
-    loadChunk,
-    on,
-  };
+  function _showSessionComplete() {
+    const pct = _sessionScore.total > 0
+      ? Math.round((_sessionScore.correct / _sessionScore.total) * 100)
+      : 0;
+
+    const s = SRS.getStats();
+    document.getElementById('complete-score').textContent   = pct + '%';
+    document.getElementById('complete-correct').textContent = _sessionScore.correct;
+    document.getElementById('complete-total').textContent   = _sessionScore.total;
+    document.getElementById('complete-learned').textContent = s.learned;
+    document.getElementById('complete-streak').textContent  = s.streak;
+    document.getElementById('session-complete').classList.add('show');
+  }
+
+  // ── Session Controls ───────────────────────────────────────────────────────
+
+  function restartSession() {
+    _sessionScore = { correct: 0, incorrect: 0, total: 0 };
+    document.getElementById('session-complete').classList.remove('show');
+    _nextCard();
+    _refreshStats();
+  }
+
+  function resetAllProgress() {
+    if (!confirm('Reset ALL progress? This cannot be undone.')) return;
+    SRS.resetAll();
+    _sessionScore = { correct: 0, incorrect: 0, total: 0 };
+    _prevXP = 0;
+    _nextCard();
+    _refreshStats();
+  }
+
+  // ── Keyboard Controls ─────────────────────────────────────────────────────
+
+  function _initKeyboard() {
+    document.addEventListener('keydown', e => {
+      switch (e.key) {
+        case ' ':
+        case 'Enter':
+          e.preventDefault();
+          if (!_isRevealed) reveal();
+          break;
+        case '1': if (_isRevealed) answer(0); break;  // Miss
+        case '2': if (_isRevealed) answer(2); break;  // Hard
+        case '3': if (_isRevealed) answer(4); break;  // Good
+        case '4': if (_isRevealed) answer(5); break;  // Easy
+        case 'ArrowLeft':  if (_isRevealed) answer(0); break;
+        case 'ArrowRight': if (_isRevealed) answer(5); break;
+        case 'ArrowDown':  if (_isRevealed) answer(2); break;
+        case 'ArrowUp':    if (_isRevealed) answer(4); break;
+      }
+    });
+  }
+
+  // ── Touch / Swipe ─────────────────────────────────────────────────────────
+
+  function _initSwipe() {
+    const wrapper = document.getElementById('card-wrapper');
+    if (!wrapper) return;
+
+    let startX = 0, startY = 0;
+
+    wrapper.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    wrapper.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+
+      // Tap (no real movement) — reveal
+      if (Math.abs(dx) < 30 && Math.abs(dy) < 30) {
+        if (!_isRevealed) reveal();
+        return;
+      }
+
+      if (!_isRevealed) return;
+
+      // Swipe gesture after reveal
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 60)       answer(5);  // → Easy
+        else if (dx < -60) answer(0);  // ← Miss
+      } else {
+        if (dy < -60)      answer(4);  // ↑ Good
+        else if (dy > 60)  answer(2);  // ↓ Hard
+      }
+    }, { passive: true });
+  }
+
+  // ── Bootstrap ─────────────────────────────────────────────────────────────
+
+  function start() {
+    init();
+    _initKeyboard();
+    _initSwipe();
+  }
+
+  return { start, reveal, answer, restartSession, resetAllProgress };
 
 })();
 
-// ── Usage (called from index.html after DOM ready) ─────────────────────────
-//
-//   App.on('cardChanged', ({ card, stats }) => {
-//     renderCard(card);
-//     renderStats(stats);
-//   });
-//
-//   App.on('cardAnswered', ({ xpEarned, stats }) => {
-//     showXPPopup(xpEarned);
-//     renderStats(stats);
-//   });
-//
-//   App.on('levelUp', ({ level, title }) => {
-//     showLevelUpModal(level, title);
-//   });
-//
-//   App.on('sessionDone', ({ stats }) => {
-//     showSessionSummary(stats);
-//   });
-//
-//   App.on('bossBattle', ({ cards }) => {
-//     showBossBattleIntro();
-//   });
-//
-//   App.init();
-//
-// ── Adding vocab later ─────────────────────────────────────────────────────
-//
-//   // In index.html, just add the new script tag:
-//   // <script src="vocab-501-750.js"></script>
-//   // app.js _getAllVocab() will automatically detect and include it.
-//   // No other changes needed anywhere.
+// Auto-start when DOM is ready
+document.addEventListener('DOMContentLoaded', () => App.start());
