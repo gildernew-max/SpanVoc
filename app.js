@@ -42,6 +42,7 @@ const App = (() => {
   function _nextCard() {
     _currentCard = SRS.getNextCard();
     _isRevealed  = false;
+    _refreshStats();
 
     if (!_currentCard) {
       _showSessionComplete();
@@ -182,6 +183,7 @@ const App = (() => {
   // ── Session Controls ───────────────────────────────────────────────────────
 
   function restartSession() {
+    SRS.startSession();
     _sessionScore = { correct: 0, incorrect: 0, total: 0 };
     document.getElementById('session-complete').classList.remove('show');
     _nextCard();

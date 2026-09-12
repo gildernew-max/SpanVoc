@@ -215,6 +215,10 @@ const SRS = (() => {
   }
 
   // Add more vocab chunks without resetting existing progress
+  function startSession() {
+    _sessionNew = 0;
+  }
+
   function addCards(moreCards) {
     moreCards.forEach(c => {
       if (!_cardMap[c.rank]) {
@@ -306,7 +310,7 @@ const SRS = (() => {
     return [...LEVELS];
   }
 
-  return { init, addCards, getNextCard, recordAnswer, getStats, resetAll, getLevels };
+  return { init, startSession, addCards, getNextCard, recordAnswer, getStats, resetAll, getLevels };
 
 })();
 
