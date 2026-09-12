@@ -64,6 +64,10 @@ const App = (() => {
     if (!_currentCard || !_isRevealed) return;
 
     const id     = _currentCard.rank;
+    // Consume this card before the animation delay so repeated inputs cannot
+    // award XP, update its schedule, or queue another advance a second time.
+    _currentCard = null;
+    _isRevealed = false;
     const result = SRS.recordAnswer(id, q);
 
     // Session score
