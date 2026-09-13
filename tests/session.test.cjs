@@ -15,6 +15,7 @@ function boot() {
     document: { addEventListener() {}, getElementById(id) {
       if (!elements.has(id)) elements.set(id, {
         textContent: '', style: {}, classList: { add() {}, remove() {} },
+        setAttribute(name, value) { this[name] = String(value); },
         addEventListener() {},
       });
       return elements.get(id);
@@ -72,4 +73,48 @@ test('counters reflect the next displayed card after a transition', () => {
   app.timers.find(t => t.delay === 400).fn();
   assert.equal(app.elements.get('stat-new').textContent, app.run('SRS.getStats().new'));
   assert.equal(app.elements.get('stat-due').textContent, app.run('SRS.getStats().due'));
+});
+
+test('missed cards return after two intervening answers', () => {
+  const app = boot();
+  function answerAndAdvance(quality) {
+    app.run(`App.reveal(); App.answer(${quality})`);
+    const index = app.timers.findIndex(t => t.delay === 400);
+    assert.notEqual(index, -1);
+    app.timers.splice(index, 1)[0].fn();
+  }
+
+  answerAndAdvance(0);
+  assert.equal(app.elements.get('card-rank').textContent, '#2');
+  assert.equal(app.elements.get('stat-retry').textContent, 1);
+  answerAndAdvance(4);
+  assert.equal(app.elements.get('card-rank').textContent, '#3');
+  answerAndAdvance(4);
+  assert.equal(app.elements.get('card-rank').textContent, '#1');
+  assert.equal(app.elements.get('stat-retry').textContent, 0);
+});
+
+test('long-term progress reports practiced and mastered vocabulary', () => {
+  const app = boot();
+  function answerAndAdvance(quality) {
+    app.run(`App.reveal(); App.answer(${quality})`);
+    const index = app.timers.findIndex(t => t.delay === 400);
+    app.timers.splice(index, 1)[0].fn();
+  }
+
+  assert.equal(app.elements.get('mastery-label').textContent, '0 of 500 practiced · 0 mastered');
+  answerAndAdvance(4);
+  assert.equal(app.elements.get('mastery-label').textContent, '1 of 500 practiced · 0 mastered');
+  assert.equal(app.elements.get('mastery-bar-fill')['aria-valuenow'], '0.2');
+});
+
+test('index provides every UI element required by the app', () => {
+  const appSource = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const requiredIds = [...appSource.matchAll(/getElementById\('([^']+)'\)/g)]
+    .map(match => match[1]);
+
+  for (const id of new Set(requiredIds)) {
+    assert.match(html, new RegExp(`id=["']${id}["']`), `missing #${id} in index.html`);
+  }
 });
