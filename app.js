@@ -131,6 +131,17 @@ const App = (() => {
     document.getElementById('stat-due').textContent     = s.due;
     document.getElementById('stat-new').textContent     = s.new;
     document.getElementById('stat-learned').textContent = s.learned;
+    document.getElementById('stat-retry').textContent   = s.retry;
+
+    // Long-term progress stays visible independently of the current session.
+    const progressPct = s.total > 0
+      ? Math.round((s.practiced / s.total) * 1000) / 10
+      : 0;
+    const masteryFill = document.getElementById('mastery-bar-fill');
+    masteryFill.style.width = progressPct + '%';
+    masteryFill.setAttribute('aria-valuenow', progressPct);
+    document.getElementById('mastery-label').textContent =
+      `${s.practiced} of ${s.total} practiced · ${s.learned} mastered`;
 
     // Session score
     document.getElementById('session-correct').textContent   = _sessionScore.correct;

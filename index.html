@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>LÉXICO</title>
@@ -33,7 +33,7 @@
     }
 
     html, body {
-      height: 100%;
+      min-height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
@@ -44,11 +44,13 @@
     /* ── Layout ────────────────────────────────────────────────────────── */
     #app {
       height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       max-width: 480px;
       margin: 0 auto;
-      padding: env(safe-area-inset-top, 12px) 16px env(safe-area-inset-bottom, 16px);
+      padding: calc(8px + env(safe-area-inset-top)) 16px calc(12px + env(safe-area-inset-bottom));
+      overflow-y: auto;
     }
 
     /* ── Header ────────────────────────────────────────────────────────── */
@@ -187,6 +189,44 @@
     .stat-pill.due   .val { color: var(--gold); }
     .stat-pill.new   .val { color: var(--blue); }
     .stat-pill.learned .val { color: var(--green); }
+    .stat-pill.retry .val { color: var(--red); }
+
+    /* ── Mastery Progress ───────────────────────────────────────────────── */
+    #mastery-section {
+      flex-shrink: 0;
+      margin: -2px 0 10px;
+    }
+
+    .mastery-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 5px;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+
+    .mastery-title {
+      color: var(--green);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .mastery-track {
+      height: 5px;
+      overflow: hidden;
+      background: var(--surface2);
+      border-radius: 3px;
+    }
+
+    #mastery-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #287a48, var(--green));
+      border-radius: 3px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
     /* ── Card Area ──────────────────────────────────────────────────────── */
     #card-area {
@@ -227,6 +267,7 @@
       justify-content: center;
       padding: 28px 24px;
       box-shadow: var(--shadow);
+      overflow-y: auto;
     }
 
     /* Front */
@@ -368,6 +409,7 @@
       padding: 14px 4px 10px;
       font-size: 0.8rem;
       border-radius: 14px;
+      min-height: 58px;
     }
 
     .btn-answer-opt .emoji { font-size: 1.3rem; }
@@ -592,12 +634,25 @@
     @media (max-height: 700px) {
       #card { height: 220px; }
       #stats-row { margin-bottom: 8px; }
+      #mastery-section { margin-bottom: 6px; }
       #keyboard-hint { display: none; }
     }
 
     @media (max-height: 600px) {
       #card { height: 190px; }
       #stats-row { display: none; }
+      #card-wrapper { margin-bottom: 12px; }
+      header { padding-top: 4px; }
+    }
+
+    @media (max-width: 390px) {
+      #app { padding-left: 12px; padding-right: 12px; }
+      .header-right { gap: 6px; }
+      .streak-badge { padding: 5px 9px; }
+      .stat-pill { padding: 7px 3px; }
+      .stat-pill .val { font-size: 1.05rem; }
+      .btn-answer-opt { padding-left: 2px; padding-right: 2px; }
+      .btn-answer-opt .emoji { font-size: 1.15rem; }
     }
   </style>
 </head>
@@ -645,6 +700,22 @@
     <div class="stat-pill learned">
       <span class="val" id="stat-learned">0</span>
       <span class="lbl">Learned</span>
+    </div>
+    <div class="stat-pill retry" title="Missed or hard words returning this session">
+      <span class="val" id="stat-retry">0</span>
+      <span class="lbl">Retry</span>
+    </div>
+  </div>
+
+  <!-- Long-term mastery progress -->
+  <div id="mastery-section">
+    <div class="mastery-meta">
+      <span class="mastery-title">Vocabulary progress</span>
+      <span id="mastery-label">0 of 500 practiced · 0 mastered</span>
+    </div>
+    <div class="mastery-track">
+      <div id="mastery-bar-fill" role="progressbar" aria-label="Vocabulary practiced"
+           aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
     </div>
   </div>
 
@@ -762,8 +833,8 @@
 <!-- Scripts — order matters -->
 <script src="vocab-1-250.js"></script>
 <script src="vocab-251-500.js"></script>
-<script src="srs.js?v=20260912-session"></script>
-<script src="app.js?v=20260912-session"></script>
+<script src="srs.js?v=20260913-progress"></script>
+<script src="app.js?v=20260913-progress"></script>
 
 </body>
 </html>

@@ -54,6 +54,8 @@ const SRS = (() => {
   let _cardMap     = {};   // id → card object (for fast lookup)
   let _schedules   = {};   // id → { ef, interval, repetitions, nextReview, lastReview }
   let _sessionNew  = 0;    // New cards introduced this session
+  let _sessionAnswers = 0; // Answers recorded in the current session
+  let _retryQueue  = [];   // Missed/hard cards scheduled to return this session
   let _totalXP     = 0;
   let _streak      = { count: 0, lastDate: null };
 
@@ -212,11 +214,15 @@ const SRS = (() => {
     allCards.forEach(c => { _cardMap[c.rank] = c; });
     _load();
     _sessionNew = 0;
+    _sessionAnswers = 0;
+    _retryQueue = [];
   }
 
   // Add more vocab chunks without resetting existing progress
   function startSession() {
     _sessionNew = 0;
+    _sessionAnswers = 0;
+    _retryQueue = [];
   }
 
   function addCards(moreCards) {
@@ -230,11 +236,20 @@ const SRS = (() => {
 
   // Returns the next card object to show, or null if session is done
   function getNextCard() {
-    // 1. Due cards first (most overdue)
+    // 1. Retry missed/hard cards after two intervening answers.
+    const readyRetryIndex = _retryQueue.findIndex(item =>
+      item.readyAfter <= _sessionAnswers && _cardMap[item.id]
+    );
+    if (readyRetryIndex >= 0) {
+      const [{ id }] = _retryQueue.splice(readyRetryIndex, 1);
+      return _cardMap[id];
+    }
+
+    // 2. Due cards first (most overdue)
     const due = _sortByDue(_getDueCards());
     if (due.length > 0) return due[0];
 
-    // 2. New cards (up to session limit)
+    // 3. New cards (up to session limit)
     if (_sessionNew < NEW_CARDS_PER_SESSION) {
       const newCards = _getNewCards();
       if (newCards.length > 0) {
@@ -246,7 +261,13 @@ const SRS = (() => {
       }
     }
 
-    // 3. Nothing left for this session
+    // 4. If the session has no other cards, do not strand a pending retry.
+    if (_retryQueue.length > 0) {
+      const [{ id }] = _retryQueue.splice(0, 1);
+      return _cardMap[id] || null;
+    }
+
+    // 5. Nothing left for this session
     return null;
   }
 
@@ -258,6 +279,13 @@ const SRS = (() => {
 
     // Update SM-2 schedule
     _schedules[id] = _sm2(_schedules[id], q);
+    _sessionAnswers++;
+
+    // Give difficult cards another pass in this session, with enough spacing
+    // to require recall rather than an immediate repeat.
+    if (q < 3 && !_retryQueue.some(item => item.id === id)) {
+      _retryQueue.push({ id, readyAfter: _sessionAnswers + 2 });
+    }
 
     // Award XP
     const earned = _xpForQuality(q);
@@ -279,6 +307,9 @@ const SRS = (() => {
       const s = _schedules[id];
       return s && s.repetitions >= 2;
     }).length;
+    const practiced = Object.keys(_schedules).filter(id =>
+      _cardMap[id] && _schedules[id]?.lastReview !== null
+    ).length;
 
     const levelInfo = _getLevel(_totalXP);
 
@@ -286,6 +317,8 @@ const SRS = (() => {
       due,
       new:     newCount,
       learned,
+      practiced,
+      retry:   _retryQueue.length,
       total:   _allCards.length,
       streak:  _streak.count,
       xp:      _totalXP,
@@ -302,6 +335,8 @@ const SRS = (() => {
     _totalXP    = 0;
     _streak     = { count: 0, lastDate: null };
     _sessionNew = 0;
+    _sessionAnswers = 0;
+    _retryQueue = [];
     _save();
   }
 
